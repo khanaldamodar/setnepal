@@ -9,6 +9,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useCart } from "@/hooks/use-cart";
+import { useCartContext } from "@/context/CartContext";
+
 
 import { AutoplayPlugin } from "./SliderAutoplay";
 import { Button } from "../ui/button";
@@ -32,7 +34,8 @@ interface ProductSliderProps {
 const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [addedToCart, setAddedToCart] = useState<number | null>(null);
-  const { addToCart } = useCart();
+  // const { addToCart } = useCart();
+  const { addToCart } = useCartContext();
 
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
     {

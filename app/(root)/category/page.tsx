@@ -7,8 +7,14 @@ import "keen-slider/keen-slider.min.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
+import Image from "next/image";
 import Heading from "@/components/global/Heading";
+import ScienceImg from "./images/science.png";
+import MathsImg from "./images/maths.png";
+import ITImg from "./images/IT.png";
+import ICTImg from "./images/ICT.png";
+import RoboticsImg from "./images/robotics.jpg";
+import AIImg from "./images/AI.png";
 
 interface Category {
   id: number;
@@ -16,7 +22,6 @@ interface Category {
   description: string;
   category: string;
   productCount: number;
-  imageUrl?: string; // optional
 }
 
 export function FeaturedPackages() {
@@ -52,15 +57,14 @@ export function FeaturedPackages() {
     slider.on("updated", start);
   };
 
-  // Keen Slider setup
   const [sliderRef, instanceRef] = useKeenSlider(
     {
       loop: true,
       mode: "free",
-      slides: { perView: 1, spacing: 16 }, // default: 1 card
+      slides: { perView: 1, spacing: 16 },
       breakpoints: {
-        "(min-width: 768px)": { slides: { perView: 2, spacing: 20 } }, // md: 2 cards
-        "(min-width: 1024px)": { slides: { perView: 4, spacing: 24 } }, // lg: 4 cards
+        "(min-width: 768px)": { slides: { perView: 2, spacing: 20 } },
+        "(min-width: 1024px)": { slides: { perView: 4, spacing: 24 } },
       },
     },
     [autoplay]
@@ -83,6 +87,25 @@ export function FeaturedPackages() {
 
     fetchCategories();
   }, []);
+
+  const getStaticImageById = (id: number) => {
+    switch (id) {
+      case 1:
+        return ScienceImg;
+      case 2:
+        return MathsImg;
+      case 3:
+        return ITImg;
+      case 4:
+        return ICTImg;
+      case 5:
+        return RoboticsImg;
+      case 6:
+        return AIImg;
+      default:
+        return ScienceImg;
+    }
+  };
 
   if (loading) {
     return (
@@ -149,14 +172,14 @@ export function FeaturedPackages() {
           {categories.map((c) => (
             <div key={c.id} className="keen-slider__slide">
               <Link href={`/category/${c.id}`}>
-                <div className="w-full  h-48 lg:w-48 rounded-full bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col justify-center items-center p-4">
-                  {c.imageUrl && (
-                    <img
-                      src={c.imageUrl}
-                      alt={c.name}
-                      className="w-full h-24 object-cover rounded-md mb-2"
-                    />
-                  )}
+                <div className="w-full h-64 lg:w-56 rounded-xl bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col justify-center items-center p-4">
+                  <Image
+                    src={getStaticImageById(c.id)}
+                    alt={c.name}
+                    width={350}
+                    height={200}
+                    className="w-full h-32 lg:h-40 object-cover rounded-md mb-2"
+                  />
                   <h3 className="font-semibold text-foreground text-sm text-center line-clamp-2">
                     {c.name}
                   </h3>
