@@ -73,6 +73,9 @@ model Product {
 
   packages    Package[] @relation("PackageProducts")
   orderItems  OrderItem[]
+
+  quotationItems QuotationItem[]
+
 }
 
 model Package {
@@ -202,6 +205,51 @@ model Certificates {
   title  String?
   image  String?
 }
+model Quotation {
+  id            Int              @id @default(autoincrement())
+
+  // Customer Information (directly stored)
+  name          String
+  email         String
+  phone         String
+  address       String?
+
+  // Extra fields (optional)
+  companyName   String?
+  message       String? @db.Text
+
+  status        QuotationStatus  @default(PENDING)
+  total         Float            @default(0)
+
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  items         QuotationItem[]
+}
+
+
+
+model QuotationItem {
+  id           Int        @id @default(autoincrement())
+  
+  quotationId  Int
+  quotation    Quotation  @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  productId    Int
+  product      Product    @relation(fields: [productId], references: [id])
+
+  quantity     Int        @default(1)
+  price        Float
+  subtotal     Float
+}
+
+
+enum QuotationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 
 
 
