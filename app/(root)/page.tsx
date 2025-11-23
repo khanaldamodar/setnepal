@@ -6,6 +6,7 @@ import HappyClientsSlider from "@/components/Homepage-components/HappyClientsSli
 import Introduction from "@/components/Homepage-components/Introduction";
 import { getProducts } from "@/lib/settings";
 import { FeaturedPackages } from "./category/page";
+import CertificateSliderPage from "@/components/Homepage-components/Certificate";
 
 export default async function Home() {
   const products = await getProducts();
@@ -120,7 +121,8 @@ export default async function Home() {
       <div className=" justify-center flex flex-col items-center text-white font-poppins">
         <Heading title="Our Products" />
         <ProductSlider products={products} />
-        <HappyClientsSlider certificates={certificates} />
+        {/* <HappyClientsSlider certificates={certificates} /> */}
+        <CertificateSliderPage />
       </div>
 
       {/* Happy CLients */}

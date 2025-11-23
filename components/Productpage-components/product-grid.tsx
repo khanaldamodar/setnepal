@@ -83,20 +83,20 @@ export function ProductGrid({ products }: ProductGridProps) {
               </div>
 
               {/* Rating */}
-              <div className="mb-3 flex items-center gap-1">
+              {/* <div className="mb-3 flex items-center gap-1">
                 <div className="flex text-yellow-400">
                   {"★".repeat(Math.floor(product.rating))}
                 </div>
                 <span className="text-xs text-muted-foreground">
                   ({product.rating})
                 </span>
-              </div>
+              </div> */}
 
               {/* Price and Button */}
               <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-foreground">
+                {/* <span className="text-lg font-bold text-foreground">
                   Rs. {product.price.toFixed(2)}
-                </span>
+                </span> */}
                 <Button
                   size="sm"
                   variant={addedItems.has(product.id) ? "default" : "default"}

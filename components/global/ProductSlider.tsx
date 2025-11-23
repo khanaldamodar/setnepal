@@ -1,40 +1,38 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { useKeenSlider } from "keen-slider/react"
-import "keen-slider/keen-slider.min.css"
-import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { useCart } from "@/hooks/use-cart"
+import type React from "react";
+import { useState } from "react";
+import { useKeenSlider } from "keen-slider/react";
+import "keen-slider/keen-slider.min.css";
+import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { useCart } from "@/hooks/use-cart";
 
-import { AutoplayPlugin } from "./SliderAutoplay"
-import { Button } from "../ui/button"
+import { AutoplayPlugin } from "./SliderAutoplay";
+import { Button } from "../ui/button";
 
 interface Product {
-  id: number
-  name: string
-  price: number
-  imageUrl: string
-  description?: string
-  category?: string
-  rating?: number
-  stock?: number
-  sku?: string
-
-
+  id: number;
+  name: string;
+  price: number;
+  imageUrl: string;
+  description?: string;
+  category?: string;
+  rating?: number;
+  stock?: number;
+  sku?: string;
 }
 
 interface ProductSliderProps {
-  products: Product[]
+  products: Product[];
 }
 
 const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [addedToCart, setAddedToCart] = useState<number | null>(null)
-  const { addToCart } = useCart()
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [addedToCart, setAddedToCart] = useState<number | null>(null);
+  const { addToCart } = useCart();
 
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
     {
@@ -52,25 +50,25 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
         },
       },
       slideChanged(slider) {
-        setCurrentSlide(slider.track.details.rel)
+        setCurrentSlide(slider.track.details.rel);
       },
     },
-    [AutoplayPlugin(3000)],
-  )
+    [AutoplayPlugin(3000)]
+  );
 
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
-    e.preventDefault()
+    e.preventDefault();
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.imageUrl,
       category: product.category || "Products",
-    })
+    });
 
-    setAddedToCart(product.id)
-    setTimeout(() => setAddedToCart(null), 2000)
-  }
+    setAddedToCart(product.id);
+    setTimeout(() => setAddedToCart(null), 2000);
+  };
 
   return (
     <div className="relative w-full py-5 px-8 md:px-20 font-poppins">
@@ -107,32 +105,37 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
                 </div>
 
                 <div className="p-4 flex flex-col grow">
-                  <h3 className="font-semibold text-lg mb-1 text-gray-800 line-clamp-1">{product.name}</h3>
+                  <h3 className="font-semibold text-lg mb-1 text-gray-800 line-clamp-1">
+                    {product.name}
+                  </h3>
                   <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-                    {product.description || "High-quality product built for performance and durability."}
+                    {product.description ||
+                      "High-quality product built for performance and durability."}
                   </p>
 
                   {product.rating && (
                     <div className="flex items-center gap-1 mb-2">
                       <span className="text-yellow-400">★</span>
-                      <span className="text-sm text-gray-600">{product.rating}</span>
+                      <span className="text-sm text-gray-600">
+                        {product.rating}
+                      </span>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between mt-auto">
                     <div className="flex  items-center  justify-center gap-8">
                       {/* Original Price (strikethrough) */}
-                      <span className="text-gray-400 line-through text-sm">
+                      {/* <span className="text-gray-400 line-through text-sm">
                         Rs. {(product.price).toLocaleString()}
-                      </span>
+                      </span> */}
 
                       {/* Discounted Price */}
                       <span className="text-lg font-semibold text-[#d86d38]">
-                        Rs. {(product.price * 0.9).toLocaleString()} {/* 10% off example */}
+                        {/* Rs. {(product.price * 0.9).toLocaleString()}{" "} */}
+                        {/* 10% off example */}
                       </span>
                     </div>
                   </div>
-
                 </div>
               </motion.div>
             </Link>
@@ -140,8 +143,11 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
             <div className="px-4 pb-4">
               <button
                 onClick={(e) => handleAddToCart(e, product)}
-                className={`w-full py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-300 ${addedToCart === product.id ? "bg-green-600 text-white" : "bg-secondary text-white hover:bg-primary"
-                  }`}
+                className={`w-full py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-300 ${
+                  addedToCart === product.id
+                    ? "bg-green-600 text-white"
+                    : "bg-secondary text-white hover:bg-primary"
+                }`}
               >
                 <ShoppingCart size={18} />
                 {addedToCart === product.id ? "Added!" : "Add to Cart"}
@@ -165,21 +171,27 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
           <button
             key={idx}
             onClick={() => instanceRef.current?.moveToIdx(idx)}
-            className={`w-3 h-3 rounded-full transition-all ${currentSlide === idx ? "bg-green-600 scale-110" : "bg-gray-300 hover:bg-gray-400"
-              }`}
+            className={`w-3 h-3 rounded-full transition-all ${
+              currentSlide === idx
+                ? "bg-green-600 scale-110"
+                : "bg-gray-300 hover:bg-gray-400"
+            }`}
           ></button>
         ))}
       </div>
 
       <div className="mt-12 text-center">
         <Link href="/products">
-          <Button size="lg" className="bg-secondary hover:text-primary hover:bg-blue-900">
+          <Button
+            size="lg"
+            className="bg-secondary hover:text-primary hover:bg-blue-900"
+          >
             View All Products
           </Button>
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProductSlider
+export default ProductSlider;

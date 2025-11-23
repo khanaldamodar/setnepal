@@ -48,7 +48,10 @@ export function PackageGrid() {
         name: pkg.name,
         price: pkg.price,
         image: pkg.imageUrl,
-        category: pkg.category,
+        category:
+          typeof pkg.category === "string"
+            ? pkg.category
+            : pkg.category?.name ?? "",
       },
       1
     );

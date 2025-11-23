@@ -19,7 +19,7 @@ export default function ProductsPage() {
   }>({
     categories: [],
     brands: [],
-    priceRange: [0, Infinity],
+    priceRange: [0, 1000000],
     minRating: 0,
   });
 

@@ -9,7 +9,7 @@ import Link from "next/link";
 import { ChevronRight, Lock } from "lucide-react";
 import CryptoJS from "crypto-js";
 
-export default function PaymentPage() {
+export default function PaymentPage({ packages }: { packages?: any[] }) {
   const router = useRouter();
   const { cart, isLoaded, subtotal, tax, total, clearCart } = useCart();
   const [checkoutData, setCheckoutData] = useState<any>(null);
@@ -20,12 +20,31 @@ export default function PaymentPage() {
   // Load checkout data
   useEffect(() => {
     const data = sessionStorage.getItem("checkoutData");
-    if (data) {
-      setCheckoutData(JSON.parse(data));
-    } else {
-      router.push("/checkout");
-    }
+    if (data) setCheckoutData(JSON.parse(data));
+    else router.push("/checkout");
   }, [router]);
+
+  // Combine products and packages for orderItems
+  const orderItems = [
+    ...cart.map((item) => ({
+      productId: item.id,
+      quantity: item.quantity,
+      price: item.price, // frontend price
+      name: item.name,
+    })),
+    ...(packages?.map((pkg) => ({
+      productId: pkg.id, // package ID (unique)
+      quantity: 1,
+      price: pkg.price, // frontend price for package
+      name: pkg.name,
+      products: pkg.products?.map((p: any) => ({ id: p.id, name: p.name })),
+    })) ?? []),
+  ];
+
+  const calculatedTotal = orderItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   if (!isLoaded || !checkoutData) {
     return (
@@ -37,7 +56,7 @@ export default function PaymentPage() {
     );
   }
 
-  if (cart.length === 0) {
+  if (cart.length === 0 && (!packages || packages.length === 0)) {
     return (
       <main className="min-h-screen bg-background">
         <div className="mx-auto max-w-7xl px-4 py-8">
@@ -60,43 +79,40 @@ export default function PaymentPage() {
     total_amount,
     transaction_uuid,
     product_code,
-  }) => {
+  }: any) => {
     const message = `total_amount=${total_amount},transaction_uuid=${transaction_uuid},product_code=${product_code}`;
     const secret = process.env.NEXT_PUBLIC_ESEWA_SECRET_KEY;
-
     const hash = CryptoJS.HmacSHA256(message, secret);
     return CryptoJS.enc.Base64.stringify(hash);
   };
-
-  // MAIN FUNCTION — Place Order + eSewa Redirect
 
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
     setError(null);
 
-    const shippingAddress = `${checkoutData.billingAddress.fullName}, ${
-      checkoutData.billingAddress.province
-    }, ${checkoutData.billingAddress.district}, ${
-      checkoutData.billingAddress.municipality
-    }, Ward ${checkoutData.billingAddress.ward}${
-      checkoutData.billingAddress.zipCode
-        ? `, ${checkoutData.billingAddress.zipCode}`
-        : ""
-    }`;
-
-    const payload = {
-      items: cart.map((item) => ({
-        productId: item.id,
-        quantity: item.quantity,
-      })),
-      shippingAddress,
-      paymentMethod,
-    };
-
     try {
+      const shippingAddress = `${checkoutData.billingAddress.fullName}, ${
+        checkoutData.billingAddress.province
+      }, ${checkoutData.billingAddress.district}, ${
+        checkoutData.billingAddress.municipality
+      }, Ward ${checkoutData.billingAddress.ward}${
+        checkoutData.billingAddress.zipCode
+          ? `, ${checkoutData.billingAddress.zipCode}`
+          : ""
+      }`;
+
+      const payload = {
+        items: orderItems.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price, // frontend price
+        })),
+        shippingAddress,
+        paymentMethod,
+      };
+
       const token = localStorage.getItem("token");
 
-      // Create order in DB first
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -112,25 +128,24 @@ export default function PaymentPage() {
       }
 
       const order = await res.json();
+
       clearCart();
       sessionStorage.removeItem("checkoutData");
 
-      // If ESEWA, redirect
+      // Handle eSewa Payment
       if (paymentMethod === "ESEWA") {
         const transaction_uuid = "TXN-" + Date.now();
-
-        // On your PaymentPage.tsx, inside handlePlaceOrder, when preparing eSewa form:
         const formData: any = {
-          amount: total.toString(),
+          amount: calculatedTotal.toString(),
           tax_amount: "0",
-          total_amount: total.toString(),
+          total_amount: calculatedTotal.toString(),
           transaction_uuid,
           product_code: "EPAYTEST",
           product_service_charge: "0",
           product_delivery_charge: "0",
           signed_field_names: "total_amount,transaction_uuid,product_code",
           signature: generateEsewaSignature({
-            total_amount: total.toString(),
+            total_amount: calculatedTotal.toString(),
             transaction_uuid,
             product_code: "EPAYTEST",
           }),
@@ -143,8 +158,6 @@ export default function PaymentPage() {
           )}`,
           failure_url: `http://localhost:3007/esewa/failure?orderId=${order.id}`,
         };
-
-        formData.signature = generateEsewaSignature(formData);
 
         const form = document.createElement("form");
         form.method = "POST";
@@ -163,7 +176,6 @@ export default function PaymentPage() {
         return;
       }
 
-      //  If COD or Bank, just redirect to confirmation
       router.push(`/order-confirmation/${order.id}`);
     } catch (err: any) {
       setError(err.message);
@@ -175,7 +187,7 @@ export default function PaymentPage() {
   return (
     <main className="min-h-screen font-poppins py-15">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* HEADER */}
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Payment</h1>
           <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
@@ -190,13 +202,12 @@ export default function PaymentPage() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Payment Options */}
+          {/* Payment + Billing */}
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6">
               <h2 className="mb-4 text-xl font-bold text-foreground">
                 Payment Method
               </h2>
-
               <div className="space-y-3">
                 {["COD", "Bank", "ESEWA"].map((method) => (
                   <label
@@ -217,7 +228,6 @@ export default function PaymentPage() {
               </div>
             </Card>
 
-            {/* Billing Address */}
             <Card className="p-6">
               <h2 className="mb-4 text-xl font-bold text-foreground">
                 Billing Address
@@ -243,17 +253,30 @@ export default function PaymentPage() {
               </h2>
 
               <div className="mb-4 max-h-64 space-y-3 overflow-y-auto border-b border-border pb-4">
-                {cart.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <div>
-                      <p className="font-medium text-foreground">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Qty: {item.quantity}
+                {orderItems.map((item: any) => (
+                  <div
+                    key={item.productId}
+                    className="flex flex-col text-sm border-b border-border pb-2"
+                  >
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Qty: {item.quantity}
+                        </p>
+                      </div>
+                      <p className="font-medium text-foreground">
+                        Rs. {(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
-                    <p className="font-medium text-foreground">
-                      Rs. {(item.price * item.quantity).toFixed(2)}
-                    </p>
+                    {item.products && (
+                      <p className="text-xs text-muted-foreground">
+                        Includes:{" "}
+                        {item.products.map((p: any) => p.name).join(", ")}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>

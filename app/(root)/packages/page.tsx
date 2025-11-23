@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { PackageFilters } from "@/components/package-components/package-filter"
-import { PackageGrid } from "@/components/package-components/package-grid"
-import { ProductPagination } from "@/components/Productpage-components/product-pagination"
-import { useState, useMemo } from "react"
+import { PackageFilters } from "@/components/package-components/package-filter";
+import { PackageGrid } from "@/components/package-components/package-grid";
+import { ProductPagination } from "@/components/Productpage-components/product-pagination";
+import { useState, useMemo } from "react";
 
 // Sample package data
 const SAMPLE_PACKAGES = [
@@ -115,41 +115,45 @@ const SAMPLE_PACKAGES = [
       { id: 2, name: "USB-C Cable", price: 19.99 },
     ],
   },
-]
+];
 
-const ITEMS_PER_PAGE = 6
+const ITEMS_PER_PAGE = 6;
 
 export default function PackagesPage() {
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
     categories: [],
-    priceRange: [0, 1000],
+    priceRange: [0, 100000],
     minRating: 0,
-  })
+  });
 
   // Filter packages based on selected filters
   const filteredPackages = useMemo(() => {
     return SAMPLE_PACKAGES.filter((pkg) => {
-      const categoryMatch = filters.categories.length === 0 || filters.categories.includes(pkg.category)
-      const priceMatch = pkg.price >= filters.priceRange[0] && pkg.price <= filters.priceRange[1]
-      const ratingMatch = pkg.rating >= filters.minRating
+      const categoryMatch =
+        filters.categories.length === 0 ||
+        filters.categories.includes(pkg.category);
+      const priceMatch =
+        pkg.price >= filters.priceRange[0] &&
+        pkg.price <= filters.priceRange[1];
+      const ratingMatch = pkg.rating >= filters.minRating;
 
-      return categoryMatch && priceMatch && ratingMatch
-    })
-  }, [filters])
+      return categoryMatch && priceMatch && ratingMatch;
+    });
+  }, [filters]);
 
   // Paginate filtered packages
-  const totalPages = Math.ceil(filteredPackages.length / ITEMS_PER_PAGE)
+  const totalPages = Math.ceil(filteredPackages.length / ITEMS_PER_PAGE);
   const paginatedPackages = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-    return filteredPackages.slice(startIndex, startIndex + ITEMS_PER_PAGE)
-  }, [filteredPackages, currentPage])
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredPackages.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredPackages, currentPage]);
 
   // Reset to page 1 when filters change
   const handleFilterChange = (newFilters: typeof filters) => {
-    setFilters(newFilters)
-    setCurrentPage(1)
-  }
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
 
   return (
     <main className="min-h-screen font-poppins">
@@ -158,7 +162,8 @@ export default function PackagesPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Packages</h1>
           <p className="mt-2 text-muted-foreground">
-            Curated bundles of {filteredPackages.length} packages to save you money
+            Curated bundles of {filteredPackages.length} packages to save you
+            money
           </p>
         </div>
 
@@ -166,7 +171,10 @@ export default function PackagesPage() {
         <div className="flex gap-8">
           {/* Sidebar Filters */}
           <aside className="w-full shrink-0 md:w-64">
-            <PackageFilters filters={filters} onFilterChange={handleFilterChange} />
+            <PackageFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+            />
           </aside>
 
           {/* Packages Section */}
@@ -175,14 +183,22 @@ export default function PackagesPage() {
               <>
                 <PackageGrid packages={paginatedPackages} />
                 <div className="mt-8">
-                  <ProductPagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                  <ProductPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
                 </div>
               </>
             ) : (
               <div className="flex h-96 items-center justify-center rounded-lg border border-border bg-card">
                 <div className="text-center">
-                  <p className="text-lg font-medium text-foreground">No packages found</p>
-                  <p className="mt-2 text-sm text-muted-foreground">Try adjusting your filters</p>
+                  <p className="text-lg font-medium text-foreground">
+                    No packages found
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Try adjusting your filters
+                  </p>
                 </div>
               </div>
             )}
@@ -190,5 +206,5 @@ export default function PackagesPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }

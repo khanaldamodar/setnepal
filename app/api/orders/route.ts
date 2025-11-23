@@ -214,9 +214,59 @@ export async function GET(req: NextRequest) {
 }
 
 // POST: create order
+// export async function POST(req: NextRequest) {
+//   try {
+//     // const user = requireAuth(req);
+//     const body = await req.json();
+//     const { items, shippingAddress, paymentMethod } = body;
+
+//     if (!items || !items.length) {
+//       return NextResponse.json({ message: "Order items are required" }, { status: 400 });
+//     }
+
+//     let total = 0;
+//     const orderItemsData = [];
+
+//     for (const item of items) {
+//       const product = await prisma.product.findUnique({ where: { id: item.productId } });
+//       if (!product) return NextResponse.json({ message: `Product ${item.productId} not found` }, { status: 400 });
+//       if (product.stock < item.quantity) return NextResponse.json({ message: `Insufficient stock for ${product.name}` }, { status: 400 });
+
+//       total += product.price * item.quantity;
+//       orderItemsData.push({
+//         productId: product.id,
+//         quantity: item.quantity,
+//         price: product.price,
+//       });
+
+//       // Reduce stock
+//       await prisma.product.update({
+//         where: { id: product.id },
+//         data: { stock: product.stock - item.quantity },
+//       });
+//     }
+
+//     const order = await prisma.order.create({
+//       data: {
+//         userId: 2,
+//         total,
+//         shippingAddress,
+//         paymentMethod,
+//         items: { create: orderItemsData },
+//       },
+//       include: { items: { include: { product: true } }, payments: true },
+//     });
+
+//     return NextResponse.json(order, { status: 201 });
+//   } catch (err) {
+//     console.error(err);
+//     return NextResponse.json({ message: "Failed to create order" }, { status: 500 });
+//   }
+// }
+
 export async function POST(req: NextRequest) {
   try {
-    // const user = requireAuth(req);
+    // const user = requireAuth(req); // uncomment if using auth
     const body = await req.json();
     const { items, shippingAddress, paymentMethod } = body;
 
@@ -228,27 +278,35 @@ export async function POST(req: NextRequest) {
     const orderItemsData = [];
 
     for (const item of items) {
+      // Check if item exists as a real product
       const product = await prisma.product.findUnique({ where: { id: item.productId } });
-      if (!product) return NextResponse.json({ message: `Product ${item.productId} not found` }, { status: 400 });
-      if (product.stock < item.quantity) return NextResponse.json({ message: `Insufficient stock for ${product.name}` }, { status: 400 });
 
-      total += product.price * item.quantity;
+      if (product) {
+        // It's a real product, check stock
+        if (product.stock < item.quantity)
+          return NextResponse.json({ message: `Insufficient stock for ${product.name}` }, { status: 400 });
+
+        // Reduce stock for real products only
+        await prisma.product.update({
+          where: { id: product.id },
+          data: { stock: product.stock - item.quantity },
+        });
+      }
+
+      // Use frontend price for both products & packages
+      const itemTotal = item.price * item.quantity;
+      total += itemTotal;
+
       orderItemsData.push({
-        productId: product.id,
+        productId: item.productId,
         quantity: item.quantity,
-        price: product.price,
-      });
-
-      // Reduce stock
-      await prisma.product.update({
-        where: { id: product.id },
-        data: { stock: product.stock - item.quantity },
+        price: item.price, 
       });
     }
 
     const order = await prisma.order.create({
       data: {
-        userId: 2,
+        userId: 2, 
         total,
         shippingAddress,
         paymentMethod,
@@ -263,6 +321,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Failed to create order" }, { status: 500 });
   }
 }
+
 
 // PATCH: update order (admin only)
 export async function PATCH(req: NextRequest) {
