@@ -92,6 +92,7 @@ const QuotationsPage = () => {
             columns={["name", "email", "phone", "companyName"]}
             data={quotations}
             setData={setQuotations}
+            actions={["view"]}
             renderCell={(column, row) => {
               if (column === "status") {
                 return (
