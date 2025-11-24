@@ -16,6 +16,7 @@ import { PiPackageFill } from "react-icons/pi";
 import { IoMdSettings } from "react-icons/io";
 import { TbTruckDelivery } from "react-icons/tb";
 import { GrGallery } from "react-icons/gr";
+import { TbQuotes } from "react-icons/tb";
 import { User } from "lucide-react";
 
 export default function Sidebar() {
@@ -102,6 +103,12 @@ export default function Sidebar() {
       label: "Settings",
       icon: <IoMdSettings />,
       path: "/admin/settings",
+    },
+    {
+      id: "quotations",
+      label: "Quotations",
+      icon: <TbQuotes />,
+      path: "/admin/quotation",
     },
   ];
 

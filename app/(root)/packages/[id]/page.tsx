@@ -434,19 +434,29 @@ export default function PackageDetailPage() {
             <h2 className="text-2xl font-bold text-foreground mb-6">
               Included Products ({pkg.products.length})
             </h2>
+
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {pkg.products.map((product) => (
                 <Card key={product.id} className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h4 className="font-semibold text-foreground">
-                        {product.name}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {product.description}
-                      </p>
+                  {/* Product Image */}
+                  {product.imageUrl && (
+                    <div className="w-full h-40 mb-3 overflow-hidden rounded-lg bg-muted">
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  </div>
+                  )}
+
+                  <h4 className="font-semibold text-foreground">
+                    {product.name}
+                  </h4>
+
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {product.description}
+                  </p>
+
                   <p className="text-lg font-bold text-foreground">
                     Rs. {product.price.toFixed(2)}
                   </p>

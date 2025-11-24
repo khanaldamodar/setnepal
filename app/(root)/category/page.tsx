@@ -15,7 +15,7 @@ import ITImg from "./images/IT.png";
 import ICTImg from "./images/ICT.png";
 import RoboticsImg from "./images/robotics.jpg";
 import AIImg from "./images/AI.png";
-
+import Home from "./images/home.png";
 interface Category {
   id: number;
   name: string;
@@ -102,6 +102,8 @@ export function FeaturedPackages() {
         return RoboticsImg;
       case 6:
         return AIImg;
+      case 7:
+        return Home;
       default:
         return ScienceImg;
     }

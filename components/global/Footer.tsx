@@ -1,7 +1,14 @@
 "use client";
 export const dynamic = "force-dynamic";
 import React from "react";
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Twitter,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -20,7 +27,7 @@ interface SettingsType {
   facebook?: string;
   instagram?: string;
   twitter?: string;
-  about?: string
+  about?: string;
 }
 
 interface FooterProps {
@@ -56,7 +63,8 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
             </h2>
           </div>
           <p className="text-sm leading-relaxed text-black">
-            {settings.about || "Your trusted destination to get all the instruments you need."}
+            {settings.about ||
+              "Your trusted destination to get all the instruments you need."}
           </p>
         </div>
 
@@ -70,17 +78,26 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
               </Link>
             </li>
             <li>
-              <Link href="/products" className="hover:text-green-500 transition-colors">
+              <Link
+                href="/products"
+                className="hover:text-green-500 transition-colors"
+              >
                 Products
               </Link>
             </li>
             <li>
-              <Link href="/about" className="hover:text-green-500 transition-colors">
+              <Link
+                href="/about"
+                className="hover:text-green-500 transition-colors"
+              >
                 About Us
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="hover:text-green-500 transition-colors">
+              <Link
+                href="/contact"
+                className="hover:text-green-500 transition-colors"
+              >
                 Contact
               </Link>
             </li>
@@ -92,17 +109,26 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
           <h3 className="text-xl font-semibold text-white mb-4">Support</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="/faq" className="hover:text-green-500 transition-colors">
+              <Link
+                href="/faq"
+                className="hover:text-green-500 transition-colors"
+              >
                 FAQs
               </Link>
             </li>
             <li>
-              <Link href="/privacy-policy" className="hover:text-green-500 transition-colors">
+              <Link
+                href="/privacy-policy"
+                className="hover:text-green-500 transition-colors"
+              >
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="hover:text-green-500 transition-colors">
+              <Link
+                href="/terms"
+                className="hover:text-green-500 transition-colors"
+              >
                 Terms & Conditions
               </Link>
             </li>
@@ -113,22 +139,22 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
         <div>
           <h3 className="text-xl font-semibold text-white mb-4">Contact Us</h3>
           <ul className="space-y-3 text-black">
-            <h4 className="text-3xl font-bold text-white ml-7">{settings.companyName || "Set Nepal"}</h4>
-            
+            <h4 className="text-3xl font-bold text-white ml-7">
+              {settings.companyName || "Set Nepal"}
+            </h4>
+
             {settings.phone1 && (
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-green-500" />
                 <span>{settings.phone1}</span>
               </li>
             )}
-            {
-              settings.phone2 && (
-                <li className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-green-500" />
-                  <span>{settings.phone2}</span>
-                </li>
-              )
-            }
+            {settings.phone2 && (
+              <li className="flex items-center gap-3">
+                <Phone className="w-5 h-5 text-green-500" />
+                <span>{settings.phone2}</span>
+              </li>
+            )}
             {settings.email1 && (
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-green-500" />
@@ -148,7 +174,17 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
       {/* Divider */}
       <div className="border-t border-gray-700 mt-5 text-center text-sm text-black-500">
         <p>
-          © {new Date().getFullYear()} <span className="text-green-500 font-medium">{settings.companyName || "Set Nepal"}</span>. All rights reserved.
+          © {new Date().getFullYear()}{" "}
+          <span className="text-[#aec958] font-medium">
+            {settings.companyName || "Set Nepal"}
+          </span>
+          . All rights reserved.
+        </p>
+        <p>
+          Developed by
+          <span className="text-[#031f33] font-medium">
+            {" Shakta Technology "}
+          </span>
         </p>
       </div>
     </footer>
