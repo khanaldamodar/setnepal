@@ -1,3 +1,4 @@
+//old version
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,14 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronRight, Lock } from "lucide-react";
-// import CryptoJS from "crypto-js"; // commented out, not used now
+import CryptoJS from "crypto-js";
 
 export default function PaymentPage({ packages }: { packages?: any[] }) {
   const router = useRouter();
   const { cart, isLoaded, subtotal, tax, total, clearCart } = useCart();
   const [checkoutData, setCheckoutData] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState("COD");
-  const [transactionId, setTransactionId] = useState(""); // state for eSewa
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,19 +30,15 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     ...cart.map((item) => ({
       productId: item.id,
       quantity: item.quantity,
-      price: item.price,
+      price: item.price, // frontend price
       name: item.name,
     })),
-
     ...(packages?.map((pkg) => ({
-      productId: pkg.id, // KEY FIX: send package ID, not product IDs
+      productId: pkg.id, // package ID (unique)
       quantity: 1,
-      price: pkg.price, // package price (not individual product price)
+      price: pkg.price, // frontend price for package
       name: pkg.name,
-      products: pkg.products?.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-      })),
+      products: pkg.products?.map((p: any) => ({ id: p.id, name: p.name })),
     })) ?? []),
   ];
 
@@ -80,13 +76,18 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     );
   }
 
-  const handlePlaceOrder = async () => {
-    // Prevent order if ESEWA is selected and transactionId is empty
-    if (paymentMethod === "ESEWA" && !transactionId.trim()) {
-      setError("Transaction ID is required for eSewa payment");
-      return;
-    }
+  const generateEsewaSignature = ({
+    total_amount,
+    transaction_uuid,
+    product_code,
+  }: any) => {
+    const message = `total_amount=${total_amount},transaction_uuid=${transaction_uuid},product_code=${product_code}`;
+    const secret = process.env.NEXT_PUBLIC_ESEWA_SECRET_KEY;
+    const hash = CryptoJS.HmacSHA256(message, secret);
+    return CryptoJS.enc.Base64.stringify(hash);
+  };
 
+  const handlePlaceOrder = async () => {
     setIsProcessing(true);
     setError(null);
 
@@ -105,16 +106,14 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
         items: orderItems.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
-          price: item.price,
+          price: item.price, // frontend price
         })),
         shippingAddress,
         paymentMethod,
-        ...(paymentMethod === "ESEWA" && { transactionId }),
       };
 
       const token = localStorage.getItem("token");
 
-      // Create Order
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -124,46 +123,61 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      const orderId = data?.id || data?.data?.id;
-
-      if (!res.ok || !orderId) {
-        throw new Error(data?.message);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Failed to place order");
       }
 
-      //  If ESEWA, post payment record
-      if (paymentMethod === "ESEWA") {
-        const paymentPayload = {
-          orderId: Number(orderId),
-          userId: 1, // replace with actual user ID if available
-          amount: calculatedTotal, // or total from payload
-          method: "ESEWA",
-          status: "SUCCESS",
-          transactionId: transactionId,
-          paymentData: {
-            transactionId,
-            totalAmount: calculatedTotal,
-            userName: checkoutData.billingAddress.fullName,
-            userAccount: checkoutData.billingAddress.phoneNumber,
-          },
-        };
+      const order = await res.json();
 
-        const paymentRes = await fetch("/api/payments", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(paymentPayload),
-        });
-
-        if (!paymentRes.ok) {
-          const errData = await paymentRes.json();
-          throw new Error(errData.message || "Payment save failed");
-        }
-      }
-
-      // Clear cart & redirect
       clearCart();
       sessionStorage.removeItem("checkoutData");
-      router.push(`/order-confirmation/${orderId}`);
+
+      // Handle eSewa Payment
+      if (paymentMethod === "ESEWA") {
+        const transaction_uuid = "TXN-" + Date.now();
+        const formData: any = {
+          amount: calculatedTotal.toString(),
+          tax_amount: "0",
+          total_amount: calculatedTotal.toString(),
+          transaction_uuid,
+          product_code: "EPAYTEST",
+          product_service_charge: "0",
+          product_delivery_charge: "0",
+          signed_field_names: "total_amount,transaction_uuid,product_code",
+          signature: generateEsewaSignature({
+            total_amount: calculatedTotal.toString(),
+            transaction_uuid,
+            product_code: "EPAYTEST",
+          }),
+          success_url: `http://localhost:3007/esewa/success?orderId=${
+            order.id
+          }&esewaName=${encodeURIComponent(
+            checkoutData.billingAddress.fullName
+          )}&esewaNumber=${encodeURIComponent(
+            checkoutData.billingAddress.phoneNumber
+          )}`,
+          failure_url: `http://localhost:3007/esewa/failure?orderId=${order.id}`,
+        };
+
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+
+        Object.keys(formData).forEach((key) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = formData[key];
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        return;
+      }
+
+      router.push(`/order-confirmation/${order.id}`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -212,34 +226,6 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
                     <p className="font-medium text-foreground">{method}</p>
                   </label>
                 ))}
-
-                {paymentMethod === "ESEWA" && (
-                  <div className="mt-2 space-y-2">
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
-                        Transaction ID
-                      </label>
-                      <input
-                        type="text"
-                        value={transactionId}
-                        onChange={(e) => setTransactionId(e.target.value)}
-                        className="w-full rounded border border-border p-2"
-                        placeholder="Enter eSewa Transaction ID"
-                        required
-                      />
-                    </div>
-
-                    <div className="flex flex-col items-center">
-                      <span className="mb-1 text-xs font-medium text-gray-500">
-                        Scan for Pay
-                      </span>
-
-                      <div className="w-50 h-50 border border-dashed border-gray-400 rounded flex items-center justify-center text-gray-500">
-                        {/* QR code will be assigned here */}
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </Card>
 

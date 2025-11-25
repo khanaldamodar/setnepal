@@ -115,14 +115,14 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
                       "High-quality product built for performance and durability."}
                   </p>
 
-                  {product.rating && (
+                  {/* {product.rating && (
                     <div className="flex items-center gap-1 mb-2">
                       <span className="text-yellow-400">★</span>
                       <span className="text-sm text-gray-600">
                         {product.rating}
                       </span>
                     </div>
-                  )}
+                  )} */}
 
                   <div className="flex items-center justify-between mt-auto">
                     <div className="flex  items-center  justify-center gap-8">
