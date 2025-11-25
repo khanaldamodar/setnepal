@@ -21,8 +21,10 @@ import {
 import { useUpdate } from "@/services/useUpdate";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [settings, setSettings] = useState<any>(null);
 
   // Company info
@@ -141,13 +143,38 @@ export default function SettingsPage() {
     return <div className="p-6 text-black">Loading settings...</div>;
 
   return (
-    <div className="flex min-h-screen bg-gray-100 justify-center p-4 font-poppins">
+    <div className="flex min-h-screen justify-center font-poppins">
       <main className="flex-1 max-w-6xl">
-        <div className="bg-white shadow-md rounded-xl p-6 md:p-8">
+        <div className="bg-white shadow-md rounded-xl  md:p-8">
           <form
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
             onSubmit={handleSubmit}
           >
+            {/* Top Buttons - immediately after Company Settings */}
+            <div className="md:col-span-2 flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Company Settings
+              </h2>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  className="bg-[#4998d1] hover:bg-[#62a4d3] text-white px-4 py-2 rounded-md text-sm font-medium transition"
+                  onClick={() => router.push("/admin/settings/payment")}
+                >
+                  Add Payment
+                </button>
+
+                <button
+                  type="button"
+                  className="bg-[#aec958] hover:bg-[#aabe66] text-white px-4 py-2 rounded-md text-sm font-medium transition"
+                  onClick={() => router.push("/admin/settings/team")}
+                >
+                  Add Team
+                </button>
+              </div>
+            </div>
+
             {/* Company info */}
             <InputField
               label="Company Name"
