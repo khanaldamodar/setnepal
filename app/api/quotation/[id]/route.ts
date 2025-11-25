@@ -7,15 +7,19 @@ interface Params {
   };
 }
 
-export async function GET(req: Request, { params }: Params) {
+export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const id = Number(params.id);
-    if (isNaN(id)) {
+    const {id} = await context.params
+    const numericId = parseInt(id, 10);
+
+    console.log(numericId)
+
+    if (isNaN(numericId)) {
       return NextResponse.json({ success: false, error: "Invalid ID" }, { status: 400 });
     }
 
     const quotation = await prisma.quotation.findUnique({
-      where: { id },
+      where: {id: numericId},
       include: {
         items: {
           include: {
