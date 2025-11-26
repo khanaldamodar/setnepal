@@ -160,7 +160,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   className="bg-[#4998d1] hover:bg-[#62a4d3] text-white px-4 py-2 rounded-md text-sm font-medium transition"
-                  onClick={() => router.push("/admin/settings/payment")}
+                  onClick={() => router.push("/admin/settings/banks")}
                 >
                   Payment
                 </button>
