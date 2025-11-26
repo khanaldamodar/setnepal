@@ -88,6 +88,11 @@ export type Quotation = $Result.DefaultSelection<Prisma.$QuotationPayload>
  * 
  */
 export type QuotationItem = $Result.DefaultSelection<Prisma.$QuotationItemPayload>
+/**
+ * Model Members
+ * 
+ */
+export type Members = $Result.DefaultSelection<Prisma.$MembersPayload>
 
 /**
  * Enums
@@ -428,6 +433,16 @@ export class PrismaClient<
     * ```
     */
   get quotationItem(): Prisma.QuotationItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.members`: Exposes CRUD operations for the **Members** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Members
+    * const members = await prisma.members.findMany()
+    * ```
+    */
+  get members(): Prisma.MembersDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -883,7 +898,8 @@ export namespace Prisma {
     Contacts: 'Contacts',
     Certificates: 'Certificates',
     Quotation: 'Quotation',
-    QuotationItem: 'QuotationItem'
+    QuotationItem: 'QuotationItem',
+    Members: 'Members'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -902,7 +918,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "category" | "brand" | "product" | "package" | "order" | "orderItem" | "payment" | "settings" | "gallery" | "galleryImage" | "contacts" | "certificates" | "quotation" | "quotationItem"
+      modelProps: "user" | "category" | "brand" | "product" | "package" | "order" | "orderItem" | "payment" | "settings" | "gallery" | "galleryImage" | "contacts" | "certificates" | "quotation" | "quotationItem" | "members"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1896,6 +1912,72 @@ export namespace Prisma {
           }
         }
       }
+      Members: {
+        payload: Prisma.$MembersPayload<ExtArgs>
+        fields: Prisma.MembersFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MembersFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MembersPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MembersFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MembersPayload>
+          }
+          findFirst: {
+            args: Prisma.MembersFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MembersPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MembersFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MembersPayload>
+          }
+          findMany: {
+            args: Prisma.MembersFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MembersPayload>[]
+          }
+          create: {
+            args: Prisma.MembersCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MembersPayload>
+          }
+          createMany: {
+            args: Prisma.MembersCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.MembersDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MembersPayload>
+          }
+          update: {
+            args: Prisma.MembersUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MembersPayload>
+          }
+          deleteMany: {
+            args: Prisma.MembersDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MembersUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.MembersUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MembersPayload>
+          }
+          aggregate: {
+            args: Prisma.MembersAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMembers>
+          }
+          groupBy: {
+            args: Prisma.MembersGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MembersGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MembersCountArgs<ExtArgs>
+            result: $Utils.Optional<MembersCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2007,6 +2089,7 @@ export namespace Prisma {
     certificates?: CertificatesOmit
     quotation?: QuotationOmit
     quotationItem?: QuotationItemOmit
+    members?: MembersOmit
   }
 
   /* Types for Logging */
@@ -17876,6 +17959,944 @@ export namespace Prisma {
 
 
   /**
+   * Model Members
+   */
+
+  export type AggregateMembers = {
+    _count: MembersCountAggregateOutputType | null
+    _avg: MembersAvgAggregateOutputType | null
+    _sum: MembersSumAggregateOutputType | null
+    _min: MembersMinAggregateOutputType | null
+    _max: MembersMaxAggregateOutputType | null
+  }
+
+  export type MembersAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MembersSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MembersMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    phone: string | null
+    email: string | null
+    desc: string | null
+    designation: string | null
+    photo: string | null
+  }
+
+  export type MembersMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    phone: string | null
+    email: string | null
+    desc: string | null
+    designation: string | null
+    photo: string | null
+  }
+
+  export type MembersCountAggregateOutputType = {
+    id: number
+    name: number
+    phone: number
+    email: number
+    desc: number
+    designation: number
+    photo: number
+    _all: number
+  }
+
+
+  export type MembersAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type MembersSumAggregateInputType = {
+    id?: true
+  }
+
+  export type MembersMinAggregateInputType = {
+    id?: true
+    name?: true
+    phone?: true
+    email?: true
+    desc?: true
+    designation?: true
+    photo?: true
+  }
+
+  export type MembersMaxAggregateInputType = {
+    id?: true
+    name?: true
+    phone?: true
+    email?: true
+    desc?: true
+    designation?: true
+    photo?: true
+  }
+
+  export type MembersCountAggregateInputType = {
+    id?: true
+    name?: true
+    phone?: true
+    email?: true
+    desc?: true
+    designation?: true
+    photo?: true
+    _all?: true
+  }
+
+  export type MembersAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Members to aggregate.
+     */
+    where?: MembersWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Members to fetch.
+     */
+    orderBy?: MembersOrderByWithRelationInput | MembersOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MembersWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Members from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Members.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Members
+    **/
+    _count?: true | MembersCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MembersAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MembersSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MembersMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MembersMaxAggregateInputType
+  }
+
+  export type GetMembersAggregateType<T extends MembersAggregateArgs> = {
+        [P in keyof T & keyof AggregateMembers]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMembers[P]>
+      : GetScalarType<T[P], AggregateMembers[P]>
+  }
+
+
+
+
+  export type MembersGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MembersWhereInput
+    orderBy?: MembersOrderByWithAggregationInput | MembersOrderByWithAggregationInput[]
+    by: MembersScalarFieldEnum[] | MembersScalarFieldEnum
+    having?: MembersScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MembersCountAggregateInputType | true
+    _avg?: MembersAvgAggregateInputType
+    _sum?: MembersSumAggregateInputType
+    _min?: MembersMinAggregateInputType
+    _max?: MembersMaxAggregateInputType
+  }
+
+  export type MembersGroupByOutputType = {
+    id: number
+    name: string
+    phone: string
+    email: string | null
+    desc: string | null
+    designation: string | null
+    photo: string | null
+    _count: MembersCountAggregateOutputType | null
+    _avg: MembersAvgAggregateOutputType | null
+    _sum: MembersSumAggregateOutputType | null
+    _min: MembersMinAggregateOutputType | null
+    _max: MembersMaxAggregateOutputType | null
+  }
+
+  type GetMembersGroupByPayload<T extends MembersGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MembersGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MembersGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MembersGroupByOutputType[P]>
+            : GetScalarType<T[P], MembersGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MembersSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    phone?: boolean
+    email?: boolean
+    desc?: boolean
+    designation?: boolean
+    photo?: boolean
+  }, ExtArgs["result"]["members"]>
+
+
+
+  export type MembersSelectScalar = {
+    id?: boolean
+    name?: boolean
+    phone?: boolean
+    email?: boolean
+    desc?: boolean
+    designation?: boolean
+    photo?: boolean
+  }
+
+  export type MembersOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "email" | "desc" | "designation" | "photo", ExtArgs["result"]["members"]>
+
+  export type $MembersPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Members"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      phone: string
+      email: string | null
+      desc: string | null
+      designation: string | null
+      photo: string | null
+    }, ExtArgs["result"]["members"]>
+    composites: {}
+  }
+
+  type MembersGetPayload<S extends boolean | null | undefined | MembersDefaultArgs> = $Result.GetResult<Prisma.$MembersPayload, S>
+
+  type MembersCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MembersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MembersCountAggregateInputType | true
+    }
+
+  export interface MembersDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Members'], meta: { name: 'Members' } }
+    /**
+     * Find zero or one Members that matches the filter.
+     * @param {MembersFindUniqueArgs} args - Arguments to find a Members
+     * @example
+     * // Get one Members
+     * const members = await prisma.members.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MembersFindUniqueArgs>(args: SelectSubset<T, MembersFindUniqueArgs<ExtArgs>>): Prisma__MembersClient<$Result.GetResult<Prisma.$MembersPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Members that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MembersFindUniqueOrThrowArgs} args - Arguments to find a Members
+     * @example
+     * // Get one Members
+     * const members = await prisma.members.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MembersFindUniqueOrThrowArgs>(args: SelectSubset<T, MembersFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MembersClient<$Result.GetResult<Prisma.$MembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Members that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MembersFindFirstArgs} args - Arguments to find a Members
+     * @example
+     * // Get one Members
+     * const members = await prisma.members.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MembersFindFirstArgs>(args?: SelectSubset<T, MembersFindFirstArgs<ExtArgs>>): Prisma__MembersClient<$Result.GetResult<Prisma.$MembersPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Members that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MembersFindFirstOrThrowArgs} args - Arguments to find a Members
+     * @example
+     * // Get one Members
+     * const members = await prisma.members.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MembersFindFirstOrThrowArgs>(args?: SelectSubset<T, MembersFindFirstOrThrowArgs<ExtArgs>>): Prisma__MembersClient<$Result.GetResult<Prisma.$MembersPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Members that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MembersFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Members
+     * const members = await prisma.members.findMany()
+     * 
+     * // Get first 10 Members
+     * const members = await prisma.members.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const membersWithIdOnly = await prisma.members.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MembersFindManyArgs>(args?: SelectSubset<T, MembersFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MembersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Members.
+     * @param {MembersCreateArgs} args - Arguments to create a Members.
+     * @example
+     * // Create one Members
+     * const Members = await prisma.members.create({
+     *   data: {
+     *     // ... data to create a Members
+     *   }
+     * })
+     * 
+     */
+    create<T extends MembersCreateArgs>(args: SelectSubset<T, MembersCreateArgs<ExtArgs>>): Prisma__MembersClient<$Result.GetResult<Prisma.$MembersPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Members.
+     * @param {MembersCreateManyArgs} args - Arguments to create many Members.
+     * @example
+     * // Create many Members
+     * const members = await prisma.members.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MembersCreateManyArgs>(args?: SelectSubset<T, MembersCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Members.
+     * @param {MembersDeleteArgs} args - Arguments to delete one Members.
+     * @example
+     * // Delete one Members
+     * const Members = await prisma.members.delete({
+     *   where: {
+     *     // ... filter to delete one Members
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MembersDeleteArgs>(args: SelectSubset<T, MembersDeleteArgs<ExtArgs>>): Prisma__MembersClient<$Result.GetResult<Prisma.$MembersPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Members.
+     * @param {MembersUpdateArgs} args - Arguments to update one Members.
+     * @example
+     * // Update one Members
+     * const members = await prisma.members.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MembersUpdateArgs>(args: SelectSubset<T, MembersUpdateArgs<ExtArgs>>): Prisma__MembersClient<$Result.GetResult<Prisma.$MembersPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Members.
+     * @param {MembersDeleteManyArgs} args - Arguments to filter Members to delete.
+     * @example
+     * // Delete a few Members
+     * const { count } = await prisma.members.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MembersDeleteManyArgs>(args?: SelectSubset<T, MembersDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Members.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MembersUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Members
+     * const members = await prisma.members.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MembersUpdateManyArgs>(args: SelectSubset<T, MembersUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Members.
+     * @param {MembersUpsertArgs} args - Arguments to update or create a Members.
+     * @example
+     * // Update or create a Members
+     * const members = await prisma.members.upsert({
+     *   create: {
+     *     // ... data to create a Members
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Members we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MembersUpsertArgs>(args: SelectSubset<T, MembersUpsertArgs<ExtArgs>>): Prisma__MembersClient<$Result.GetResult<Prisma.$MembersPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Members.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MembersCountArgs} args - Arguments to filter Members to count.
+     * @example
+     * // Count the number of Members
+     * const count = await prisma.members.count({
+     *   where: {
+     *     // ... the filter for the Members we want to count
+     *   }
+     * })
+    **/
+    count<T extends MembersCountArgs>(
+      args?: Subset<T, MembersCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MembersCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Members.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MembersAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MembersAggregateArgs>(args: Subset<T, MembersAggregateArgs>): Prisma.PrismaPromise<GetMembersAggregateType<T>>
+
+    /**
+     * Group by Members.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MembersGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MembersGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MembersGroupByArgs['orderBy'] }
+        : { orderBy?: MembersGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MembersGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMembersGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Members model
+   */
+  readonly fields: MembersFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Members.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MembersClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Members model
+   */
+  interface MembersFieldRefs {
+    readonly id: FieldRef<"Members", 'Int'>
+    readonly name: FieldRef<"Members", 'String'>
+    readonly phone: FieldRef<"Members", 'String'>
+    readonly email: FieldRef<"Members", 'String'>
+    readonly desc: FieldRef<"Members", 'String'>
+    readonly designation: FieldRef<"Members", 'String'>
+    readonly photo: FieldRef<"Members", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Members findUnique
+   */
+  export type MembersFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+    /**
+     * Filter, which Members to fetch.
+     */
+    where: MembersWhereUniqueInput
+  }
+
+  /**
+   * Members findUniqueOrThrow
+   */
+  export type MembersFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+    /**
+     * Filter, which Members to fetch.
+     */
+    where: MembersWhereUniqueInput
+  }
+
+  /**
+   * Members findFirst
+   */
+  export type MembersFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+    /**
+     * Filter, which Members to fetch.
+     */
+    where?: MembersWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Members to fetch.
+     */
+    orderBy?: MembersOrderByWithRelationInput | MembersOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Members.
+     */
+    cursor?: MembersWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Members from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Members.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Members.
+     */
+    distinct?: MembersScalarFieldEnum | MembersScalarFieldEnum[]
+  }
+
+  /**
+   * Members findFirstOrThrow
+   */
+  export type MembersFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+    /**
+     * Filter, which Members to fetch.
+     */
+    where?: MembersWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Members to fetch.
+     */
+    orderBy?: MembersOrderByWithRelationInput | MembersOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Members.
+     */
+    cursor?: MembersWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Members from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Members.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Members.
+     */
+    distinct?: MembersScalarFieldEnum | MembersScalarFieldEnum[]
+  }
+
+  /**
+   * Members findMany
+   */
+  export type MembersFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+    /**
+     * Filter, which Members to fetch.
+     */
+    where?: MembersWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Members to fetch.
+     */
+    orderBy?: MembersOrderByWithRelationInput | MembersOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Members.
+     */
+    cursor?: MembersWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Members from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Members.
+     */
+    skip?: number
+    distinct?: MembersScalarFieldEnum | MembersScalarFieldEnum[]
+  }
+
+  /**
+   * Members create
+   */
+  export type MembersCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Members.
+     */
+    data: XOR<MembersCreateInput, MembersUncheckedCreateInput>
+  }
+
+  /**
+   * Members createMany
+   */
+  export type MembersCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Members.
+     */
+    data: MembersCreateManyInput | MembersCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Members update
+   */
+  export type MembersUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Members.
+     */
+    data: XOR<MembersUpdateInput, MembersUncheckedUpdateInput>
+    /**
+     * Choose, which Members to update.
+     */
+    where: MembersWhereUniqueInput
+  }
+
+  /**
+   * Members updateMany
+   */
+  export type MembersUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Members.
+     */
+    data: XOR<MembersUpdateManyMutationInput, MembersUncheckedUpdateManyInput>
+    /**
+     * Filter which Members to update
+     */
+    where?: MembersWhereInput
+    /**
+     * Limit how many Members to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Members upsert
+   */
+  export type MembersUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Members to update in case it exists.
+     */
+    where: MembersWhereUniqueInput
+    /**
+     * In case the Members found by the `where` argument doesn't exist, create a new Members with this data.
+     */
+    create: XOR<MembersCreateInput, MembersUncheckedCreateInput>
+    /**
+     * In case the Members was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MembersUpdateInput, MembersUncheckedUpdateInput>
+  }
+
+  /**
+   * Members delete
+   */
+  export type MembersDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+    /**
+     * Filter which Members to delete.
+     */
+    where: MembersWhereUniqueInput
+  }
+
+  /**
+   * Members deleteMany
+   */
+  export type MembersDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Members to delete
+     */
+    where?: MembersWhereInput
+    /**
+     * Limit how many Members to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Members without action
+   */
+  export type MembersDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Members
+     */
+    select?: MembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Members
+     */
+    omit?: MembersOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -18103,6 +19124,19 @@ export namespace Prisma {
   export type QuotationItemScalarFieldEnum = (typeof QuotationItemScalarFieldEnum)[keyof typeof QuotationItemScalarFieldEnum]
 
 
+  export const MembersScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    phone: 'phone',
+    email: 'email',
+    desc: 'desc',
+    designation: 'designation',
+    photo: 'photo'
+  };
+
+  export type MembersScalarFieldEnum = (typeof MembersScalarFieldEnum)[keyof typeof MembersScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -18272,6 +19306,18 @@ export namespace Prisma {
   };
 
   export type QuotationOrderByRelevanceFieldEnum = (typeof QuotationOrderByRelevanceFieldEnum)[keyof typeof QuotationOrderByRelevanceFieldEnum]
+
+
+  export const MembersOrderByRelevanceFieldEnum: {
+    name: 'name',
+    phone: 'phone',
+    email: 'email',
+    desc: 'desc',
+    designation: 'designation',
+    photo: 'photo'
+  };
+
+  export type MembersOrderByRelevanceFieldEnum = (typeof MembersOrderByRelevanceFieldEnum)[keyof typeof MembersOrderByRelevanceFieldEnum]
 
 
   /**
@@ -19518,6 +20564,71 @@ export namespace Prisma {
     subtotal?: FloatWithAggregatesFilter<"QuotationItem"> | number
   }
 
+  export type MembersWhereInput = {
+    AND?: MembersWhereInput | MembersWhereInput[]
+    OR?: MembersWhereInput[]
+    NOT?: MembersWhereInput | MembersWhereInput[]
+    id?: IntFilter<"Members"> | number
+    name?: StringFilter<"Members"> | string
+    phone?: StringFilter<"Members"> | string
+    email?: StringNullableFilter<"Members"> | string | null
+    desc?: StringNullableFilter<"Members"> | string | null
+    designation?: StringNullableFilter<"Members"> | string | null
+    photo?: StringNullableFilter<"Members"> | string | null
+  }
+
+  export type MembersOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    email?: SortOrderInput | SortOrder
+    desc?: SortOrderInput | SortOrder
+    designation?: SortOrderInput | SortOrder
+    photo?: SortOrderInput | SortOrder
+    _relevance?: MembersOrderByRelevanceInput
+  }
+
+  export type MembersWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: MembersWhereInput | MembersWhereInput[]
+    OR?: MembersWhereInput[]
+    NOT?: MembersWhereInput | MembersWhereInput[]
+    name?: StringFilter<"Members"> | string
+    phone?: StringFilter<"Members"> | string
+    email?: StringNullableFilter<"Members"> | string | null
+    desc?: StringNullableFilter<"Members"> | string | null
+    designation?: StringNullableFilter<"Members"> | string | null
+    photo?: StringNullableFilter<"Members"> | string | null
+  }, "id">
+
+  export type MembersOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    email?: SortOrderInput | SortOrder
+    desc?: SortOrderInput | SortOrder
+    designation?: SortOrderInput | SortOrder
+    photo?: SortOrderInput | SortOrder
+    _count?: MembersCountOrderByAggregateInput
+    _avg?: MembersAvgOrderByAggregateInput
+    _max?: MembersMaxOrderByAggregateInput
+    _min?: MembersMinOrderByAggregateInput
+    _sum?: MembersSumOrderByAggregateInput
+  }
+
+  export type MembersScalarWhereWithAggregatesInput = {
+    AND?: MembersScalarWhereWithAggregatesInput | MembersScalarWhereWithAggregatesInput[]
+    OR?: MembersScalarWhereWithAggregatesInput[]
+    NOT?: MembersScalarWhereWithAggregatesInput | MembersScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Members"> | number
+    name?: StringWithAggregatesFilter<"Members"> | string
+    phone?: StringWithAggregatesFilter<"Members"> | string
+    email?: StringNullableWithAggregatesFilter<"Members"> | string | null
+    desc?: StringNullableWithAggregatesFilter<"Members"> | string | null
+    designation?: StringNullableWithAggregatesFilter<"Members"> | string | null
+    photo?: StringNullableWithAggregatesFilter<"Members"> | string | null
+  }
+
   export type UserCreateInput = {
     name: string
     email: string
@@ -20701,6 +21812,73 @@ export namespace Prisma {
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type MembersCreateInput = {
+    name: string
+    phone: string
+    email?: string | null
+    desc?: string | null
+    designation?: string | null
+    photo?: string | null
+  }
+
+  export type MembersUncheckedCreateInput = {
+    id?: number
+    name: string
+    phone: string
+    email?: string | null
+    desc?: string | null
+    designation?: string | null
+    photo?: string | null
+  }
+
+  export type MembersUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    desc?: NullableStringFieldUpdateOperationsInput | string | null
+    designation?: NullableStringFieldUpdateOperationsInput | string | null
+    photo?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MembersUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    desc?: NullableStringFieldUpdateOperationsInput | string | null
+    designation?: NullableStringFieldUpdateOperationsInput | string | null
+    photo?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MembersCreateManyInput = {
+    id?: number
+    name: string
+    phone: string
+    email?: string | null
+    desc?: string | null
+    designation?: string | null
+    photo?: string | null
+  }
+
+  export type MembersUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    desc?: NullableStringFieldUpdateOperationsInput | string | null
+    designation?: NullableStringFieldUpdateOperationsInput | string | null
+    photo?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MembersUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    desc?: NullableStringFieldUpdateOperationsInput | string | null
+    designation?: NullableStringFieldUpdateOperationsInput | string | null
+    photo?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -21917,6 +23095,50 @@ export namespace Prisma {
     quantity?: SortOrder
     price?: SortOrder
     subtotal?: SortOrder
+  }
+
+  export type MembersOrderByRelevanceInput = {
+    fields: MembersOrderByRelevanceFieldEnum | MembersOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type MembersCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    email?: SortOrder
+    desc?: SortOrder
+    designation?: SortOrder
+    photo?: SortOrder
+  }
+
+  export type MembersAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type MembersMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    email?: SortOrder
+    desc?: SortOrder
+    designation?: SortOrder
+    photo?: SortOrder
+  }
+
+  export type MembersMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    email?: SortOrder
+    desc?: SortOrder
+    designation?: SortOrder
+    photo?: SortOrder
+  }
+
+  export type MembersSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type ProductCreateNestedManyWithoutCreatedByInput = {
