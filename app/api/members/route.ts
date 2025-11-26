@@ -2,10 +2,26 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import cloudinary from "@/lib/cloudinary"
 
-export async function GET(){
+export async function GET() {
+  try {
+    const members = await prisma.members.findMany();
+
+    if (members.length === 0) {
+      return NextResponse.json({
+        Message: "No members found!",
+      });
+    }
+    return NextResponse.json(
+      { message: "members Fetched Success!", "members": members },
+      { status: 200 }
+    );
+  } catch (err) {
+    return NextResponse.json(
+      { message: "Failed to Fetch the members" },
+      { status: 500 }
+    );
+  }
 }
-
-
 
 
 

@@ -2,39 +2,40 @@
 
 import React, { useState } from "react";
 
-export default function AddMemberForm() {
-  // Personal Info
+export default function AddMemberPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [designation, setDesignation] = useState("");
-  const [description, setDescription] = useState("");
+  const [desc, setDesc] = useState("");
+  const [email, setEmail] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // Optional Social Links
-  const [facebook, setFacebook] = useState("");
-  const [instagram, setInstagram] = useState("");
-  const [linkedin, setLinkedin] = useState("");
-  const [email, setEmail] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newMemberData = {
-      name,
-      phone,
-      designation,
-      description,
-      imageFile,
-      email,
-    };
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("phone", phone);
+    formData.append("designation", designation);
+    formData.append("desc", desc);
+    formData.append("email", email);
 
-    console.log("New Member Added:", newMemberData);
-    // Send `newMemberData` to backend here
+    if (imageFile) {
+      formData.append("photo", imageFile);
+    }
+
+    const res = await fetch("/api/members", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    console.log("Response:", data);
   };
 
   return (
-    <div className="flex min-h-screen justify-center font-poppins">
+    <div className="flex min-h-screen justify-center p-10 font-poppins bg-gray-100">
       <main className="flex-1 max-w-4xl">
         <div className="bg-white shadow-md rounded-xl p-8">
           <form
@@ -62,11 +63,12 @@ export default function AddMemberForm() {
 
             <TextareaField
               label="Description"
-              value={description}
-              onChange={setDescription}
+              value={desc}
+              onChange={setDesc}
               className="md:col-span-2"
             />
 
+            {/* Image Upload */}
             <div className="flex flex-col gap-2 md:col-span-2">
               <label className="font-medium">Profile Image</label>
               <input
@@ -78,18 +80,20 @@ export default function AddMemberForm() {
                   setImagePreview(file ? URL.createObjectURL(file) : null);
                 }}
               />
+
               {imagePreview && (
                 <img
                   src={imagePreview}
-                  alt="Profile preview"
-                  className="h-24 w-24 object-cover rounded-full shadow-md mt-2 border border-gray-300"
+                  alt="Preview"
+                  className="h-24 w-24 object-cover rounded-full shadow-md mt-2 border"
                 />
               )}
             </div>
-            <div className="md:col-span-2 flex justify-center mt-8">
+
+            <div className="md:col-span-2 flex justify-center mt-6">
               <button
                 type="submit"
-                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2.5 rounded-md font-medium text-sm transition"
+                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2 rounded-md font-medium transition"
               >
                 Add Member
               </button>
@@ -101,26 +105,26 @@ export default function AddMemberForm() {
   );
 }
 
-// Reusable Input & Textarea
+// Reusable Input
 const InputField = ({ label, type = "text", value, onChange }: any) => (
-  <div className="flex flex-col gap-1.5">
+  <div className="flex flex-col gap-1">
     <label className="text-gray-700 text-sm font-medium">{label}</label>
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="border border-gray-300 rounded-md p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-lime-500 transition"
+      className="border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-lime-500"
     />
   </div>
 );
 
 const TextareaField = ({ label, value, onChange, className }: any) => (
-  <div className={`flex flex-col gap-1.5 ${className || ""}`}>
+  <div className={`flex flex-col gap-1 ${className}`}>
     <label className="text-gray-700 text-sm font-medium">{label}</label>
     <textarea
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="border border-gray-300 rounded-md p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-lime-500 transition resize-y h-20"
+      className="border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-lime-500 h-20 resize-y"
     />
   </div>
 );
