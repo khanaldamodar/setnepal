@@ -11,7 +11,6 @@ import { motion } from "framer-motion";
 import { useCart } from "@/hooks/use-cart";
 import { useCartContext } from "@/context/CartContext";
 
-
 import { AutoplayPlugin } from "./SliderAutoplay";
 import { Button } from "../ui/button";
 
@@ -85,7 +84,7 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
 
       {/* Slider */}
       <div ref={sliderRef} className="keen-slider">
-        {products.map((product) => (
+        {products.slice(0, 10).map((product) => (
           <div
             key={product.id}
             className="keen-slider__slide min-w-0 bg-white rounded-2xl shadow-md overflow-hidden flex flex-col justify-between"
@@ -116,25 +115,25 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
                       "High-quality product built for performance and durability."}
                   </p>
 
-                  {product.rating && (
+                  {/* {product.rating && (
                     <div className="flex items-center gap-1 mb-2">
                       <span className="text-yellow-400">★</span>
                       <span className="text-sm text-gray-600">
                         {product.rating}
                       </span>
                     </div>
-                  )}
+                  )} */}
 
                   <div className="flex items-center justify-between mt-auto">
                     <div className="flex  items-center  justify-center gap-8">
                       {/* Original Price (strikethrough) */}
-                      {/* <span className="text-gray-400 line-through text-sm">
-                        Rs. {(product.price).toLocaleString()}
-                      </span> */}
+                      <span className="text-gray-400 line-through text-sm">
+                        Rs. {product.price.toLocaleString()}
+                      </span>
 
                       {/* Discounted Price */}
                       <span className="text-lg font-semibold text-[#d86d38]">
-                        {/* Rs. {(product.price * 0.9).toLocaleString()}{" "} */}
+                        Rs. {(product.price * 0.9).toLocaleString()}{" "}
                         {/* 10% off example */}
                       </span>
                     </div>

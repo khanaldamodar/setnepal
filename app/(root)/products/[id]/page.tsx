@@ -76,7 +76,7 @@ export default function ProductPage() {
           };
 
           setProduct(p);
-          setSelectedImage(p.images?.[0] || null); // set main image
+          setSelectedImage(p.images?.[0] || null);
         }
       } catch (err) {
         console.error(err);
@@ -300,12 +300,14 @@ export default function ProductPage() {
         )}
 
         {/* Related Products */}
-        <div className="mt-12">
-          <RelatedProducts
-            currentProductId={product.id}
-            category={product.category?.name || ""}
-          />
-        </div>
+        {product.category?.id && (
+          <div className="mt-12">
+            <RelatedProducts
+              currentProductId={product.id}
+              categoryId={product.category.id}
+            />
+          </div>
+        )}
       </div>
     </main>
   );

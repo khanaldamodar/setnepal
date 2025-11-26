@@ -91,7 +91,7 @@ export default function ProductsPage() {
               ),
             },
             { key: "name", label: "Product Name" },
-            { key: "price", label: "Price", render: (p) => `$${p.price}` },
+            { key: "price", label: "Price", render: (p) => `Rs. ${p.price}` },
             { key: "stock", label: "Stock" },
             {
               key: "brand",

@@ -5,6 +5,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Heading from "@/components/global/Heading";
+import { jsPDF } from "jspdf";
 
 interface Category {
   id: number;
@@ -91,16 +92,37 @@ export default function Quotation() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    // Validate that all selections have a category and at least one product
     if (!selections.every((sel) => sel.category && sel.products.length > 0)) {
       toast.error("Please complete all selections.");
       return;
     }
 
-    const items = selections.flatMap((sel) =>
-      sel.products.map((pid) => ({ productId: pid, quantity: 1 }))
-    );
+    // Build items safely, filter out undefined products
+    const items = selections.flatMap(
+      (sel) =>
+        sel.products
+          .map((pid) => {
+            const product = products.find((p) => p.id === pid);
+            if (!product) return null; // skip invalid product
+            return {
+              productId: product.id, // for backend
+              name: product.name, // for PDF
+              price: product.price,
+              quantity: 1,
+            };
+          })
+          .filter(Boolean) // remove nulls
+    ) as { productId: number; name: string; price: number; quantity: number }[];
+
+    if (items.length === 0) {
+      toast.error("Please select at least one valid product.");
+      return;
+    }
 
     try {
+      // Submit to backend
       await axios.post("/api/quotation", {
         name: formData.name,
         email: formData.email,
@@ -108,10 +130,78 @@ export default function Quotation() {
         address: formData.address,
         companyName: formData.organization,
         message: formData.message,
-        items,
+        items: items.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+        })), // only send what backend needs
       });
 
       toast.success("Quotation submitted successfully!");
+
+      // Generate PDF
+      const doc = new jsPDF();
+
+      doc.setFontSize(20);
+      doc.text("Quotation", 105, 20, { align: "center" });
+
+      // Customer info
+      doc.setFontSize(12);
+      let y = 35;
+      doc.text(`Name: ${formData.name}`, 20, y);
+      y += 7;
+      doc.text(`Organization: ${formData.organization}`, 20, y);
+      y += 7;
+      doc.text(`Email: ${formData.email}`, 20, y);
+      y += 7;
+      doc.text(`Phone: ${formData.phone}`, 20, y);
+      y += 7;
+      doc.text(`Address: ${formData.address}`, 20, y);
+      if (formData.message) {
+        y += 7;
+        doc.text(`Message: ${formData.message}`, 20, y);
+      }
+
+      // Table header
+      y += 15;
+      doc.setFontSize(14);
+      doc.text("Items", 20, y);
+      y += 7;
+
+      doc.setFontSize(12);
+      doc.text("No", 20, y);
+      doc.text("Product Name", 35, y);
+      doc.text("Qty", 130, y);
+      doc.text("Price", 150, y);
+
+      y += 5;
+      doc.line(20, y, 190, y); // horizontal line
+      y += 7;
+
+      // Table rows
+      let grandTotal = 0;
+      items.forEach((item, index) => {
+        const total = item.price * item.quantity;
+        grandTotal += total;
+
+        doc.text(`${index + 1}`, 20, y);
+        doc.text(item.name, 35, y);
+        doc.text(`${item.quantity}`, 130, y);
+        doc.text(`Rs. ${item.price.toFixed(2)}`, 150, y);
+
+        y += 7;
+      });
+
+      // Grand total
+      y += 5;
+      doc.line(120, y, 190, y); // line above total
+      y += 7;
+      doc.setFontSize(12);
+      doc.text(`Grand Total: Rs. ${grandTotal.toFixed(2)}`, 150, y);
+
+      // Save PDF
+      doc.save("quotation.pdf");
+
+      // Reset form
       setFormData({
         organization: "",
         name: "",
@@ -251,7 +341,7 @@ export default function Quotation() {
                                 handleProductToggle(index, product.id)
                               }
                             />
-                            {product.name} (${product.price})
+                            {product.name} (Rs. {product.price})
                           </label>
                         ))}
                       </div>

@@ -94,9 +94,9 @@ export function ProductGrid({ products }: ProductGridProps) {
 
               {/* Price and Button */}
               <div className="flex items-center justify-between">
-                {/* <span className="text-lg font-bold text-foreground">
+                <span className="text-lg font-bold text-foreground">
                   Rs. {product.price.toFixed(2)}
-                </span> */}
+                </span>
                 <Button
                   size="sm"
                   variant={addedItems.has(product.id) ? "default" : "default"}

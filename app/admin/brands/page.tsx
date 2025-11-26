@@ -38,11 +38,11 @@ const BrandsPage = () => {
   return (
     <div className="h-screen flex flex-col font-poppins">
       {/* header */}
-      <div className="w-full flex items-center p-4 shadow-md justify-between bg-[#aec958]">
-        <h3 className="text-2xl text-white font-bold">Brands</h3>
+      <div className="w-full flex items-center justify-between ">
+        <h3 className="text-2xl font-bold">Brands</h3>
         <button
           onClick={() => router.push("/admin/brands/add")}
-          className="bg-[#4998d1] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition"
+          className="bg-[#aec958] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition"
         >
           Add Brand
         </button>

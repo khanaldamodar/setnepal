@@ -16,6 +16,7 @@ import { PiPackageFill } from "react-icons/pi";
 import { IoMdSettings } from "react-icons/io";
 import { TbTruckDelivery } from "react-icons/tb";
 import { GrGallery } from "react-icons/gr";
+import { TbQuotes } from "react-icons/tb";
 import { User } from "lucide-react";
 
 export default function Sidebar() {
@@ -98,6 +99,12 @@ export default function Sidebar() {
       path: "/admin/contacts",
     },
     {
+      id: "quotations",
+      label: "Quotations",
+      icon: <TbQuotes />,
+      path: "/admin/quotation",
+    },
+    {
       id: "settings",
       label: "Settings",
       icon: <IoMdSettings />,
@@ -142,7 +149,7 @@ export default function Sidebar() {
         ))}
       </div>
 
-      {/* Footer */}
+      {/* Footer 
       <div className="mt-auto flex flex-col items-start w-full">
         <div
           className="flex items-center gap-3 p-3 bg-[#4998d1] rounded-xl w-full cursor-pointer transition-all duration-200 hover:bg-blue-700"
@@ -166,15 +173,16 @@ export default function Sidebar() {
         </div>
 
         {/* Logout Button  */}
-        {/* {showLogout && ( */}
+      {/* {showLogout && ( 
         <button
           onClick={handleLogout}
           className="mt-2 w-full bg-red-500 text-white font-medium py-2 rounded-md hover:bg-red-600 transition-all duration-200"
         >
           Log Out
         </button>
-        {/* )} */}
+        {/* )} 
       </div>
+      */}
     </aside>
   );
 }

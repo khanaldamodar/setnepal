@@ -39,13 +39,13 @@ const GalleryPage = () => {
   return (
     <div className="h-screen flex flex-col ">
       {/* header */}
-      <div className="w-full flex items-center p-4 shadow-md justify-between bg-[#aec958]">
-        <h3 className="text-2xl text-white font-bold">Gallery</h3>
+      <div className="w-full flex items-center justify-between ">
+        <h3 className="text-2xl font-bold">Gallery</h3>
         <button
           onClick={() => router.push("/admin/gallery/add")}
-          className="bg-[#4998d1] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition"
+          className="bg-[#aec958] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition"
         >
-          Add Gallery Item
+          Add Gallery
         </button>
       </div>
 

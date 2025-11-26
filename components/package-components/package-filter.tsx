@@ -1,35 +1,44 @@
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 
 interface PackageFiltersProps {
   filters: {
-    categories: string[]
-    priceRange: [number, number]
-    minRating: number
-  }
-  onFilterChange: (filters: { categories: string[]; priceRange: [number, number]; minRating: number }) => void
+    categories: string[];
+    priceRange: [number, number];
+    minRating: number;
+  };
+  onFilterChange: (filters: {
+    categories: string[];
+    priceRange: [number, number];
+    minRating: number;
+  }) => void;
 }
 
-const CATEGORIES = ["Office Setup", "Professional", "Accessories", "Gaming"]
-const RATINGS = [4, 3, 2, 1]
+const CATEGORIES = ["Office Setup", "Professional", "Accessories", "Gaming"];
+const RATINGS = [4, 3, 2, 1];
 
-export function PackageFilters({ filters, onFilterChange }: PackageFiltersProps) {
+export function PackageFilters({
+  filters,
+  onFilterChange,
+}: PackageFiltersProps) {
   const handleCategoryChange = (category: string, checked: boolean) => {
-    const newCategories = checked ? [...filters.categories, category] : filters.categories.filter((c) => c !== category)
-    onFilterChange({ ...filters, categories: newCategories })
-  }
+    const newCategories = checked
+      ? [...filters.categories, category]
+      : filters.categories.filter((c) => c !== category);
+    onFilterChange({ ...filters, categories: newCategories });
+  };
 
   const handlePriceChange = (value: number[]) => {
-    onFilterChange({ ...filters, priceRange: [value[0], value[1]] })
-  }
+    onFilterChange({ ...filters, priceRange: [value[0], value[1]] });
+  };
 
   const handleRatingChange = (rating: number, checked: boolean) => {
-    onFilterChange({ ...filters, minRating: checked ? rating : 0 })
-  }
+    onFilterChange({ ...filters, minRating: checked ? rating : 0 });
+  };
 
   return (
     <div className="sticky top-4 space-y-4">
@@ -42,9 +51,14 @@ export function PackageFilters({ filters, onFilterChange }: PackageFiltersProps)
               <Checkbox
                 id={`category-${category}`}
                 checked={filters.categories.includes(category)}
-                onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                onCheckedChange={(checked) =>
+                  handleCategoryChange(category, checked as boolean)
+                }
               />
-              <Label htmlFor={`category-${category}`} className="text-sm cursor-pointer">
+              <Label
+                htmlFor={`category-${category}`}
+                className="text-sm cursor-pointer"
+              >
                 {category}
               </Label>
             </div>
@@ -64,13 +78,13 @@ export function PackageFilters({ filters, onFilterChange }: PackageFiltersProps)
           className="mb-3"
         />
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>${filters.priceRange[0]}</span>
-          <span>${filters.priceRange[1]}</span>
+          <span>Rs. {filters.priceRange[0]}</span>
+          <span>Rs. {filters.priceRange[1]}</span>
         </div>
       </Card>
 
       {/* Rating */}
-      <Card className="p-4">
+      {/* <Card className="p-4">
         <h3 className="font-semibold text-foreground mb-3">Rating</h3>
         <div className="space-y-2">
           {RATINGS.map((rating) => (
@@ -87,7 +101,7 @@ export function PackageFilters({ filters, onFilterChange }: PackageFiltersProps)
             </div>
           ))}
         </div>
-      </Card>
+      </Card> */}
     </div>
-  )
+  );
 }

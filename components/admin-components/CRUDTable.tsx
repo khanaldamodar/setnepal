@@ -15,6 +15,8 @@ interface CRUDTableProps {
   columns: string[];
   data: any[];
   setData: React.Dispatch<React.SetStateAction<any[]>>;
+  actions?: ("view" | "edit" | "delete")[];
+  renderCell?: (column: string, row: any) => React.ReactNode;
 }
 
 export default function CRUDTable({
@@ -22,6 +24,8 @@ export default function CRUDTable({
   columns,
   data,
   setData,
+  actions = ["view", "edit", "delete"],
+  renderCell,
 }: CRUDTableProps) {
   const router = useRouter();
   const { deleteItem, loading: deleting } = useDelete(
@@ -36,6 +40,7 @@ export default function CRUDTable({
   const [page, setPage] = useState(1);
   const perPage = 8;
 
+  // Filtered
   const filtered = useMemo(() => {
     const lower = search.toLowerCase();
     return data.filter((item) =>
@@ -45,6 +50,7 @@ export default function CRUDTable({
     );
   }, [data, search]);
 
+  // Sorted
   const sorted = useMemo(() => {
     if (!sortKey) return filtered;
     return [...filtered].sort((a, b) => {
@@ -54,12 +60,55 @@ export default function CRUDTable({
     });
   }, [filtered, sortKey, sortAsc]);
 
+  // Paginated
   const paginated = useMemo(() => {
     const start = (page - 1) * perPage;
     return sorted.slice(start, start + perPage);
   }, [sorted, page]);
 
   const totalPages = Math.ceil(filtered.length / perPage);
+
+  // Helper to render cell safely
+  const renderSafeCell = (col: string, row: any) => {
+    if (renderCell) return renderCell(col, row);
+
+    const value = row[col];
+
+    // Handle array (like gallery)
+    if (Array.isArray(value)) {
+      if (endpoint === "gallery") {
+        return (
+          <div className="flex gap-2">
+            {value.slice(0, 1).map((img: any, idx: number) => (
+              <img
+                key={idx}
+                src={img.url || img}
+                alt={img.name || `image-${idx}`}
+                className="w-16 h-16 object-cover rounded-md border"
+              />
+            ))}
+            {value.length > 1 && (
+              <span className="text-sm text-gray-500 flex items-center">
+                +{value.length - 1} more
+              </span>
+            )}
+          </div>
+        );
+      } else {
+        return value
+          .map((v: any) => (typeof v === "object" ? JSON.stringify(v) : v))
+          .join(", ");
+      }
+    }
+
+    // Handle object
+    if (typeof value === "object" && value !== null) {
+      return JSON.stringify(value);
+    }
+
+    // Default
+    return value;
+  };
 
   return (
     <Card className="shadow-md border rounded-2xl overflow-hidden">
@@ -109,7 +158,9 @@ export default function CRUDTable({
                   )}
                 </th>
               ))}
-              <th className="px-4 py-3 text-center w-52">Actions</th>
+              {actions.length > 0 && (
+                <th className="px-4 py-3 text-center w-52">Actions</th>
+              )}
             </tr>
           </thead>
 
@@ -129,91 +180,59 @@ export default function CRUDTable({
                     {(page - 1) * perPage + index + 1}
                   </td>
 
-                  {columns.map((col) => {
-                    const isDescription =
-                      col.toLowerCase().includes("description") ||
-                      col.toLowerCase().includes("details") ||
-                      col.toLowerCase().includes("content");
+                  {columns.map((col) => (
+                    <td key={col} className="px-4 py-3 text-sm align-top">
+                      {renderSafeCell(col, item)}
+                    </td>
+                  ))}
 
-                    return (
-                      <td
-                        key={col}
-                        className={clsx(
-                          "px-4 py-3 text-sm align-top",
-                          isDescription
-                            ? "min-w-[300px] max-w-[500px] whitespace-pre-wrap"
-                            : "whitespace-nowrap"
-                        )}
-                      >
-                        {Array.isArray(item[col]) && endpoint === "gallery" ? (
-                          <div className="flex gap-2">
-                            {item[col]
-                              .slice(0, 1)
-                              .map((img: any, idx: number) => (
-                                <img
-                                  key={idx}
-                                  src={img.url || img}
-                                  alt={img.name || `image-${idx}`}
-                                  className="w-16 h-16 object-cover rounded-md border"
-                                />
-                              ))}
-                            {item[col].length > 1 && (
-                              <span className="text-sm text-gray-500 flex items-center">
-                                +{item[col].length - 1} more
-                              </span>
-                            )}
-                          </div>
-                        ) : Array.isArray(item[col]) ? (
-                          item[col]
-                            .map((subItem: any) => subItem.name || subItem)
-                            .join(", ")
-                        ) : (
-                          <div className="line-clamp-4">{item[col]}</div>
-                        )}
-                      </td>
-                    );
-                  })}
+                  {actions.length > 0 && (
+                    <td className="px-4 py-3 text-center flex justify-center gap-2">
+                      {actions.includes("view") && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() =>
+                            router.push(`/admin/${endpoint}/view/${item.id}`)
+                          }
+                          className="hover:text-blue-600"
+                        >
+                          <Eye size={18} />
+                        </Button>
+                      )}
 
-                  {/* Actions */}
-                  <td className="px-4 py-3 text-center flex justify-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() =>
-                        router.push(`/admin/${endpoint}/view/${item.id}`)
-                      }
-                      className="hover:text-blue-600"
-                    >
-                      <Eye size={18} />
-                    </Button>
+                      {actions.includes("edit") && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() =>
+                            router.push(`/admin/${endpoint}/edit/${item.id}`)
+                          }
+                          className="hover:text-green-600"
+                        >
+                          <Edit size={18} />
+                        </Button>
+                      )}
 
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() =>
-                        router.push(`/admin/${endpoint}/edit/${item.id}`)
-                      }
-                      className="hover:text-green-600"
-                    >
-                      <Edit size={18} />
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => deleteItem(item.id)}
-                      disabled={deleting}
-                      className="hover:text-red-600 text-red-800"
-                    >
-                      <Trash2 size={18} />
-                    </Button>
-                  </td>
+                      {actions.includes("delete") && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteItem(item.id)}
+                          disabled={deleting}
+                          className="hover:text-red-600 text-red-800"
+                        >
+                          <Trash2 size={18} />
+                        </Button>
+                      )}
+                    </td>
+                  )}
                 </motion.tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan={columns.length + 2}
+                  colSpan={columns.length + (actions.length > 0 ? 2 : 1)}
                   className="text-center py-6 text-gray-500"
                 >
                   No records found
