@@ -18,6 +18,7 @@ import { TbTruckDelivery } from "react-icons/tb";
 import { GrGallery } from "react-icons/gr";
 import { TbQuotes } from "react-icons/tb";
 import { User } from "lucide-react";
+import { GiAutoRepair } from "react-icons/gi";
 
 export default function Sidebar() {
   const [activeView, setActiveView] = useState("dashboard");
@@ -103,6 +104,12 @@ export default function Sidebar() {
       label: "Quotations",
       icon: <TbQuotes />,
       path: "/admin/quotation",
+    },
+    {
+      id: "repair",
+      label: "maintanance",
+      icon: <GiAutoRepair />,
+      path: "/admin/repair",
     },
     {
       id: "settings",
