@@ -12,6 +12,7 @@ import Cookies from "js-cookie";
 interface OrderItem {
   id: number;
   productId: number;
+  packageId: number;
   price: number;
   quantity: number;
   product?: {
@@ -217,7 +218,7 @@ export default function ViewOrderPage() {
               <table className="min-w-full border border-gray-200 text-sm">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="px-4 py-2 text-left">ID</th>
+                    <th className="px-4 py-2 text-left">Order ID</th>
                     <th className="px-4 py-2 text-left">Product Name</th>
                     <th className="px-4 py-2 text-left">Price</th>
                     <th className="px-4 py-2 text-left">Quantity</th>

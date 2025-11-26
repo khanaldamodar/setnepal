@@ -52,6 +52,7 @@ export function PackageGrid() {
           typeof pkg.category === "string"
             ? pkg.category
             : pkg.category?.name ?? "",
+        type: "package",
       },
       1
     );

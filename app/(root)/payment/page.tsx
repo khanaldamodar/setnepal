@@ -35,9 +35,9 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     })),
 
     ...(packages?.map((pkg) => ({
-      productId: pkg.id, // KEY FIX: send package ID, not product IDs
+      productId: pkg.id, 
       quantity: 1,
-      price: pkg.price, // package price (not individual product price)
+      price: pkg.price, 
       name: pkg.name,
       products: pkg.products?.map((p: any) => ({
         id: p.id,
