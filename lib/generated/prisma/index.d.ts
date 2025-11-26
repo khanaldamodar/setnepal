@@ -98,6 +98,11 @@ export type Members = $Result.DefaultSelection<Prisma.$MembersPayload>
  * 
  */
 export type Banks = $Result.DefaultSelection<Prisma.$BanksPayload>
+/**
+ * Model Maintenance
+ * 
+ */
+export type Maintenance = $Result.DefaultSelection<Prisma.$MaintenancePayload>
 
 /**
  * Enums
@@ -458,6 +463,16 @@ export class PrismaClient<
     * ```
     */
   get banks(): Prisma.BanksDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.maintenance`: Exposes CRUD operations for the **Maintenance** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Maintenances
+    * const maintenances = await prisma.maintenance.findMany()
+    * ```
+    */
+  get maintenance(): Prisma.MaintenanceDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -915,7 +930,8 @@ export namespace Prisma {
     Quotation: 'Quotation',
     QuotationItem: 'QuotationItem',
     Members: 'Members',
-    Banks: 'Banks'
+    Banks: 'Banks',
+    Maintenance: 'Maintenance'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -934,7 +950,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "category" | "brand" | "product" | "package" | "order" | "orderItem" | "payment" | "settings" | "gallery" | "galleryImage" | "contacts" | "certificates" | "quotation" | "quotationItem" | "members" | "banks"
+      modelProps: "user" | "category" | "brand" | "product" | "package" | "order" | "orderItem" | "payment" | "settings" | "gallery" | "galleryImage" | "contacts" | "certificates" | "quotation" | "quotationItem" | "members" | "banks" | "maintenance"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2060,6 +2076,72 @@ export namespace Prisma {
           }
         }
       }
+      Maintenance: {
+        payload: Prisma.$MaintenancePayload<ExtArgs>
+        fields: Prisma.MaintenanceFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MaintenanceFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaintenancePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MaintenanceFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaintenancePayload>
+          }
+          findFirst: {
+            args: Prisma.MaintenanceFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaintenancePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MaintenanceFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaintenancePayload>
+          }
+          findMany: {
+            args: Prisma.MaintenanceFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaintenancePayload>[]
+          }
+          create: {
+            args: Prisma.MaintenanceCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaintenancePayload>
+          }
+          createMany: {
+            args: Prisma.MaintenanceCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.MaintenanceDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaintenancePayload>
+          }
+          update: {
+            args: Prisma.MaintenanceUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaintenancePayload>
+          }
+          deleteMany: {
+            args: Prisma.MaintenanceDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MaintenanceUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.MaintenanceUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaintenancePayload>
+          }
+          aggregate: {
+            args: Prisma.MaintenanceAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMaintenance>
+          }
+          groupBy: {
+            args: Prisma.MaintenanceGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MaintenanceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MaintenanceCountArgs<ExtArgs>
+            result: $Utils.Optional<MaintenanceCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2173,6 +2255,7 @@ export namespace Prisma {
     quotationItem?: QuotationItemOmit
     members?: MembersOmit
     banks?: BanksOmit
+    maintenance?: MaintenanceOmit
   }
 
   /* Types for Logging */
@@ -19874,6 +19957,933 @@ export namespace Prisma {
 
 
   /**
+   * Model Maintenance
+   */
+
+  export type AggregateMaintenance = {
+    _count: MaintenanceCountAggregateOutputType | null
+    _avg: MaintenanceAvgAggregateOutputType | null
+    _sum: MaintenanceSumAggregateOutputType | null
+    _min: MaintenanceMinAggregateOutputType | null
+    _max: MaintenanceMaxAggregateOutputType | null
+  }
+
+  export type MaintenanceAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MaintenanceSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MaintenanceMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    phone: string | null
+    address: string | null
+    product: string | null
+    message: string | null
+  }
+
+  export type MaintenanceMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    phone: string | null
+    address: string | null
+    product: string | null
+    message: string | null
+  }
+
+  export type MaintenanceCountAggregateOutputType = {
+    id: number
+    name: number
+    phone: number
+    address: number
+    product: number
+    message: number
+    _all: number
+  }
+
+
+  export type MaintenanceAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type MaintenanceSumAggregateInputType = {
+    id?: true
+  }
+
+  export type MaintenanceMinAggregateInputType = {
+    id?: true
+    name?: true
+    phone?: true
+    address?: true
+    product?: true
+    message?: true
+  }
+
+  export type MaintenanceMaxAggregateInputType = {
+    id?: true
+    name?: true
+    phone?: true
+    address?: true
+    product?: true
+    message?: true
+  }
+
+  export type MaintenanceCountAggregateInputType = {
+    id?: true
+    name?: true
+    phone?: true
+    address?: true
+    product?: true
+    message?: true
+    _all?: true
+  }
+
+  export type MaintenanceAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Maintenance to aggregate.
+     */
+    where?: MaintenanceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Maintenances to fetch.
+     */
+    orderBy?: MaintenanceOrderByWithRelationInput | MaintenanceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MaintenanceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Maintenances from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Maintenances.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Maintenances
+    **/
+    _count?: true | MaintenanceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MaintenanceAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MaintenanceSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MaintenanceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MaintenanceMaxAggregateInputType
+  }
+
+  export type GetMaintenanceAggregateType<T extends MaintenanceAggregateArgs> = {
+        [P in keyof T & keyof AggregateMaintenance]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMaintenance[P]>
+      : GetScalarType<T[P], AggregateMaintenance[P]>
+  }
+
+
+
+
+  export type MaintenanceGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaintenanceWhereInput
+    orderBy?: MaintenanceOrderByWithAggregationInput | MaintenanceOrderByWithAggregationInput[]
+    by: MaintenanceScalarFieldEnum[] | MaintenanceScalarFieldEnum
+    having?: MaintenanceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MaintenanceCountAggregateInputType | true
+    _avg?: MaintenanceAvgAggregateInputType
+    _sum?: MaintenanceSumAggregateInputType
+    _min?: MaintenanceMinAggregateInputType
+    _max?: MaintenanceMaxAggregateInputType
+  }
+
+  export type MaintenanceGroupByOutputType = {
+    id: number
+    name: string
+    phone: string
+    address: string | null
+    product: string | null
+    message: string | null
+    _count: MaintenanceCountAggregateOutputType | null
+    _avg: MaintenanceAvgAggregateOutputType | null
+    _sum: MaintenanceSumAggregateOutputType | null
+    _min: MaintenanceMinAggregateOutputType | null
+    _max: MaintenanceMaxAggregateOutputType | null
+  }
+
+  type GetMaintenanceGroupByPayload<T extends MaintenanceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MaintenanceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MaintenanceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MaintenanceGroupByOutputType[P]>
+            : GetScalarType<T[P], MaintenanceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MaintenanceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    phone?: boolean
+    address?: boolean
+    product?: boolean
+    message?: boolean
+  }, ExtArgs["result"]["maintenance"]>
+
+
+
+  export type MaintenanceSelectScalar = {
+    id?: boolean
+    name?: boolean
+    phone?: boolean
+    address?: boolean
+    product?: boolean
+    message?: boolean
+  }
+
+  export type MaintenanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "address" | "product" | "message", ExtArgs["result"]["maintenance"]>
+
+  export type $MaintenancePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Maintenance"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      phone: string
+      address: string | null
+      product: string | null
+      message: string | null
+    }, ExtArgs["result"]["maintenance"]>
+    composites: {}
+  }
+
+  type MaintenanceGetPayload<S extends boolean | null | undefined | MaintenanceDefaultArgs> = $Result.GetResult<Prisma.$MaintenancePayload, S>
+
+  type MaintenanceCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MaintenanceFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MaintenanceCountAggregateInputType | true
+    }
+
+  export interface MaintenanceDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Maintenance'], meta: { name: 'Maintenance' } }
+    /**
+     * Find zero or one Maintenance that matches the filter.
+     * @param {MaintenanceFindUniqueArgs} args - Arguments to find a Maintenance
+     * @example
+     * // Get one Maintenance
+     * const maintenance = await prisma.maintenance.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MaintenanceFindUniqueArgs>(args: SelectSubset<T, MaintenanceFindUniqueArgs<ExtArgs>>): Prisma__MaintenanceClient<$Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Maintenance that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MaintenanceFindUniqueOrThrowArgs} args - Arguments to find a Maintenance
+     * @example
+     * // Get one Maintenance
+     * const maintenance = await prisma.maintenance.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MaintenanceFindUniqueOrThrowArgs>(args: SelectSubset<T, MaintenanceFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MaintenanceClient<$Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Maintenance that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaintenanceFindFirstArgs} args - Arguments to find a Maintenance
+     * @example
+     * // Get one Maintenance
+     * const maintenance = await prisma.maintenance.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MaintenanceFindFirstArgs>(args?: SelectSubset<T, MaintenanceFindFirstArgs<ExtArgs>>): Prisma__MaintenanceClient<$Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Maintenance that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaintenanceFindFirstOrThrowArgs} args - Arguments to find a Maintenance
+     * @example
+     * // Get one Maintenance
+     * const maintenance = await prisma.maintenance.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MaintenanceFindFirstOrThrowArgs>(args?: SelectSubset<T, MaintenanceFindFirstOrThrowArgs<ExtArgs>>): Prisma__MaintenanceClient<$Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Maintenances that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaintenanceFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Maintenances
+     * const maintenances = await prisma.maintenance.findMany()
+     * 
+     * // Get first 10 Maintenances
+     * const maintenances = await prisma.maintenance.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const maintenanceWithIdOnly = await prisma.maintenance.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MaintenanceFindManyArgs>(args?: SelectSubset<T, MaintenanceFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Maintenance.
+     * @param {MaintenanceCreateArgs} args - Arguments to create a Maintenance.
+     * @example
+     * // Create one Maintenance
+     * const Maintenance = await prisma.maintenance.create({
+     *   data: {
+     *     // ... data to create a Maintenance
+     *   }
+     * })
+     * 
+     */
+    create<T extends MaintenanceCreateArgs>(args: SelectSubset<T, MaintenanceCreateArgs<ExtArgs>>): Prisma__MaintenanceClient<$Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Maintenances.
+     * @param {MaintenanceCreateManyArgs} args - Arguments to create many Maintenances.
+     * @example
+     * // Create many Maintenances
+     * const maintenance = await prisma.maintenance.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MaintenanceCreateManyArgs>(args?: SelectSubset<T, MaintenanceCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Maintenance.
+     * @param {MaintenanceDeleteArgs} args - Arguments to delete one Maintenance.
+     * @example
+     * // Delete one Maintenance
+     * const Maintenance = await prisma.maintenance.delete({
+     *   where: {
+     *     // ... filter to delete one Maintenance
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MaintenanceDeleteArgs>(args: SelectSubset<T, MaintenanceDeleteArgs<ExtArgs>>): Prisma__MaintenanceClient<$Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Maintenance.
+     * @param {MaintenanceUpdateArgs} args - Arguments to update one Maintenance.
+     * @example
+     * // Update one Maintenance
+     * const maintenance = await prisma.maintenance.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MaintenanceUpdateArgs>(args: SelectSubset<T, MaintenanceUpdateArgs<ExtArgs>>): Prisma__MaintenanceClient<$Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Maintenances.
+     * @param {MaintenanceDeleteManyArgs} args - Arguments to filter Maintenances to delete.
+     * @example
+     * // Delete a few Maintenances
+     * const { count } = await prisma.maintenance.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MaintenanceDeleteManyArgs>(args?: SelectSubset<T, MaintenanceDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Maintenances.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaintenanceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Maintenances
+     * const maintenance = await prisma.maintenance.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MaintenanceUpdateManyArgs>(args: SelectSubset<T, MaintenanceUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Maintenance.
+     * @param {MaintenanceUpsertArgs} args - Arguments to update or create a Maintenance.
+     * @example
+     * // Update or create a Maintenance
+     * const maintenance = await prisma.maintenance.upsert({
+     *   create: {
+     *     // ... data to create a Maintenance
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Maintenance we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MaintenanceUpsertArgs>(args: SelectSubset<T, MaintenanceUpsertArgs<ExtArgs>>): Prisma__MaintenanceClient<$Result.GetResult<Prisma.$MaintenancePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Maintenances.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaintenanceCountArgs} args - Arguments to filter Maintenances to count.
+     * @example
+     * // Count the number of Maintenances
+     * const count = await prisma.maintenance.count({
+     *   where: {
+     *     // ... the filter for the Maintenances we want to count
+     *   }
+     * })
+    **/
+    count<T extends MaintenanceCountArgs>(
+      args?: Subset<T, MaintenanceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MaintenanceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Maintenance.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaintenanceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MaintenanceAggregateArgs>(args: Subset<T, MaintenanceAggregateArgs>): Prisma.PrismaPromise<GetMaintenanceAggregateType<T>>
+
+    /**
+     * Group by Maintenance.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaintenanceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MaintenanceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MaintenanceGroupByArgs['orderBy'] }
+        : { orderBy?: MaintenanceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MaintenanceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMaintenanceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Maintenance model
+   */
+  readonly fields: MaintenanceFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Maintenance.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MaintenanceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Maintenance model
+   */
+  interface MaintenanceFieldRefs {
+    readonly id: FieldRef<"Maintenance", 'Int'>
+    readonly name: FieldRef<"Maintenance", 'String'>
+    readonly phone: FieldRef<"Maintenance", 'String'>
+    readonly address: FieldRef<"Maintenance", 'String'>
+    readonly product: FieldRef<"Maintenance", 'String'>
+    readonly message: FieldRef<"Maintenance", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Maintenance findUnique
+   */
+  export type MaintenanceFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+    /**
+     * Filter, which Maintenance to fetch.
+     */
+    where: MaintenanceWhereUniqueInput
+  }
+
+  /**
+   * Maintenance findUniqueOrThrow
+   */
+  export type MaintenanceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+    /**
+     * Filter, which Maintenance to fetch.
+     */
+    where: MaintenanceWhereUniqueInput
+  }
+
+  /**
+   * Maintenance findFirst
+   */
+  export type MaintenanceFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+    /**
+     * Filter, which Maintenance to fetch.
+     */
+    where?: MaintenanceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Maintenances to fetch.
+     */
+    orderBy?: MaintenanceOrderByWithRelationInput | MaintenanceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Maintenances.
+     */
+    cursor?: MaintenanceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Maintenances from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Maintenances.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Maintenances.
+     */
+    distinct?: MaintenanceScalarFieldEnum | MaintenanceScalarFieldEnum[]
+  }
+
+  /**
+   * Maintenance findFirstOrThrow
+   */
+  export type MaintenanceFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+    /**
+     * Filter, which Maintenance to fetch.
+     */
+    where?: MaintenanceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Maintenances to fetch.
+     */
+    orderBy?: MaintenanceOrderByWithRelationInput | MaintenanceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Maintenances.
+     */
+    cursor?: MaintenanceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Maintenances from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Maintenances.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Maintenances.
+     */
+    distinct?: MaintenanceScalarFieldEnum | MaintenanceScalarFieldEnum[]
+  }
+
+  /**
+   * Maintenance findMany
+   */
+  export type MaintenanceFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+    /**
+     * Filter, which Maintenances to fetch.
+     */
+    where?: MaintenanceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Maintenances to fetch.
+     */
+    orderBy?: MaintenanceOrderByWithRelationInput | MaintenanceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Maintenances.
+     */
+    cursor?: MaintenanceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Maintenances from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Maintenances.
+     */
+    skip?: number
+    distinct?: MaintenanceScalarFieldEnum | MaintenanceScalarFieldEnum[]
+  }
+
+  /**
+   * Maintenance create
+   */
+  export type MaintenanceCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Maintenance.
+     */
+    data: XOR<MaintenanceCreateInput, MaintenanceUncheckedCreateInput>
+  }
+
+  /**
+   * Maintenance createMany
+   */
+  export type MaintenanceCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Maintenances.
+     */
+    data: MaintenanceCreateManyInput | MaintenanceCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Maintenance update
+   */
+  export type MaintenanceUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Maintenance.
+     */
+    data: XOR<MaintenanceUpdateInput, MaintenanceUncheckedUpdateInput>
+    /**
+     * Choose, which Maintenance to update.
+     */
+    where: MaintenanceWhereUniqueInput
+  }
+
+  /**
+   * Maintenance updateMany
+   */
+  export type MaintenanceUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Maintenances.
+     */
+    data: XOR<MaintenanceUpdateManyMutationInput, MaintenanceUncheckedUpdateManyInput>
+    /**
+     * Filter which Maintenances to update
+     */
+    where?: MaintenanceWhereInput
+    /**
+     * Limit how many Maintenances to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Maintenance upsert
+   */
+  export type MaintenanceUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Maintenance to update in case it exists.
+     */
+    where: MaintenanceWhereUniqueInput
+    /**
+     * In case the Maintenance found by the `where` argument doesn't exist, create a new Maintenance with this data.
+     */
+    create: XOR<MaintenanceCreateInput, MaintenanceUncheckedCreateInput>
+    /**
+     * In case the Maintenance was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MaintenanceUpdateInput, MaintenanceUncheckedUpdateInput>
+  }
+
+  /**
+   * Maintenance delete
+   */
+  export type MaintenanceDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+    /**
+     * Filter which Maintenance to delete.
+     */
+    where: MaintenanceWhereUniqueInput
+  }
+
+  /**
+   * Maintenance deleteMany
+   */
+  export type MaintenanceDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Maintenances to delete
+     */
+    where?: MaintenanceWhereInput
+    /**
+     * Limit how many Maintenances to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Maintenance without action
+   */
+  export type MaintenanceDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Maintenance
+     */
+    select?: MaintenanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Maintenance
+     */
+    omit?: MaintenanceOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -20123,6 +21133,18 @@ export namespace Prisma {
   export type BanksScalarFieldEnum = (typeof BanksScalarFieldEnum)[keyof typeof BanksScalarFieldEnum]
 
 
+  export const MaintenanceScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    phone: 'phone',
+    address: 'address',
+    product: 'product',
+    message: 'message'
+  };
+
+  export type MaintenanceScalarFieldEnum = (typeof MaintenanceScalarFieldEnum)[keyof typeof MaintenanceScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -20312,6 +21334,17 @@ export namespace Prisma {
   };
 
   export type BanksOrderByRelevanceFieldEnum = (typeof BanksOrderByRelevanceFieldEnum)[keyof typeof BanksOrderByRelevanceFieldEnum]
+
+
+  export const MaintenanceOrderByRelevanceFieldEnum: {
+    name: 'name',
+    phone: 'phone',
+    address: 'address',
+    product: 'product',
+    message: 'message'
+  };
+
+  export type MaintenanceOrderByRelevanceFieldEnum = (typeof MaintenanceOrderByRelevanceFieldEnum)[keyof typeof MaintenanceOrderByRelevanceFieldEnum]
 
 
   /**
@@ -21668,6 +22701,66 @@ export namespace Prisma {
     qr?: StringNullableWithAggregatesFilter<"Banks"> | string | null
   }
 
+  export type MaintenanceWhereInput = {
+    AND?: MaintenanceWhereInput | MaintenanceWhereInput[]
+    OR?: MaintenanceWhereInput[]
+    NOT?: MaintenanceWhereInput | MaintenanceWhereInput[]
+    id?: IntFilter<"Maintenance"> | number
+    name?: StringFilter<"Maintenance"> | string
+    phone?: StringFilter<"Maintenance"> | string
+    address?: StringNullableFilter<"Maintenance"> | string | null
+    product?: StringNullableFilter<"Maintenance"> | string | null
+    message?: StringNullableFilter<"Maintenance"> | string | null
+  }
+
+  export type MaintenanceOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    address?: SortOrderInput | SortOrder
+    product?: SortOrderInput | SortOrder
+    message?: SortOrderInput | SortOrder
+    _relevance?: MaintenanceOrderByRelevanceInput
+  }
+
+  export type MaintenanceWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: MaintenanceWhereInput | MaintenanceWhereInput[]
+    OR?: MaintenanceWhereInput[]
+    NOT?: MaintenanceWhereInput | MaintenanceWhereInput[]
+    name?: StringFilter<"Maintenance"> | string
+    phone?: StringFilter<"Maintenance"> | string
+    address?: StringNullableFilter<"Maintenance"> | string | null
+    product?: StringNullableFilter<"Maintenance"> | string | null
+    message?: StringNullableFilter<"Maintenance"> | string | null
+  }, "id">
+
+  export type MaintenanceOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    address?: SortOrderInput | SortOrder
+    product?: SortOrderInput | SortOrder
+    message?: SortOrderInput | SortOrder
+    _count?: MaintenanceCountOrderByAggregateInput
+    _avg?: MaintenanceAvgOrderByAggregateInput
+    _max?: MaintenanceMaxOrderByAggregateInput
+    _min?: MaintenanceMinOrderByAggregateInput
+    _sum?: MaintenanceSumOrderByAggregateInput
+  }
+
+  export type MaintenanceScalarWhereWithAggregatesInput = {
+    AND?: MaintenanceScalarWhereWithAggregatesInput | MaintenanceScalarWhereWithAggregatesInput[]
+    OR?: MaintenanceScalarWhereWithAggregatesInput[]
+    NOT?: MaintenanceScalarWhereWithAggregatesInput | MaintenanceScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Maintenance"> | number
+    name?: StringWithAggregatesFilter<"Maintenance"> | string
+    phone?: StringWithAggregatesFilter<"Maintenance"> | string
+    address?: StringNullableWithAggregatesFilter<"Maintenance"> | string | null
+    product?: StringNullableWithAggregatesFilter<"Maintenance"> | string | null
+    message?: StringNullableWithAggregatesFilter<"Maintenance"> | string | null
+  }
+
   export type UserCreateInput = {
     name: string
     email: string
@@ -22959,6 +24052,66 @@ export namespace Prisma {
     qr?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type MaintenanceCreateInput = {
+    name: string
+    phone: string
+    address?: string | null
+    product?: string | null
+    message?: string | null
+  }
+
+  export type MaintenanceUncheckedCreateInput = {
+    id?: number
+    name: string
+    phone: string
+    address?: string | null
+    product?: string | null
+    message?: string | null
+  }
+
+  export type MaintenanceUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    product?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MaintenanceUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    product?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MaintenanceCreateManyInput = {
+    id?: number
+    name: string
+    phone: string
+    address?: string | null
+    product?: string | null
+    message?: string | null
+  }
+
+  export type MaintenanceUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    product?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MaintenanceUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    product?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -24248,6 +25401,47 @@ export namespace Prisma {
   }
 
   export type BanksSumOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type MaintenanceOrderByRelevanceInput = {
+    fields: MaintenanceOrderByRelevanceFieldEnum | MaintenanceOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type MaintenanceCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    product?: SortOrder
+    message?: SortOrder
+  }
+
+  export type MaintenanceAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type MaintenanceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    product?: SortOrder
+    message?: SortOrder
+  }
+
+  export type MaintenanceMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    product?: SortOrder
+    message?: SortOrder
+  }
+
+  export type MaintenanceSumOrderByAggregateInput = {
     id?: SortOrder
   }
 

@@ -259,6 +259,15 @@ model Banks{
   qr String?
 }
 
+model Maintenance{
+  id Int    @id @default(autoincrement())
+  name String
+  phone String
+  address String?
+  product String?
+  message  String?  @db.Text    
+}
+
 
 enum QuotationStatus {
   PENDING
