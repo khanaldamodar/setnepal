@@ -7,14 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronRight, Lock } from "lucide-react";
-// import CryptoJS from "crypto-js"; // commented out, not used now
 
 export default function PaymentPage({ packages }: { packages?: any[] }) {
   const router = useRouter();
   const { cart, isLoaded, subtotal, tax, total, clearCart } = useCart();
+
   const [checkoutData, setCheckoutData] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState("COD");
-  const [transactionId, setTransactionId] = useState(""); // state for eSewa
+
+  // BANK PAYMENT STATES
+  const [banks, setBanks] = useState<any[]>([]);
+  const [selectedBank, setSelectedBank] = useState<any>(null);
+  const [transactionId, setTransactionId] = useState("");
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +30,28 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     else router.push("/checkout");
   }, [router]);
 
-  // Combine products and packages for orderItems
+  useEffect(() => {
+    if (paymentMethod === "BANK") {
+      fetch("/api/banks")
+        .then((res) => res.json())
+        .then((data) => {
+          // FIX: normalize response into array
+          if (Array.isArray(data)) {
+            setBanks(data);
+          } else if (Array.isArray(data.data)) {
+            setBanks(data.data);
+          } else if (Array.isArray(data.banks)) {
+            setBanks(data.banks);
+          } else {
+            console.error("Unexpected banks response:", data);
+            setBanks([]);
+          }
+        })
+        .catch((err) => console.error("Error fetching banks:", err));
+    }
+  }, [paymentMethod]);
+
+  // Combine products + packages
   const orderItems = [
     ...cart.map((item) => ({
       productId: item.id,
@@ -35,9 +61,9 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     })),
 
     ...(packages?.map((pkg) => ({
-      productId: pkg.id, 
+      productId: pkg.id,
       quantity: 1,
-      price: pkg.price, 
+      price: pkg.price,
       name: pkg.name,
       products: pkg.products?.map((p: any) => ({
         id: p.id,
@@ -80,15 +106,23 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     );
   }
 
+  // Place Order
   const handlePlaceOrder = async () => {
-    // Prevent order if ESEWA is selected and transactionId is empty
-    if (paymentMethod === "ESEWA" && !transactionId.trim()) {
-      setError("Transaction ID is required for eSewa payment");
-      return;
+    setError(null);
+
+    // BANK validations
+    if (paymentMethod === "BANK") {
+      if (!selectedBank) {
+        setError("Please select a bank");
+        return;
+      }
+      if (!transactionId.trim()) {
+        setError("Transaction ID is required for bank payment");
+        return;
+      }
     }
 
     setIsProcessing(true);
-    setError(null);
 
     try {
       const shippingAddress = `${checkoutData.billingAddress.fullName}, ${
@@ -108,8 +142,12 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
           price: item.price,
         })),
         shippingAddress,
-        paymentMethod,
-        ...(paymentMethod === "ESEWA" && { transactionId }),
+        paymentMethod: paymentMethod === "BANK" ? "ONLINE" : "COD",
+
+        ...(paymentMethod === "BANK" && {
+          bankId: selectedBank.id,
+          transactionId,
+        }),
       };
 
       const token = localStorage.getItem("token");
@@ -131,20 +169,20 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
         throw new Error(data?.message);
       }
 
-      //  If ESEWA, post payment record
-      if (paymentMethod === "ESEWA") {
+      // Save Payment
+      if (paymentMethod === "BANK") {
         const paymentPayload = {
           orderId: Number(orderId),
-          userId: 1, // replace with actual user ID if available
-          amount: calculatedTotal, // or total from payload
-          method: "ESEWA",
+          userId: 1, // Replace with real user id
+          amount: calculatedTotal,
+          method: "ONLINE",
           status: "SUCCESS",
-          transactionId: transactionId,
+          bankId: selectedBank.id,
+          transactionId,
           paymentData: {
+            bankName: selectedBank.name,
+            qr: selectedBank.qr,
             transactionId,
-            totalAmount: calculatedTotal,
-            userName: checkoutData.billingAddress.fullName,
-            userAccount: checkoutData.billingAddress.phoneNumber,
           },
         };
 
@@ -156,11 +194,10 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
 
         if (!paymentRes.ok) {
           const errData = await paymentRes.json();
-          throw new Error(errData.message || "Payment save failed");
+          throw new Error(errData.message || "Payment saving failed");
         }
       }
 
-      // Clear cart & redirect
       clearCart();
       sessionStorage.removeItem("checkoutData");
       router.push(`/order-confirmation/${orderId}`);
@@ -195,8 +232,9 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
               <h2 className="mb-4 text-xl font-bold text-foreground">
                 Payment Method
               </h2>
+
               <div className="space-y-3">
-                {["COD", "Bank", "ESEWA"].map((method) => (
+                {["COD", "BANK"].map((method) => (
                   <label
                     key={method}
                     className="flex items-center gap-3 rounded-lg border border-border p-4 cursor-pointer hover:bg-card/50"
@@ -209,40 +247,80 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="h-4 w-4"
                     />
-                    <p className="font-medium text-foreground">{method}</p>
+                    <p className="font-medium text-foreground">
+                      {method === "BANK"
+                        ? "Online Bank Transfer"
+                        : "Cash on Delivery"}
+                    </p>
                   </label>
                 ))}
 
-                {paymentMethod === "ESEWA" && (
-                  <div className="mt-2 space-y-2">
+                {/* BANK PAYMENT FIELDS */}
+                {paymentMethod === "BANK" && (
+                  <div className="mt-2 space-y-4">
+                    {/* Bank dropdown */}
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
-                        Transaction ID
+                      <label className="block text-sm font-medium mb-1">
+                        Select Bank
                       </label>
-                      <input
-                        type="text"
-                        value={transactionId}
-                        onChange={(e) => setTransactionId(e.target.value)}
+                      <select
                         className="w-full rounded border border-border p-2"
-                        placeholder="Enter eSewa Transaction ID"
-                        required
-                      />
+                        onChange={(e) => {
+                          const bank = banks.find(
+                            (b) => b.id == e.target.value
+                          );
+                          setSelectedBank(bank);
+                        }}
+                      >
+                        <option value="">Choose a bank</option>
+                        {banks.map((bank) => (
+                          <option key={bank.id} value={bank.id}>
+                            {bank.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
-                    <div className="flex flex-col items-center">
-                      <span className="mb-1 text-xs font-medium text-gray-500">
-                        Scan for Pay
-                      </span>
+                    {/* After bank selected */}
+                    {selectedBank && (
+                      <>
+                        {/* Transaction ID */}
+                        <div>
+                          <label className="block text-sm font-medium mb-1">
+                            Transaction ID
+                          </label>
+                          <input
+                            type="text"
+                            value={transactionId}
+                            onChange={(e) => setTransactionId(e.target.value)}
+                            className="w-full rounded border border-border p-2"
+                            placeholder="Enter transaction ID"
+                            required
+                          />
+                        </div>
 
-                      <div className="w-50 h-50 border border-dashed border-gray-400 rounded flex items-center justify-center text-gray-500">
-                        {/* QR code will be assigned here */}
-                      </div>
-                    </div>
+                        {/* QR */}
+                        <div className="flex flex-col items-center">
+                          <span className="mb-1 text-xs font-medium text-gray-500">
+                            Scan to Pay
+                          </span>
+
+                          <div className="w-48 h-48 border rounded shadow flex items-center justify-center bg-white">
+                            <img
+                              src={selectedBank.qr}
+                              alt="Bank QR Code"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
             </Card>
 
+            {/* Billing */}
             <Card className="p-6">
               <h2 className="mb-4 text-xl font-bold text-foreground">
                 Billing Address
@@ -286,6 +364,7 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
                         Rs. {(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
+
                     {item.products && (
                       <p className="text-xs text-muted-foreground">
                         Includes:{" "}
