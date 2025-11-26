@@ -243,6 +243,16 @@ model QuotationItem {
   subtotal     Float
 }
 
+model Members{
+  id Int    @id @default(autoincrement())
+  name String
+  phone String
+  email String?
+  desc String?
+  designation String?
+  photo String?
+}
+
 
 enum QuotationStatus {
   PENDING

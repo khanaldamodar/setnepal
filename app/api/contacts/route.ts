@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 // To get the Contacts of the website
 export async function GET() {
@@ -31,35 +32,55 @@ export async function GET() {
   }
 }
 
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await  req.json();
-    const {name, phone, message} = body;
+    const body = await req.json();
+    const { name, phone, message } = body;
 
-    if(!phone){
-        return NextResponse.json({"Message": "Phone Number is required"}, {status: 400})
+    if (!phone) {
+      return NextResponse.json({ Message: "Phone Number is required" }, { status: 400 });
     }
-     const contact = await prisma.contacts.create({
-      data: {
-        name,
-        phone,
-        message,
+
+    // Save to database
+    const contact = await prisma.contacts.create({
+      data: { name, phone, message },
+    });
+
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.example.com", // e.g., smtp.gmail.com
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.EMAIL_USER, // your email
+        pass: process.env.EMAIL_PASS, // your password or app password
       },
     });
 
-    return NextResponse.json({
-        "message": "Submitted Successfully!!",
-        "contact": contact
-    },
-    {status: 202})
+    const mailOptions = {
+      from: `"Website Contact" <${process.env.EMAIL_USER}>`,
+      to: "your-receiving-email@example.com", // where you want to receive the message
+      subject: "New Contact Form Submission",
+      text: `Name: ${name}\nPhone: ${phone}\nMessage: ${message}`,
+      html: `<p><strong>Name:</strong> ${name}</p>
+             <p><strong>Phone:</strong> ${phone}</p>
+             <p><strong>Message:</strong> ${message}</p>`,
+    };
 
+    await transporter.sendMail(mailOptions);
+
+    return NextResponse.json(
+      { message: "Submitted Successfully!!", contact },
+      { status: 202 }
+    );
 
   } catch (ex) {
+    console.error(ex);
     return NextResponse.json(
-      {
-        Message: "Failed to submit, Try again Later!",
-      },
+      { Message: "Failed to submit, Try again Later!" },
       { status: 500 }
     );
   }
 }
+
