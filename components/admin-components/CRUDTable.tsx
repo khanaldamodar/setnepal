@@ -11,7 +11,8 @@ import { useDelete } from "@/services/useDelete";
 import clsx from "clsx";
 
 interface CRUDTableProps {
-  endpoint: string;
+  endpoint: string; // for frontend routes
+  apiEndpoint?: string; // for backend API (optional)
   columns: string[];
   data: any[];
   setData: React.Dispatch<React.SetStateAction<any[]>>;
@@ -21,6 +22,7 @@ interface CRUDTableProps {
 
 export default function CRUDTable({
   endpoint,
+  apiEndpoint,
   columns,
   data,
   setData,
@@ -31,7 +33,7 @@ export default function CRUDTable({
   const { deleteItem, loading: deleting } = useDelete(
     data,
     setData,
-    `/api/${endpoint}`
+    `/api/${apiEndpoint || endpoint}` // use apiEndpoint if provided
   );
 
   const [search, setSearch] = useState("");
@@ -68,13 +70,11 @@ export default function CRUDTable({
 
   const totalPages = Math.ceil(filtered.length / perPage);
 
-  // Helper to render cell safely
   const renderSafeCell = (col: string, row: any) => {
     if (renderCell) return renderCell(col, row);
 
     const value = row[col];
 
-    // Handle array (like gallery)
     if (Array.isArray(value)) {
       if (endpoint === "gallery") {
         return (
@@ -101,18 +101,15 @@ export default function CRUDTable({
       }
     }
 
-    // Handle object
     if (typeof value === "object" && value !== null) {
       return JSON.stringify(value);
     }
 
-    // Default
     return value;
   };
 
   return (
     <Card className="shadow-md border rounded-2xl overflow-hidden">
-      {/* Header */}
       <CardHeader className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <CardTitle className="text-xl font-semibold capitalize">
           {endpoint} Table
@@ -129,7 +126,6 @@ export default function CRUDTable({
         </div>
       </CardHeader>
 
-      {/* Table */}
       <CardContent className="overflow-x-auto">
         <motion.table
           className="w-full text-left border-collapse"
@@ -242,7 +238,6 @@ export default function CRUDTable({
           </tbody>
         </motion.table>
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-end items-center gap-2 mt-4">
             <Button

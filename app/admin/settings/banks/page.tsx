@@ -16,7 +16,7 @@ const BanksPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch data from API
+  // Fetch banks from API
   useEffect(() => {
     const fetchBanks = async () => {
       try {
@@ -35,6 +35,7 @@ const BanksPage = () => {
         setLoading(false);
       }
     };
+
     fetchBanks();
   }, []);
 
@@ -47,7 +48,7 @@ const BanksPage = () => {
       <div className="w-full flex items-center justify-between mb-4">
         <h3 className="text-2xl font-bold">Banks</h3>
         <button
-          onClick={() => router.push("/admin/banks/add")}
+          onClick={() => router.push("/admin/settings/banks/add")}
           className="bg-[#aec958] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition"
         >
           Add Bank
@@ -58,7 +59,8 @@ const BanksPage = () => {
       <div className="flex-1 p-4 w-full">
         {banks.length > 0 ? (
           <CRUDTable
-            endpoint="settings/banks"
+            endpoint="settings/banks" // frontend route
+            apiEndpoint="banks" // backend API route
             columns={["name", "qr"]}
             data={banks}
             actions={["edit", "delete"]}
