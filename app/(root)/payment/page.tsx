@@ -51,7 +51,6 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     }
   }, [paymentMethod]);
 
-  // Combine products + packages
   const orderItems = [
     ...cart.map((item) => ({
       productId: item.id,
@@ -59,7 +58,6 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
       price: item.price,
       name: item.name,
     })),
-
     ...(packages?.map((pkg) => ({
       productId: pkg.id,
       quantity: 1,
@@ -137,10 +135,15 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
 
       const payload = {
         items: orderItems.map((item) => ({
-          productId: item.productId,
+          productId: Number(
+            (item.productId ?? item.id).toString().replace(/(pkg-|prod-)/, "")
+          ),
           quantity: item.quantity,
           price: item.price,
+          name: item.name,
+          products: item.products, // include package products
         })),
+
         shippingAddress,
         paymentMethod: paymentMethod === "BANK" ? "ONLINE" : "COD",
 

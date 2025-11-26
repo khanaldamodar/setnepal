@@ -40,6 +40,7 @@ export function ProductGrid({ products }: ProductGridProps) {
         price: product.price,
         image: product.imageUrl,
         category: product.category?.[0]?.name ?? "",
+        type: "product", // ADD THIS
       },
       1
     );
