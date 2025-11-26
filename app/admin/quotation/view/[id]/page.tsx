@@ -22,7 +22,7 @@ interface Quotation {
   address: string;
   companyName: string;
   message?: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  // status: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;
   items: ProductItem[];
 }
@@ -189,14 +189,14 @@ export default function QuotationViewPage() {
               <strong>Message:</strong> {quotation.message}
             </p>
           )}
-          <p>
+          {/* <p>
             <strong>Status:</strong>{" "}
             <Badge
               variant={quotation.status === "APPROVED" ? "default" : "outline"}
             >
               {quotation.status}
             </Badge>
-          </p>
+          </p> */}
 
           <p>
             <strong>Created At:</strong>{" "}

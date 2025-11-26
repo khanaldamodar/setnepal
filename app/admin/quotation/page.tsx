@@ -80,8 +80,8 @@ const QuotationsPage = () => {
   return (
     <div className="h-screen flex flex-col font-poppins">
       {/* Header */}
-      <div className="w-full flex items-center p-4 shadow-md justify-between bg-[#aec958]">
-        <h3 className="text-2xl text-white font-bold">Quotations</h3>
+      <div className="w-full flex items-center p-4 justify-between">
+        <h3 className="text-2xl  font-bold">Quotations</h3>
       </div>
 
       {/* Table */}

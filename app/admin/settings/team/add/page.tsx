@@ -26,9 +26,6 @@ export default function AddMemberForm() {
       designation,
       description,
       imageFile,
-      facebook,
-      instagram,
-      linkedin,
       email,
     };
 
@@ -37,7 +34,7 @@ export default function AddMemberForm() {
   };
 
   return (
-    <div className="flex min-h-screen justify-center font-poppins bg-gray-50 p-6">
+    <div className="flex min-h-screen justify-center font-poppins">
       <main className="flex-1 max-w-4xl">
         <div className="bg-white shadow-md rounded-xl p-8">
           <form
@@ -89,27 +86,6 @@ export default function AddMemberForm() {
                 />
               )}
             </div>
-
-            <h2 className="text-xl font-semibold text-gray-800 md:col-span-2 mt-6">
-              Social Links (Optional)
-            </h2>
-
-            <InputField
-              label="Facebook"
-              value={facebook}
-              onChange={setFacebook}
-            />
-            <InputField
-              label="Instagram"
-              value={instagram}
-              onChange={setInstagram}
-            />
-            <InputField
-              label="LinkedIn"
-              value={linkedin}
-              onChange={setLinkedin}
-            />
-
             <div className="md:col-span-2 flex justify-center mt-8">
               <button
                 type="submit"

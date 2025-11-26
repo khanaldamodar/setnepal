@@ -26,8 +26,6 @@ interface Package {
   products?: { id: number; name: string }[];
 }
 
-
-
 export default function PackagesPage() {
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(false);
@@ -77,7 +75,7 @@ export default function PackagesPage() {
   //  Define columns for the DataTable
   const columns: Column<Package>[] = [
     {
-      key: 'imageUrl' as keyof Package,
+      key: "imageUrl" as keyof Package,
       label: "Image",
       render: (pkg: Package) =>
         pkg.imageUrl ? (
@@ -92,10 +90,14 @@ export default function PackagesPage() {
           <span className="text-gray-400 italic">No Image</span>
         ),
     },
-    { key: 'name' as keyof Package, label: "Name" },
-    { key: 'price' as keyof Package, label: "Price", render: (pkg: Package) => `Rs. ${pkg.price}` },
+    { key: "name" as keyof Package, label: "Name" },
     {
-      key: 'discount' as keyof Package,
+      key: "price" as keyof Package,
+      label: "Price",
+      render: (pkg: Package) => `Rs. ${pkg.price}`,
+    },
+    {
+      key: "discount" as keyof Package,
       label: "Discount",
       render: (pkg: Package) =>
         pkg.discount ? (
@@ -104,9 +106,9 @@ export default function PackagesPage() {
           <span className="text-gray-400">None</span>
         ),
     },
-    { key: 'stock' as keyof Package, label: "Stock" },
+    { key: "stock" as keyof Package, label: "Stock" },
     {
-      key: 'isFeatured' as keyof Package,
+      key: "isFeatured" as keyof Package,
       label: "Featured",
       render: (pkg: Package) =>
         pkg.isFeatured ? (
@@ -116,7 +118,7 @@ export default function PackagesPage() {
         ),
     },
     {
-      key: 'isActive' as keyof Package,
+      key: "isActive" as keyof Package,
       label: "Status",
       render: (pkg: Package) =>
         pkg.isActive ? (
@@ -129,12 +131,14 @@ export default function PackagesPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold"> Packages</h1>
-        <Button onClick={() => router.push("/admin/packages/add")}>
-          <Plus className="w-4 h-4 mr-2" />
+      <div className="w-full flex items-center justify-between ">
+        <h3 className="text-2xl font-bold">Package</h3>
+        <button
+          onClick={() => router.push("/admin/packages/add")}
+          className="bg-[#aec958] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition"
+        >
           Add Package
-        </Button>
+        </button>
       </div>
 
       {loading ? (
