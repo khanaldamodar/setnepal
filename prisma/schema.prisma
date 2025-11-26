@@ -253,6 +253,12 @@ model Members{
   photo String?
 }
 
+model Banks{
+  id Int    @id @default(autoincrement())
+  name String
+  qr String?
+}
+
 
 enum QuotationStatus {
   PENDING
