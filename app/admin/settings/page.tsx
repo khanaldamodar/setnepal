@@ -162,15 +162,15 @@ export default function SettingsPage() {
                   className="bg-[#4998d1] hover:bg-[#62a4d3] text-white px-4 py-2 rounded-md text-sm font-medium transition"
                   onClick={() => router.push("/admin/settings/payment")}
                 >
-                  Add Payment
+                  Payment
                 </button>
 
                 <button
                   type="button"
                   className="bg-[#aec958] hover:bg-[#aabe66] text-white px-4 py-2 rounded-md text-sm font-medium transition"
-                  onClick={() => router.push("/admin/settings/team")}
+                  onClick={() => router.push("/admin/settings/members")}
                 >
-                  Add Team
+                  Members
                 </button>
               </div>
             </div>
