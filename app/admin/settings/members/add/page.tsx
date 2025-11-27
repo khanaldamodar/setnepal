@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AddMemberPage() {
   const [name, setName] = useState("");
@@ -14,6 +16,25 @@ export default function AddMemberPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const phoneRegex = /^[0-9]{10}$/;
+
+    if (!name || !phone || !email) {
+      toast.error("Please fill all required fields!");
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address!");
+      return;
+    }
+
+    if (!phoneRegex.test(phone)) {
+      toast.error("Phone number must be 10 digits!");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("phone", phone);
@@ -25,13 +46,31 @@ export default function AddMemberPage() {
       formData.append("photo", imageFile);
     }
 
-    const res = await fetch("/api/members", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("/api/members", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    console.log("Response:", data);
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Failed to add member");
+        return;
+      }
+
+      toast.success("Member added successfully!");
+
+      setName("");
+      setPhone("");
+      setDesignation("");
+      setDesc("");
+      setEmail("");
+      setImageFile(null);
+      setImagePreview(null);
+    } catch (error) {
+      toast.error("Something went wrong!");
+    }
   };
 
   return (

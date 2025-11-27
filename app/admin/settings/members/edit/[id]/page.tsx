@@ -7,7 +7,8 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 interface TeamMember {
   id: number;
@@ -85,19 +86,36 @@ export default function EditMemberPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{10}$/;
+
+    if (!form.name || !form.email) {
+      toast.error("Name and email are required");
+      return;
+    }
+
+    if (!emailRegex.test(form.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (form.phone && !phoneRegex.test(form.phone)) {
+      toast.error("Phone number must be 10 digits");
+      return;
+    }
+
     setSaving(true);
 
     try {
       const formData = new FormData();
 
-      // Only append fields that exist or changed
       Object.entries(form).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           formData.append(key, value as string);
         }
       });
 
-      // Only append photo if the user selected a new one
       if (imageFile) formData.append("photo", imageFile);
 
       await axios.put(`/api/members/${id}`, formData, {

@@ -70,7 +70,7 @@ const PaymentsPage = () => {
         {payments.length > 0 ? (
           <CRUDTable
             endpoint="payments"
-            actions={["view", "delete"]}
+            actions={["delete"]}
             columns={["orderId", "amount", "method", "status", "transactionId"]}
             data={payments}
             setData={setPayments}
