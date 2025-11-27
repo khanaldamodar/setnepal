@@ -1,5 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server"; 
 import prisma from "@/lib/prisma";
+import formidable from "formidable"; 
+import fs from "fs"; 
+import path from "path";
 
 
 /**
@@ -337,19 +340,85 @@ export async function GET(
 }
 
 // ✅ UPDATE PRODUCT (PUT)
-export async function PUT(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+// export async function PUT(
+//   req: NextRequest,
+//   context: { params: Promise<{ id: string }> }
+// ) {
+//   try {
+//     const { id } = await context.params;
+//     const numericId = parseInt(id, 10);
+
+//     if (isNaN(numericId)) {
+//       return NextResponse.json({ message: "Invalid product ID" }, { status: 400 });
+//     }
+
+//     const body = await req.json();
+
+//     const {
+//       name,
+//       description,
+//       price,
+//       stock,
+//       sku,
+//       weight,
+//       categoryId,
+//       brandId,
+//       isFeatured,
+//       isActive,
+//       imageUrl,
+//       gallery,
+//     } = body;
+
+//     const existing = await prisma.product.findUnique({ where: { id: numericId } });
+//     if (!existing) {
+//       return NextResponse.json({ message: "Product not found" }, { status: 404 });
+//     }
+
+//     const updated = await prisma.product.update({
+//       where: { id: numericId },
+//       data: {
+//         name,
+//         description,
+//         price,
+//         stock,
+//         sku,
+//         weight,
+//         categoryId,
+//         brandId,
+//         isFeatured,
+//         isActive,
+//         imageUrl,
+//         gallery: Array.isArray(gallery) ? JSON.stringify(gallery) : gallery,
+//       },
+//     });
+
+//     return NextResponse.json(
+//       { message: "Product updated successfully", product: updated },
+//       { status: 200 }
+//     );
+//   } catch (err) {
+//     console.error("Error updating product:", err);
+//     return NextResponse.json({ message: "Failed to update product" }, { status: 500 });
+//   }
+// }
+
+
+export async function PUT(req: NextRequest, context: { params: { id: string } }) {
   try {
-    const { id } = await context.params;
+    const { id } = await context.params; // ✅
+
     const numericId = parseInt(id, 10);
 
     if (isNaN(numericId)) {
       return NextResponse.json({ message: "Invalid product ID" }, { status: 400 });
     }
 
-    const body = await req.json();
+    const existing = await prisma.product.findUnique({ where: { id: numericId } });
+    if (!existing) {
+      return NextResponse.json({ message: "Product not found" }, { status: 404 });
+    }
+
+    const body = await req.json(); // Safe now, client sends JSON
 
     const {
       name,
@@ -366,22 +435,17 @@ export async function PUT(
       gallery,
     } = body;
 
-    const existing = await prisma.product.findUnique({ where: { id: numericId } });
-    if (!existing) {
-      return NextResponse.json({ message: "Product not found" }, { status: 404 });
-    }
-
     const updated = await prisma.product.update({
       where: { id: numericId },
       data: {
         name,
         description,
-        price,
-        stock,
+        price: Number(price),
+        stock: Number(stock),
         sku,
-        weight,
-        categoryId,
-        brandId,
+        weight: Number(weight),
+        categoryId: Number(categoryId),
+        brandId: Number(brandId),
         isFeatured,
         isActive,
         imageUrl,
@@ -389,10 +453,7 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(
-      { message: "Product updated successfully", product: updated },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Product updated successfully", product: updated });
   } catch (err) {
     console.error("Error updating product:", err);
     return NextResponse.json({ message: "Failed to update product" }, { status: 500 });

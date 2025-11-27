@@ -83,25 +83,16 @@ export default function EditProductPage() {
     setSaving(true);
 
     try {
-      const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) =>
-        formData.append(key, String(value))
-      );
+      // Prepare the data
+      const payload = {
+        ...form,
+        imageUrl: previewImage, // keep current image URL
+        gallery: galleryPreview, // array of URLs
+      };
 
-      // main image
-      if (imageFile) formData.append("image", imageFile);
-
-      // gallery new uploads
-      galleryFiles.forEach((file) => formData.append("gallery[]", file));
-
-      // existing gallery urls
-      galleryPreview.forEach((url) =>
-        formData.append("existingGallery[]", url)
-      );
-
-      await axios.put(`/api/products/${id}`, formData, {
+      await axios.put(`/api/products/${id}`, payload, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
           Authorization: `Bearer ${Cookies.get("token") || ""}`,
         },
       });
@@ -124,47 +115,149 @@ export default function EditProductPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Name */}
-        <Input name="name" value={form.name} onChange={handleChange} required />
+        <div>
+          <label htmlFor="name" className="font-medium block mb-1">
+            Product Name
+          </label>
+          <Input
+            id="name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
         {/* Description */}
-        <Textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-        />
-
-        {/* Price & Stock */}
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            name="price"
-            type="number"
-            value={form.price}
-            onChange={handleChange}
-          />
-          <Input
-            name="stock"
-            type="number"
-            value={form.stock}
+        <div>
+          <label htmlFor="description" className="font-medium block mb-1">
+            Description
+          </label>
+          <Textarea
+            id="description"
+            name="description"
+            value={form.description}
             onChange={handleChange}
           />
         </div>
 
+        {/* Price & Stock */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="price" className="font-medium block mb-1">
+              Price
+            </label>
+            <Input
+              id="price"
+              name="price"
+              type="number"
+              value={form.price}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="stock" className="font-medium block mb-1">
+              Stock
+            </label>
+            <Input
+              id="stock"
+              name="stock"
+              type="number"
+              value={form.stock}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        {/* SKU & Weight */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="sku" className="font-medium block mb-1">
+              SKU
+            </label>
+            <Input
+              id="sku"
+              name="sku"
+              value={form.sku}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="weight" className="font-medium block mb-1">
+              Weight
+            </label>
+            <Input
+              id="weight"
+              name="weight"
+              value={form.weight}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        {/* Category & Brand */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="categoryId" className="font-medium block mb-1">
+              Category ID
+            </label>
+            <Input
+              id="categoryId"
+              name="categoryId"
+              value={form.categoryId}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="brandId" className="font-medium block mb-1">
+              Brand ID
+            </label>
+            <Input
+              id="brandId"
+              name="brandId"
+              value={form.brandId}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        {/* Featured & Active */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              id="isFeatured"
+              checked={form.isFeatured}
+              onCheckedChange={(val) => setForm({ ...form, isFeatured: val })}
+            />
+            <label htmlFor="isFeatured" className="font-medium">
+              Featured
+            </label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="isActive"
+              checked={form.isActive}
+              onCheckedChange={(val) => setForm({ ...form, isActive: val })}
+            />
+            <label htmlFor="isActive" className="font-medium">
+              Active
+            </label>
+          </div>
+        </div>
+
         {/* Main Image */}
         <div>
-          <p className="font-medium">Main Image</p>
-
+          <label className="font-medium block mb-1">Main Image</label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (!file) return;
-
               setImageFile(file);
               setPreviewImage(URL.createObjectURL(file));
             }}
           />
-
           {previewImage && (
             <Image
               src={previewImage}
@@ -178,8 +271,7 @@ export default function EditProductPage() {
 
         {/* Gallery */}
         <div>
-          <p className="font-medium">Gallery Images</p>
-
+          <label className="font-medium block mb-1">Gallery Images</label>
           <input
             type="file"
             multiple
@@ -187,12 +279,10 @@ export default function EditProductPage() {
             onChange={(e) => {
               const files = Array.from(e.target.files || []);
               setGalleryFiles([...galleryFiles, ...files]);
-
               const previews = files.map((f) => URL.createObjectURL(f));
               setGalleryPreview([...galleryPreview, ...previews]);
             }}
           />
-
           <div className="flex gap-2 mt-2 flex-wrap">
             {galleryPreview.map((url, i) => (
               <div key={i} className="relative">
@@ -203,7 +293,6 @@ export default function EditProductPage() {
                   alt="Gallery"
                   className="border rounded"
                 />
-
                 <button
                   type="button"
                   onClick={() => {
