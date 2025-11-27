@@ -129,49 +129,76 @@ export default function EditMemberPage() {
     <div className="max-w-2xl mx-auto bg-white p-6 shadow rounded-xl">
       <h1 className="text-2xl font-semibold mb-4">Edit Member</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Name"
-          required
-        />
+      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+        {/* Name */}
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">Name</label>
+          <Input
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Enter name"
+            required
+          />
+        </div>
 
-        <Input
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          placeholder="Email"
-          required
-        />
+        {/* Email */}
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">Email</label>
+          <Input
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Enter email"
+            required
+          />
+        </div>
 
-        <Input
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-          placeholder="Phone"
-        />
+        {/* Phone */}
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">Phone</label>
+          <Input
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
+            placeholder="Enter phone"
+          />
+        </div>
 
-        <Input
-          name="designation"
-          value={form.designation}
-          onChange={handleChange}
-          placeholder="Designation"
-        />
+        {/* Designation */}
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">
+            Designation
+          </label>
+          <Input
+            name="designation"
+            value={form.designation}
+            onChange={handleChange}
+            placeholder="Enter designation"
+          />
+        </div>
 
-        <Textarea
-          name="desc"
-          value={form.desc}
-          onChange={handleChange}
-          placeholder="Description"
-        />
+        {/* Description — full width */}
+        <div className="col-span-2 flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">
+            Description
+          </label>
+          <Textarea
+            name="desc"
+            value={form.desc}
+            onChange={handleChange}
+            placeholder="Enter description"
+          />
+        </div>
 
-        <div>
-          <p className="font-medium">Photo</p>
+        {/* Photo — full width */}
+        <div className="col-span-2">
+          <label className="text-sm font-medium text-gray-700">Photo</label>
+
           <input
             type="file"
             accept="image/*"
+            className="mt-1"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (!file) return;
@@ -183,17 +210,20 @@ export default function EditMemberPage() {
           {previewImage && (
             <Image
               src={previewImage}
-              width={100}
-              height={100}
+              width={120}
+              height={120}
               alt="Member"
               className="rounded mt-2 border"
             />
           )}
         </div>
 
-        <Button type="submit" disabled={saving} className="w-full">
-          {saving ? "Saving..." : "Save Changes"}
-        </Button>
+        {/* Submit Button — full width */}
+        <div className="col-span-2">
+          <Button type="submit" disabled={saving} className="w-full">
+            {saving ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
       </form>
     </div>
   );

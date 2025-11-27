@@ -102,15 +102,21 @@ export default function EditBankPage() {
 
           <div className="flex flex-col gap-4">
             {/* Bank Name */}
+            <label className="text-sm font-medium text-gray-700">
+              Bank Name
+            </label>
             <input
               type="text"
-              placeholder="Bank Name"
+              placeholder="Enter Bank Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#aec958] transition"
             />
 
             {/* QR Upload */}
+            <label className="text-sm font-medium text-gray-700">
+              Upload QR
+            </label>
             <input
               type="file"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
@@ -121,7 +127,7 @@ export default function EditBankPage() {
               <p className="text-sm text-gray-600">Selected: {file.name}</p>
             )}
 
-            {/* Show existing QR if no new file */}
+            {/* Existing QR Preview */}
             {!file && qrUrl && (
               <p className="text-sm text-gray-600">
                 Current QR:{" "}
@@ -147,7 +153,7 @@ export default function EditBankPage() {
             <button
               type="button"
               onClick={() => router.push("/admin/settings/banks")}
-              className="mt-2 text-sm text-[#aec958] font-semibold hover:underline"
+              className="mt-2 text-sm text-[#aec958] font-semibold hover:underline cursor-pointer"
             >
               ← Back to Bank List
             </button>

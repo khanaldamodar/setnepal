@@ -93,7 +93,7 @@ export default function AddMemberPage() {
             <div className="md:col-span-2 flex justify-center mt-6">
               <button
                 type="submit"
-                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2 rounded-md font-medium transition"
+                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2 rounded-md font-medium transition cursor-pointer"
               >
                 Add Member
               </button>

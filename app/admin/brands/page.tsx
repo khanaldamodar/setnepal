@@ -42,7 +42,7 @@ const BrandsPage = () => {
         <h3 className="text-2xl font-bold">Brands</h3>
         <button
           onClick={() => router.push("/admin/brands/add")}
-          className="bg-[#aec958] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition"
+          className="bg-[#aec958] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition cursor-pointer"
         >
           Add Brand
         </button>

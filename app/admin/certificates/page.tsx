@@ -56,7 +56,7 @@ const page = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Certificates</h1>
         <Link href="/admin/certificates/add">
-          <Button className="flex items-center gap-2">
+          <Button className="flex items-center gap-2 cursor-pointer">
             <Plus size={18} /> Add Certificate
           </Button>
         </Link>

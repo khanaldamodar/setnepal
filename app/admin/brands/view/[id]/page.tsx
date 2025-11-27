@@ -33,8 +33,12 @@ export default function ViewBrandPage() {
   return (
     <div className="p-6 w-full bg-green-100 rounded shadow-lg font-poppins">
       <h1 className="text-2xl font-bold mb-4">Brand Details</h1>
-      <p><strong>ID:</strong> {brand.id}</p>
-      <p><strong>Name:</strong> {brand.name}</p>
+      <p>
+        <strong>ID:</strong> {brand.id}
+      </p>
+      <p>
+        <strong>Name:</strong> {brand.name}
+      </p>
       <p>
         <strong>Products:</strong>{" "}
         {brand.products?.length
@@ -43,7 +47,7 @@ export default function ViewBrandPage() {
       </p>
 
       <button
-        className="mt-4 bg-yellow-400 px-4 py-2 rounded"
+        className="mt-4 bg-yellow-400 px-4 py-2 rounded cursor-pointer"
         onClick={() => router.back()}
       >
         Go Back

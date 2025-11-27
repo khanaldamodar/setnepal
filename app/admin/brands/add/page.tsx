@@ -22,7 +22,7 @@ export default function AddBrandPage() {
     const token = Cookies.get("token");
 
     try {
-      const data = await postData(brand, token);
+      await postData(brand, token);
       toast.success("Brand added successfully!");
       setBrand({ name: "" });
     } catch (err) {
@@ -32,48 +32,48 @@ export default function AddBrandPage() {
   };
 
   return (
-    <div className="flex items-center justify-center mx-auto">
-      <div className="flex-col flex items-center justify-center mt-3 gap-6 w-2/5 rounded p-5 shadow-xl border-2 border-[#aec958]">
-        <h1 className="text-2xl text-black font-bold text-center mb-2 pt-4">
-          Add Brand
-        </h1>
-        <form onSubmit={handleAddBrand} className="w-full">
-          <div className="rounded-xl p-2 gap-4 flex justify-center items-center mx-auto w-full">
-            <div className="flex-col flex gap-4 w-full">
-              <label htmlFor="name" className="text-xl text-black">
-                Brand Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                required
-                value={brand.name}
-                onChange={(e) => setBrand({ name: e.target.value })}
-                className="p-3 text-black placeholder-zinc-400 rounded-2xl outline-none focus:ring-2 focus:ring-[#aec958] w-full border border-[#aec958]"
-                placeholder="Brand Name"
-              />
-            </div>
-          </div>
+    <div className="max-w-2xl mx-auto bg-white p-6 shadow rounded-xl mt-6">
+      <h1 className="text-2xl font-semibold mb-4">Add Brand</h1>
 
-          <div className="flex justify-center mx-auto items-center pb-2 w-full">
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-4 bg-[#4998d1] hover:bg-[#3b7aa8] text-white cursor-pointer font-bold py-3 rounded-2xl transition-all duration-200 w-full shadow-md"
-            >
-              {loading ? "Adding..." : "Add"}
-            </button>
-          </div>
-        </form>
+      <form onSubmit={handleAddBrand} className="space-y-4">
+        {/* Brand Name */}
+        <div className="flex flex-col gap-1">
+          <label htmlFor="name" className="text-sm font-medium text-gray-700">
+            Brand Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            value={brand.name}
+            onChange={(e) => setBrand({ name: e.target.value })}
+            className="p-2 border border-gray-300 rounded-md text-sm focus:outline-none 
+            focus:ring-2 focus:ring-[#aec958] transition"
+            placeholder="Enter brand name"
+          />
+        </div>
 
+        {/* Submit */}
         <button
-          onClick={() => router.push("/admin/brands")}
-          className="mt-4 w-full text-center text-sm text-[#aec958] font-semibold hover:underline"
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#4998d1] hover:bg-[#3b7aa8] text-white font-semibold py-3 
+          rounded-md transition"
         >
-          ← Back to Brand List
+          {loading ? "Adding..." : "Add Brand"}
         </button>
-      </div>
+      </form>
+
+      {/* Back */}
+      <button
+        onClick={() => router.push("/admin/brands")}
+        className="mt-4 w-full text-center text-sm text-[#aec958] font-semibold hover:underline cursor-pointer"
+      >
+        ← Back to Brand List
+      </button>
+
+      <ToastContainer />
     </div>
   );
 }

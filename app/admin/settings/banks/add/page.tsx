@@ -69,7 +69,7 @@ export default function BankPage() {
             <button
               type="button"
               onClick={handleAddBank}
-              className="bg-[#aec958] hover:bg-[#8da051] text-white px-6 py-2.5 rounded-md font-medium text-sm transition"
+              className="bg-[#aec958] hover:bg-[#8da051] text-white px-6 py-2.5 rounded-md font-medium text-sm transition cursor-pointer"
             >
               Add Bank
             </button>

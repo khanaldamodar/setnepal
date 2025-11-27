@@ -163,7 +163,7 @@ const EditGalleryPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveImage(index)}
-                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 cursor-pointer"
                     >
                       <MdClose size={16} />
                     </button>
@@ -189,7 +189,7 @@ const EditGalleryPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2.5 rounded-md font-medium text-sm transition"
+                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2.5 rounded-md font-medium text-sm transition cursor-pointer"
               >
                 {updating ? "Updating..." : "Save Changes"}
               </button>

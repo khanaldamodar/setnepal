@@ -32,56 +32,47 @@ export default function AddCategoryPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#eaf2e3] via-[#f5f7fa] to-[#dfe9f3] font-poppins">
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 border border-[#e1e8ed] transition-all duration-300 hover:shadow-[#aec958]/40">
-        <h1 className="text-3xl font-bold text-center text-[#2d3748] mb-6">
-          Add New Category
-        </h1>
+    <div className="max-w-2xl mx-auto bg-white p-6 shadow rounded-xl mt-6">
+      <h1 className="text-2xl font-semibold mb-4">Add Category</h1>
 
-        <form onSubmit={handleAddCategory} className="space-y-6">
-          {/* Input Field */}
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-gray-700 font-medium mb-2"
-            >
-              Category Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              required
-              value={category.name}
-              onChange={(e) => setCategory({ name: e.target.value })}
-              placeholder="Enter category name..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#aec958] focus:border-[#aec958] outline-none transition-all duration-200 text-gray-800"
-            />
-          </div>
+      <form onSubmit={handleAddCategory} className="space-y-4">
+        {/* Category Name */}
+        <div className="flex flex-col gap-1">
+          <label htmlFor="name" className="text-sm font-medium text-gray-700">
+            Category Name
+          </label>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 rounded-xl font-semibold text-lg transition-all duration-300 shadow-md ${loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-[#aec958] hover:bg-[#99b84f] text-white"
-              }`}
-          >
-            {loading ? "Adding..." : "Add Category"}
-          </button>
-        </form>
-
-        {/* Back to Dashboard */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => router.back()}
-            className="text-[#4998d1] hover:text-[#3b7aa8] font-medium transition-colors"
-          >
-            ← Back to Dashboard
-          </button>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            value={category.name}
+            onChange={(e) => setCategory({ name: e.target.value })}
+            placeholder="Enter category name"
+            className="p-2 border border-gray-300 rounded-md text-sm
+            focus:outline-none focus:ring-2 focus:ring-[#aec958] transition"
+          />
         </div>
-      </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#aec958] hover:bg-[#99b84f] text-white 
+          font-semibold py-3 rounded-md transition"
+        >
+          {loading ? "Adding..." : "Add Category"}
+        </button>
+      </form>
+
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="mt-4 w-full text-center text-sm text-[#4998d1] font-semibold hover:underline cursor-pointer"
+      >
+        ← Back to Dashboard
+      </button>
     </div>
   );
 }

@@ -191,7 +191,7 @@ export default function CRUDTable({
                           onClick={() =>
                             router.push(`/admin/${endpoint}/view/${item.id}`)
                           }
-                          className="hover:text-blue-600"
+                          className="hover:text-blue-600 cursor-pointer"
                         >
                           <Eye size={18} />
                         </Button>
@@ -204,7 +204,7 @@ export default function CRUDTable({
                           onClick={() =>
                             router.push(`/admin/${endpoint}/edit/${item.id}`)
                           }
-                          className="hover:text-green-600"
+                          className="hover:text-green-600 cursor-pointer"
                         >
                           <Edit size={18} />
                         </Button>
@@ -216,7 +216,7 @@ export default function CRUDTable({
                           size="icon"
                           onClick={() => deleteItem(item.id)}
                           disabled={deleting}
-                          className="hover:text-red-600 text-red-800"
+                          className="hover:text-red-600 text-red-800 cursor-pointer"
                         >
                           <Trash2 size={18} />
                         </Button>

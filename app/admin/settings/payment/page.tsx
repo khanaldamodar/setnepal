@@ -88,7 +88,7 @@ export default function PaymentPage() {
                 <button
                   type="button"
                   onClick={handleAddBank}
-                  className="bg-[#aec958] hover:bg-[#8da051] text-white px-4 rounded-md transition"
+                  className="bg-[#aec958] hover:bg-[#8da051] text-white px-4 rounded-md transition cursor-pointer"
                 >
                   Add
                 </button>
@@ -114,7 +114,7 @@ export default function PaymentPage() {
           <div className="flex justify-center mt-4">
             <button
               type="button"
-              className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2.5 rounded-md font-medium text-sm transition"
+              className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2.5 rounded-md font-medium text-sm transition cursor-pointer"
             >
               Save Payment Settings
             </button>

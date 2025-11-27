@@ -159,7 +159,7 @@ export default function SettingsPage() {
               <div className="flex gap-3">
                 <button
                   type="button"
-                  className="bg-[#4998d1] hover:bg-[#62a4d3] text-white px-4 py-2 rounded-md text-sm font-medium transition"
+                  className="bg-[#4998d1] hover:bg-[#62a4d3] text-white px-4 py-2 rounded-md text-sm font-medium transition cursor-pointer"
                   onClick={() => router.push("/admin/settings/banks")}
                 >
                   Payment
@@ -167,7 +167,7 @@ export default function SettingsPage() {
 
                 <button
                   type="button"
-                  className="bg-[#aec958] hover:bg-[#aabe66] text-white px-4 py-2 rounded-md text-sm font-medium transition"
+                  className="bg-[#aec958] hover:bg-[#aabe66] text-white px-4 py-2 rounded-md text-sm font-medium transition cursor-pointer"
                   onClick={() => router.push("/admin/settings/members")}
                 >
                   Members
@@ -367,7 +367,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={updating}
-                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2.5 rounded-md font-medium text-sm transition"
+                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2.5 rounded-md font-medium text-sm transition cursor-pointer"
               >
                 {updating ? "Updating..." : "Save Changes"}
               </button>

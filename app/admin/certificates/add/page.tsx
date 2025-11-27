@@ -110,7 +110,7 @@ export default function AddCertificatePage() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-xl font-semibold text-lg transition-all duration-300 shadow-md ${
+            className={`w-full py-3 rounded-xl font-semibold text-lg transition-all duration-300 shadow-md cursor-pointer ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-[#4998d1] hover:bg-[#3b7aa8] text-white"
@@ -123,7 +123,7 @@ export default function AddCertificatePage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="w-full py-2 text-[#4998d1] hover:text-[#3b7aa8] font-medium mt-2 transition-colors"
+            className="w-full py-2 text-[#4998d1] hover:text-[#3b7aa8] font-medium mt-2 transition-colors cursor-pointer"
           >
             ← Back to Dashboard
           </button>

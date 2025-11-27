@@ -125,7 +125,7 @@ const GalleryPage: React.FC = () => {
                         );
                         setImages((prev) => prev.filter((_, i) => i !== index));
                       }}
-                      className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold hover:bg-red-600 transition"
+                      className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold hover:bg-red-600 transition cursor-pointer"
                     >
                       ×
                     </button>
@@ -165,7 +165,7 @@ const GalleryPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2.5 rounded-md font-medium text-sm transition disabled:opacity-50"
+                className="bg-[#aec958] hover:bg-[#9bb648] text-white px-6 py-2.5 rounded-md font-medium text-sm transition disabled:opacity-50 cursor-pointer"
               >
                 {loading ? "Saving..." : "Save Changes"}
               </button>

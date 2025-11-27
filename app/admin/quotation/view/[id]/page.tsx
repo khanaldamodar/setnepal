@@ -234,11 +234,24 @@ export default function QuotationViewPage() {
                       </td>
                       <td className="px-4 py-2">{item.quantity}</td>
                       <td className="px-4 py-2">Rs. {item.price}</td>
+                      <td className="px-4 py-2">
+                        Rs. {(item.price * item.quantity).toFixed(2)}
+                      </td>
                     </tr>
                   ))}
+
                   <tr className="border-t font-semibold">
                     <td colSpan={4} className="px-4 py-2 text-right">
                       Grand Total:
+                    </td>
+                    <td className="px-4 py-2">
+                      Rs.{" "}
+                      {quotation.items
+                        .reduce(
+                          (sum, item) => sum + item.price * item.quantity,
+                          0
+                        )
+                        .toFixed(2)}
                     </td>
                   </tr>
                 </tbody>

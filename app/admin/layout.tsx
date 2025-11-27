@@ -18,7 +18,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen font-poppins">
       <Navbar />
 
       <div className="flex flex-1 overflow-hidden">

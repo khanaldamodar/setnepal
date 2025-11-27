@@ -63,7 +63,7 @@ const MaintenancePage = () => {
               if (column === "actions") {
                 return (
                   <button
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-600 hover:underline cursor-pointer"
                     onClick={() => setSelectedMaintenance(row)}
                   >
                     View Details
@@ -87,7 +87,7 @@ const MaintenancePage = () => {
             <h2 className="text-xl font-bold mb-4">Maintenance Details</h2>
             <button
               onClick={() => setSelectedMaintenance(null)}
-              className="absolute top-2 right-4 text-red-500 font-bold text-xl"
+              className="absolute top-2 right-4 text-red-500 font-bold text-xl cursor-pointer"
             >
               &times;
             </button>
