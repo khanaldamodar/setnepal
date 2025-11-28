@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { toast } from "sonner";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { DataTable } from "@/components/admin-components-deepak/DataTable";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Product {
   id: number;
@@ -28,7 +28,6 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // ✅ Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -44,16 +43,33 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  // ✅ Delete a product
   const handleDelete = async (product: Product) => {
     if (!confirm(`Are you sure you want to delete "${product.name}"?`)) return;
+
     try {
       await axios.delete(`/api/products/${product.id}`);
       toast.success("Product deleted successfully");
       setProducts(products.filter((p) => p.id !== product.id));
-    } catch (err) {
-      toast.error("Failed to delete product");
+    } catch (err: any) {
       console.error(err);
+
+      // Check for foreign key error from backend
+      const fkError =
+        err?.response?.data?.message?.toLowerCase().includes("foreign key") ||
+        err?.response?.data?.error?.toLowerCase().includes("foreign key");
+
+      if (fkError) {
+        toast.error(
+          "Cannot delete this product because it is linked to other records."
+        );
+      } else {
+        toast.error(
+          err?.response?.data?.message ||
+            err?.response?.data?.error ||
+            err?.message ||
+            "Failed to delete product"
+        );
+      }
     }
   };
 
@@ -81,7 +97,7 @@ export default function ProductsPage() {
               render: (p) => (
                 <div className="w-12 h-12 rounded-md overflow-hidden">
                   <Image
-                    src={p.imageUrl || "/placeholder.png"}
+                    src={p.imageUrl || "/logo.jpeg"}
                     alt={p.name}
                     width={50}
                     height={50}
@@ -113,6 +129,8 @@ export default function ProductsPage() {
           onDelete={handleDelete}
         />
       )}
+
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

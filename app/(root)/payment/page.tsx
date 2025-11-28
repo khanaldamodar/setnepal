@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { ChevronRight, Lock } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function PaymentPage({ packages }: { packages?: any[] }) {
   const router = useRouter();
@@ -30,19 +32,16 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     else router.push("/checkout");
   }, [router]);
 
+  // Fetch banks when BANK method is selected
   useEffect(() => {
     if (paymentMethod === "BANK") {
       fetch("/api/banks")
         .then((res) => res.json())
         .then((data) => {
-          // FIX: normalize response into array
-          if (Array.isArray(data)) {
-            setBanks(data);
-          } else if (Array.isArray(data.data)) {
-            setBanks(data.data);
-          } else if (Array.isArray(data.banks)) {
-            setBanks(data.banks);
-          } else {
+          if (Array.isArray(data)) setBanks(data);
+          else if (Array.isArray(data.data)) setBanks(data.data);
+          else if (Array.isArray(data.banks)) setBanks(data.banks);
+          else {
             console.error("Unexpected banks response:", data);
             setBanks([]);
           }
@@ -108,14 +107,14 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
   const handlePlaceOrder = async () => {
     setError(null);
 
-    // BANK validations
+    // BANK validation
     if (paymentMethod === "BANK") {
       if (!selectedBank) {
-        setError("Please select a bank");
+        toast.error("Please select a bank");
         return;
       }
       if (!transactionId.trim()) {
-        setError("Transaction ID is required for bank payment");
+        toast.error("Transaction ID is required for bank payment");
         return;
       }
     }
@@ -141,12 +140,10 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
           quantity: item.quantity,
           price: item.price,
           name: item.name,
-          products: item.products, // include package products
+          products: item.products,
         })),
-
         shippingAddress,
         paymentMethod: paymentMethod === "BANK" ? "ONLINE" : "COD",
-
         ...(paymentMethod === "BANK" && {
           bankId: selectedBank.id,
           transactionId,
@@ -169,14 +166,14 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
       const orderId = data?.id || data?.data?.id;
 
       if (!res.ok || !orderId) {
-        throw new Error(data?.message);
+        throw new Error(data?.message || "Failed to create order");
       }
 
       // Save Payment
       if (paymentMethod === "BANK") {
         const paymentPayload = {
           orderId: Number(orderId),
-          userId: 1, // Replace with real user id
+          userId: 1,
           amount: calculatedTotal,
           method: "ONLINE",
           status: "SUCCESS",
@@ -201,11 +198,20 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
         }
       }
 
+      // SUCCESS
       clearCart();
       sessionStorage.removeItem("checkoutData");
-      router.push(`/order-confirmation/${orderId}`);
+
+      toast.success("Order placed successfully!");
+
+      setTimeout(() => {
+        router.push("/");
+      }, 1200);
     } catch (err: any) {
-      setError(err.message);
+      const message =
+        err?.message || "Something went wrong while placing your order";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }
@@ -303,17 +309,24 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
                         </div>
 
                         {/* QR */}
-                        <div className="flex flex-col items-center">
-                          <span className="mb-1 text-xs font-medium text-gray-500">
-                            Scan to Pay
-                          </span>
+                        <div className="flex items-center justify-center">
+                          <div className="w-56 p-4 border rounded-xl shadow-md bg-white flex flex-col items-center space-y-3">
+                            <p className="text-sm font-semibold text-gray-700">
+                              Scan to Pay
+                            </p>
 
-                          <div className="w-48 h-48 border rounded shadow flex items-center justify-center bg-white">
-                            <img
-                              src={selectedBank.qr}
-                              alt="Bank QR Code"
-                              className="w-full h-full object-contain"
-                            />
+                            <div className="w-40 h-40 border rounded-lg shadow-sm overflow-hidden bg-white flex items-center justify-center p-2">
+                              <img
+                                src={selectedBank.qr}
+                                alt="Bank QR Code"
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+
+                            <p className="text-xs text-gray-500 text-center px-2">
+                              Please scan to pay through your bank. Don’t forget
+                              to include your Transaction ID.
+                            </p>
                           </div>
                         </div>
                       </>
@@ -440,6 +453,8 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
           </div>
         </div>
       </div>
+
+      <ToastContainer position="top-right" autoClose={3000} />
     </main>
   );
 }

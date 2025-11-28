@@ -21,7 +21,7 @@ const page = () => {
       try {
         const res = await fetch("/api/certificates");
         const data = await res.json();
-        console.log(data.certificates);
+
         setcertificates(data.certificates);
       } catch (err) {
         console.log(err);
