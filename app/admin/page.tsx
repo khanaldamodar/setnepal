@@ -68,7 +68,7 @@ const Page = () => {
     {
       label: "Total Categories",
       value: dashboard.totalCategories,
-      path: "admin/catehories",
+      path: "admin/categories",
     },
   ];
 

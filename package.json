@@ -27,6 +27,7 @@
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
     "keen-slider": "^6.8.6",
     "lucide-react": "^0.548.0",
     "mysql2": "^3.15.3",

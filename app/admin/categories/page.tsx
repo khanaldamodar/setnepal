@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CRUDTable from "@/components/admin-components/CRUDTable";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import Link from "next/link";
 
 interface CategoryType {
   id: number;
@@ -37,14 +40,13 @@ const page = () => {
   return (
     <div className="h-screen">
       {/* header */}
-      <div className="w-full flex items-center justify-between ">
-        <h3 className="text-2xl font-bold">Categories</h3>
-        <button
-          onClick={() => router.push("/admin/categories/add")}
-          className="bg-[#aec958] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition"
-        >
-          Add Categories
-        </button>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Categories</h1>
+        <Link href="/admin/categories/add">
+          <Button className="flex items-center gap-2">
+            <Plus size={18} /> Add Category
+          </Button>
+        </Link>
       </div>
 
       <div className="flex-1 p-4">
