@@ -12,11 +12,11 @@ export const getApiDocs = async () => {
       },
       servers: [
         {
-          url: "http://localhost:3007",
+          url: "https://setnepal.com",
           description: "Local development server",
         },
         {
-          url: "https://api.setnepal.com",
+          url: "https://setnepal.com",
           description: "Production server",
         },
       ],
