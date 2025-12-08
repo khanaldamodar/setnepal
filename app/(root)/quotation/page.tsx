@@ -166,13 +166,13 @@ export default function Quotation() {
 
       toast.success(res.data.message || "Quotation submitted successfully!");
 
-      // PDF Begins
+      // PDF Starts
       const doc = new jsPDF("p", "pt", "a4");
       const pageWidth = doc.internal.pageSize.getWidth();
       const leftX = 40;
       const rightX = pageWidth - 200;
 
-      // Add Images
+      // Header images
       if (typeof window !== "undefined") {
         const logo = new Image();
         logo.src = "/logo.jpeg";
@@ -193,12 +193,11 @@ export default function Quotation() {
         doc.text(`Date: ${new Date().toLocaleDateString()}`, rightX, 200);
       }
 
-      // Draw two equal-width boxes
+      // Boxes
       const boxY = 230;
       const boxH = 90;
       const boxW = (pageWidth - leftX * 2 - 20) / 2;
 
-      // Customer Info Box
       doc.rect(leftX, boxY, boxW, boxH);
       doc.setFontSize(10);
       doc.text("Customer Info:", leftX + 10, boxY + 20);
@@ -206,14 +205,13 @@ export default function Quotation() {
       doc.text(`Name: ${formData.name}`, leftX + 10, boxY + 50);
       doc.text(`Address: ${formData.address}`, leftX + 10, boxY + 65);
 
-      // Quotation Title Box
       doc.rect(leftX + boxW + 20, boxY, boxW, boxH);
       doc.setFontSize(24);
       doc.text("Quotation", leftX + boxW + 20 + boxW / 2, boxY + boxH / 2, {
         align: "center",
       });
 
-      // Table of items
+      // Items table
       const tableData = items.map((item, idx) => [
         idx + 1,
         item.productName,
@@ -244,7 +242,7 @@ export default function Quotation() {
 
       let lastY = doc.lastAutoTable.finalY + 20;
 
-      // NOTES TABLE
+      // Notes
       autoTable(doc, {
         startY: lastY,
         head: [
@@ -270,7 +268,7 @@ export default function Quotation() {
 
       lastY = doc.lastAutoTable.finalY + 20;
 
-      // WARRANTY TABLE
+      // Warranty
       autoTable(doc, {
         startY: lastY,
         head: [
@@ -294,19 +292,20 @@ export default function Quotation() {
 
       lastY = doc.lastAutoTable.finalY + 25;
 
-      // Closing paragraph
+      // Closing text
       doc.setFontSize(10);
       const closingText =
         "We will be happy to supply any further information you may need and trust that you call on us to fill your order, which will receive our attention promptly.";
       const wrapped = doc.splitTextToSize(closingText, pageWidth - leftX * 2);
       doc.text(wrapped, leftX, lastY);
 
-      // --------------------------
-      // UPDATED SIGNATURE SECTION
-      // --------------------------
+      // ---------------------------------------------
+      // UPDATED SIGNATURE SECTION (Left text + Right stamp)
+      // ---------------------------------------------
       lastY += wrapped.length * 12 + 30;
       let sigY = lastY;
 
+      // LEFT SIDE TEXT
       doc.setFontSize(10);
       doc.text(
         "To accept this quotation, please sign here and return:",
@@ -316,24 +315,25 @@ export default function Quotation() {
 
       sigY += 40;
 
-      // Stamp
+      // RIGHT SIDE STAMP
       const stamp = new Image();
       stamp.src = "/setNepalStamp.png";
+
       const stampWidth = 120;
       const stampHeight = 80;
 
-      doc.addImage(stamp, "PNG", leftX, sigY, stampWidth, stampHeight);
+      const rightXStamp = pageWidth - leftX - stampWidth;
 
-      sigY += stampHeight + 20;
+      doc.addImage(stamp, "PNG", rightXStamp, sigY, stampWidth, stampHeight);
 
-      // Text BELOW stamp
+      // RIGHT SIDE TEXT BELOW STAMP
       doc.setFontSize(12);
-      doc.text("For: Set Nepal Pvt. Ltd", leftX, sigY);
+      doc.text("For: Set Nepal Pvt. Ltd", rightXStamp, sigY + stampHeight + 20);
 
-      // Save
+      // Save PDF
       doc.save("quotation.pdf");
 
-      // RESET FORM
+      // Reset form
       setFormData({
         organization: "",
         name: "",
