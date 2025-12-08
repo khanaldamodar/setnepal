@@ -1,6 +1,6 @@
 datasource db {
   provider = "mysql"
-  url   =   "mysql://root:root@localhost:3306/set_nepal"
+  url   =   "mysql://shaktate_deepak:Deepak121@@s9943.sgp1.stableserver.net:3306/shaktate_setnepal"
 }
 
 generator client {
