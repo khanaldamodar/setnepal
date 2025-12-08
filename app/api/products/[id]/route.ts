@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from "next/server"; 
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import formidable from "formidable"; 
-import fs from "fs"; 
+import formidable from "formidable";
+import fs from "fs";
 import path from "path";
-
 
 /**
  * @swagger
@@ -303,7 +302,6 @@ import path from "path";
  *                   example: Failed to delete product
  */
 
-
 export async function GET(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -313,7 +311,10 @@ export async function GET(
     const numericId = parseInt(id, 10);
 
     if (isNaN(numericId)) {
-      return NextResponse.json({ message: "Invalid product ID" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid product ID" },
+        { status: 400 }
+      );
     }
 
     const product = await prisma.product.findUnique({
@@ -326,7 +327,10 @@ export async function GET(
     });
 
     if (!product) {
-      return NextResponse.json({ message: "Product not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Product not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(
@@ -335,7 +339,10 @@ export async function GET(
     );
   } catch (err) {
     console.error("Error fetching product:", err);
-    return NextResponse.json({ message: "Failed to fetch product" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to fetch product" },
+      { status: 500 }
+    );
   }
 }
 
@@ -402,20 +409,30 @@ export async function GET(
 //   }
 // }
 
-
-export async function PUT(req: NextRequest, context: { params: { id: string } }) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
     const { id } = await context.params; // ✅
 
     const numericId = parseInt(id, 10);
 
     if (isNaN(numericId)) {
-      return NextResponse.json({ message: "Invalid product ID" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid product ID" },
+        { status: 400 }
+      );
     }
 
-    const existing = await prisma.product.findUnique({ where: { id: numericId } });
+    const existing = await prisma.product.findUnique({
+      where: { id: numericId },
+    });
     if (!existing) {
-      return NextResponse.json({ message: "Product not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Product not found" },
+        { status: 404 }
+      );
     }
 
     const body = await req.json(); // Safe now, client sends JSON
@@ -453,10 +470,16 @@ export async function PUT(req: NextRequest, context: { params: { id: string } })
       },
     });
 
-    return NextResponse.json({ message: "Product updated successfully", product: updated });
+    return NextResponse.json({
+      message: "Product updated successfully",
+      product: updated,
+    });
   } catch (err) {
     console.error("Error updating product:", err);
-    return NextResponse.json({ message: "Failed to update product" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to update product" },
+      { status: 500 }
+    );
   }
 }
 
@@ -470,15 +493,46 @@ export async function DELETE(
     const numericId = parseInt(id, 10);
 
     if (isNaN(numericId)) {
-      return NextResponse.json({ message: "Invalid product ID" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid product ID" },
+        { status: 400 }
+      );
     }
 
-    const product = await prisma.product.findUnique({ where: { id: numericId } });
+    const product = await prisma.product.findUnique({
+      where: { id: numericId },
+    });
+
     if (!product) {
-      return NextResponse.json({ message: "Product not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Product not found" },
+        { status: 404 }
+      );
     }
 
-    // Remove foreign key references before deletion
+    // 1️⃣ Delete Quotation Items linked to this product
+    await prisma.quotationItem.deleteMany({
+      where: { productId: numericId },
+    });
+
+    // 2️⃣ Delete Order Items linked to this product
+    await prisma.orderItem.deleteMany({
+      where: { productId: numericId },
+    });
+
+    const packages = await prisma.package.findMany({
+      where: { products: { some: { id: numericId } } },
+    });
+
+
+    for (const pkg of packages) {
+      await prisma.package.update({
+        where: { id: pkg.id },
+        data: { products: { disconnect: { id: numericId } } },
+      });
+    }
+
+    // 4️⃣ Clear category + brand FK
     await prisma.product.update({
       where: { id: numericId },
       data: {
@@ -487,7 +541,9 @@ export async function DELETE(
       },
     });
 
-    await prisma.product.delete({ where: { id: numericId } });
+    await prisma.product.delete({
+      where: { id: numericId },
+    });
 
     return NextResponse.json(
       { message: "Product deleted successfully" },
