@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import Cookies from "js-cookie";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -32,11 +33,20 @@ export default function EditProductPage() {
     isActive: true,
   });
 
+  const [errors, setErrors] = useState<{
+    categoryId?: string;
+    brandId?: string;
+  }>({});
+
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-
   const [galleryPreview, setGalleryPreview] = useState<string[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const [brands, setBrands] = useState<{ id: string; name: string }[]>([]);
 
   // Fetch product
   useEffect(() => {
@@ -52,8 +62,8 @@ export default function EditProductPage() {
           stock: p.stock,
           sku: p.sku,
           weight: p.weight,
-          categoryId: p.categoryId || "",
-          brandId: p.brandId || "",
+          categoryId: p.categoryId ? String(p.categoryId) : "",
+          brandId: p.brandId ? String(p.brandId) : "",
           isFeatured: p.isFeatured,
           isActive: p.isActive,
         });
@@ -71,23 +81,73 @@ export default function EditProductPage() {
     fetchProduct();
   }, [id]);
 
-  // Handle inputs
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+  // Fetch categories and brands
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const [catRes, brandRes] = await Promise.all([
+          axios.get("/api/categories"),
+          axios.get("/api/brands"),
+        ]);
+
+        setCategories(
+          Array.isArray(catRes.data)
+            ? catRes.data.map((c: any) => ({ id: String(c.id), name: c.name }))
+            : []
+        );
+
+        setBrands(
+          Array.isArray(brandRes.data)
+            ? brandRes.data.map((b: any) => ({
+                id: String(b.id),
+                name: b.name,
+              }))
+            : []
+        );
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to fetch categories or brands");
+      }
+    };
+
+    fetchOptions();
+  }, []);
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value, type } = e.target;
+    let newValue: any = value;
+
+    if (name === "brandId" || name === "categoryId") newValue = String(value);
+    if (type === "number") newValue = value === "" ? "" : Number(value);
+
+    setForm({ ...form, [name]: newValue });
   };
 
-  // Submit updates
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const newErrors: typeof errors = {};
+    if (!form.categoryId) newErrors.categoryId = "Please select a category";
+    if (!form.brandId) newErrors.brandId = "Please select a brand";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fix the errors before submitting");
+      return;
+    }
+
+    setErrors({});
     setSaving(true);
 
     try {
-      // Prepare the data
       const payload = {
         ...form,
-        imageUrl: previewImage, // keep current image URL
-        gallery: galleryPreview, // array of URLs
+        imageUrl: previewImage,
+        gallery: galleryPreview,
       };
 
       await axios.put(`/api/products/${id}`, payload, {
@@ -99,7 +159,7 @@ export default function EditProductPage() {
 
       toast.success("Product updated successfully");
       router.push("/admin/products");
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       toast.error("Failed to update product");
     } finally {
@@ -199,25 +259,52 @@ export default function EditProductPage() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="categoryId" className="font-medium block mb-1">
-              Category ID
+              Category
             </label>
-            <Input
+            <select
               id="categoryId"
               name="categoryId"
               value={form.categoryId}
               onChange={handleChange}
-            />
+              className={`w-full border rounded px-3 py-2 ${
+                errors.categoryId ? "border-red-500" : ""
+              }`}
+            >
+              <option value="">Select a category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            {errors.categoryId && (
+              <p className="text-red-500 text-sm mt-1">{errors.categoryId}</p>
+            )}
           </div>
+
           <div>
             <label htmlFor="brandId" className="font-medium block mb-1">
-              Brand ID
+              Brand
             </label>
-            <Input
+            <select
               id="brandId"
               name="brandId"
               value={form.brandId}
               onChange={handleChange}
-            />
+              className={`w-full border rounded px-3 py-2 ${
+                errors.brandId ? "border-red-500" : ""
+              }`}
+            >
+              <option value="">Select a brand</option>
+              {brands.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
+            {errors.brandId && (
+              <p className="text-red-500 text-sm mt-1">{errors.brandId}</p>
+            )}
           </div>
         </div>
 
@@ -279,8 +366,10 @@ export default function EditProductPage() {
             onChange={(e) => {
               const files = Array.from(e.target.files || []);
               setGalleryFiles([...galleryFiles, ...files]);
-              const previews = files.map((f) => URL.createObjectURL(f));
-              setGalleryPreview([...galleryPreview, ...previews]);
+              setGalleryPreview([
+                ...galleryPreview,
+                ...files.map((f) => URL.createObjectURL(f)),
+              ]);
             }}
           />
           <div className="flex gap-2 mt-2 flex-wrap">
@@ -295,11 +384,11 @@ export default function EditProductPage() {
                 />
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={() =>
                     setGalleryPreview(
                       galleryPreview.filter((_, idx) => idx !== i)
-                    );
-                  }}
+                    )
+                  }
                   className="absolute -top-2 -right-2 bg-red-600 text-white p-1 rounded-full"
                 >
                   ✕

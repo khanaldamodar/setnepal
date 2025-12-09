@@ -7,6 +7,7 @@ import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+
 interface CertificateTypes {
   id: number;
   title: string;

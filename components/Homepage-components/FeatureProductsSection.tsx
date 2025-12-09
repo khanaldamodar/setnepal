@@ -47,7 +47,7 @@ const FeatureProductsSection = () => {
         </Link>
 
         {/* repair-and-maintenance Card */}
-        <Link href="/repair-and-maintenance">
+        <Link href="/maintenance">
           <div className="relative w-72 h-72 border-2 rounded-xl overflow-hidden cursor-pointer group">
             <Image
               src="/logo.jpeg"

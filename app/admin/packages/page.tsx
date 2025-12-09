@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 import { DataTable } from "@/components/admin-components-deepak/DataTable";
+import Link from "next/link";
 
 interface Package {
   id: number;
@@ -131,14 +132,13 @@ export default function PackagesPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="w-full flex items-center justify-between ">
-        <h3 className="text-2xl font-bold">Package</h3>
-        <button
-          onClick={() => router.push("/admin/packages/add")}
-          className="bg-[#aec958] rounded-2xl text-white px-4 py-2 hover:bg-green-100 transition"
-        >
-          Add Package
-        </button>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Packages</h1>
+        <Link href="/admin/packages/add">
+          <Button className="flex items-center gap-2">
+            <Plus size={18} /> Add Package
+          </Button>
+        </Link>
       </div>
 
       {loading ? (
