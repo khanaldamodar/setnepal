@@ -16,10 +16,10 @@ import ICTImg from "./images/ICT.png";
 import RoboticsImg from "./images/robotics.jpg";
 import AIImg from "./images/AI.png";
 import Home from "./images/home.png";
+
 interface Category {
   id: number;
   name: string;
-  description: string;
   category: string;
   productCount: number;
 }
@@ -61,10 +61,12 @@ export function FeaturedPackages() {
     {
       loop: true,
       mode: "free",
-      slides: { perView: 1, spacing: 16 },
+      slides: { perView: 1, spacing: 16 }, // Mobile
       breakpoints: {
-        "(min-width: 768px)": { slides: { perView: 2, spacing: 20 } },
-        "(min-width: 1024px)": { slides: { perView: 4, spacing: 24 } },
+        "(min-width: 640px)": { slides: { perView: 2, spacing: 24 } }, // Small tablet
+        "(min-width: 1024px)": { slides: { perView: 4, spacing: 40 } }, // Desktop
+        "(min-width: 1440px)": { slides: { perView: 5, spacing: 48 } }, // Large desktop
+        "(min-width: 1920px)": { slides: { perView: 6, spacing: 56 } }, // Ultra-wide
       },
     },
     [autoplay]
@@ -174,20 +176,22 @@ export function FeaturedPackages() {
           {categories.map((c) => (
             <div key={c.id} className="keen-slider__slide">
               <Link href={`/category/${c.id}`}>
-                <div className="w-full h-64 lg:w-56 rounded-xl bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col justify-center items-center p-4">
-                  <Image
-                    src={getStaticImageById(c.id)}
-                    alt={c.name}
-                    width={350}
-                    height={200}
-                    className="w-full h-32 lg:h-40 object-cover rounded-md mb-2"
-                  />
+                <div className="w-full h-56 sm:h-60 lg:h-64 xl:h-68 2xl:h-72 rounded-xl bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col justify-start items-center p-4">
+                  {/* Image container */}
+                  <div className="w-full h-40 sm:h-45 lg:h-44 xl:h-46 2xl:h-60 overflow-hidden rounded-md mb-4">
+                    <Image
+                      src={getStaticImageById(c.id)}
+                      alt={c.name}
+                      width={700}
+                      height={400}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Title only */}
                   <h3 className="font-semibold text-foreground text-sm text-center line-clamp-2">
                     {c.name}
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1 text-center line-clamp-2">
-                    {c.description}
-                  </p>
                 </div>
               </Link>
             </div>

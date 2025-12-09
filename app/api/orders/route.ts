@@ -306,7 +306,7 @@ export async function POST(req: NextRequest) {
 
     const order = await prisma.order.create({
       data: {
-        userId: 2, 
+        userId: 1, 
         total,
         shippingAddress,
         paymentMethod,

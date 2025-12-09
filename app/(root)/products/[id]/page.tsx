@@ -42,6 +42,13 @@ export default function ProductPage() {
         const data = await res.json();
 
         if (data.product) {
+          // Parse gallery safely
+          const galleryArray: string[] = Array.isArray(data.product.gallery)
+            ? data.product.gallery
+            : typeof data.product.gallery === "string"
+            ? JSON.parse(data.product.gallery)
+            : [];
+
           const p: Product = {
             id: data.product.id,
             name: data.product.name,
@@ -62,9 +69,7 @@ export default function ProductPage() {
             sku: data.product.sku,
             images: [
               ...(data.product.imageUrl ? [data.product.imageUrl] : []),
-              ...(Array.isArray(data.product.gallery)
-                ? data.product.gallery
-                : []),
+              ...galleryArray,
             ].filter(Boolean),
             specifications: [
               { label: "Weight", value: data.product.weight + " kg" },
@@ -79,7 +84,7 @@ export default function ProductPage() {
           setSelectedImage(p.images?.[0] || null);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching product:", err);
       } finally {
         setLoading(false);
       }

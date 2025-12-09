@@ -39,7 +39,7 @@ import { signToken } from '@/lib/jwt';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, password, role } = body;
+    const { name, email, password, role,address, phone } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json({ message: 'Missing fields' }, { status: 400 });
@@ -61,7 +61,9 @@ export async function POST(req: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        role
+        role,
+        phone,
+        address
       },
     });
 
