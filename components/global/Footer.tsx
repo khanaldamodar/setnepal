@@ -37,7 +37,7 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ settings }) => {
   return (
     <footer className="bg-secondary text-black pt-5 px-8 mt-16 font-poppins">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
         {/* Logo & About */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
@@ -175,15 +175,18 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
       <div className="border-t border-gray-700 mt-5 text-center text-sm text-black-500">
         <p>
           © {new Date().getFullYear()}{" "}
-          <span className="text-[#aec958] font-medium">
-            {settings.companyName || "Set Nepal"}
+          <span className="text-[#aec958] font-medium ">
+            {`${settings.companyName} ` || "Set Nepal."}
           </span>
-          . All rights reserved.
-        </p>
-        <p>
-          Developed by
-          <span className="text-[#031f33] font-medium">
-            {" Shakta Technology "}
+          <span className="pr-3">All rights reserved. </span>
+          <span className="">
+            Developed by{" "}
+            <a
+              href="https://www.shaktatechnology.com/"
+              className="text-[#aec958] font-medium cursor-pointer"
+            >
+              {" Shakta Technology "}
+            </a>
           </span>
         </p>
       </div>

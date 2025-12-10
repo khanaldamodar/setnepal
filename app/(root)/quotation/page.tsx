@@ -123,6 +123,235 @@ export default function Quotation() {
     setStep(3);
   };
 
+  // const handleSubmit = async (e: FormEvent) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const { name, email, phone, organization, address, message } = formData;
+  //     if (!name || !organization || !address) {
+  //       toast.error("Please fill all required fields.");
+  //       return;
+  //     }
+
+  //     // Prepare items
+  //     const items = selections.flatMap((sel) =>
+  //       sel.products.map((p) => {
+  //         const prod = products.find((prod) => prod.id === p.productId);
+  //         return {
+  //           category: sel.category?.name ?? "N/A",
+  //           productId: p.productId,
+  //           productName: prod?.name ?? "N/A",
+  //           brandName:
+  //             prod?.brand && typeof prod.brand === "object"
+  //               ? prod.brand.name
+  //               : "N/A",
+  //           quantity: p.quantity,
+  //           unitPrice: prod?.price ?? 0,
+  //           subtotal: (prod?.price ?? 0) * p.quantity,
+  //         };
+  //       })
+  //     );
+
+  //     if (items.length === 0) {
+  //       toast.error("Please select at least one product.");
+  //       return;
+  //     }
+
+  //     const res = await axios.post("/api/quotation", {
+  //       name,
+  //       email,
+  //       phone,
+  //       address,
+  //       companyName: organization,
+  //       message,
+  //       items,
+  //     });
+
+  //     toast.success(res.data.message || "Quotation submitted successfully!");
+
+  //     // PDF Generation
+  //     const doc = new jsPDF("p", "pt", "a4");
+  //     const pageWidth = doc.internal.pageSize.getWidth();
+  //     const leftX = 40;
+  //     const rightX = pageWidth - 200;
+
+  //     if (typeof window !== "undefined") {
+  //       const logo = new Image();
+  //       logo.src = "/logo.jpeg";
+  //       const quality = new Image();
+  //       quality.src = "/qualityAssured.png";
+
+  //       doc.addImage(logo, "JPEG", leftX, 20, 230, 150);
+  //       doc.addImage(quality, "PNG", rightX, 20, 140, 120);
+
+  //       doc.setFontSize(10);
+
+  //       // Set "Set Nepal" in green
+  //       doc.setTextColor(155, 182, 72);
+  //       doc.text("Set Nepal", leftX, 170);
+
+  //       // Reset to black
+  //       doc.setTextColor(0, 0, 0);
+  //       doc.text("Bafal Kathmandu", leftX, 185);
+  //       doc.text("01-5312298", leftX, 200);
+
+  //       doc.text("Contact No.: 015312298", rightX, 170);
+  //       doc.text("Whatsapp: 9851331773", rightX, 185);
+
+  //       // Make email clickable
+  //       const emailLink = "info.setnepal@gmail.com";
+  //       doc.textWithLink(`Email: ${emailLink}`, rightX, 200, {
+  //         url: `mailto:${emailLink}`,
+  //       });
+
+  //       doc.text(`Date: ${new Date().toLocaleDateString()}`, rightX, 215);
+  //     }
+
+  //     // Boxes
+  //     const boxY = 230;
+  //     const boxH = 60;
+  //     const boxW = (pageWidth - leftX * 2 - 20) / 2;
+
+  //     // Left box: Customer Info
+  //     doc.rect(leftX, boxY, boxW, boxH);
+  //     let infoY = boxY + 15;
+  //     doc.setFontSize(10);
+  //     doc.text("Customer Info:", leftX + 10, infoY);
+  //     infoY += 12;
+  //     doc.text(`Organization: ${organization}`, leftX + 10, infoY);
+  //     infoY += 12;
+  //     doc.text(`Name: ${name}`, leftX + 10, infoY);
+  //     infoY += 12;
+  //     doc.text(`Address: ${address}`, leftX + 10, infoY);
+
+  //     // Right box: Quotation title
+  //     doc.rect(leftX + boxW + 20, boxY, boxW, boxH);
+  //     const fontSize = 24;
+  //     doc.setFontSize(fontSize);
+  //     const titleY = boxY + boxH / 2 + fontSize / 2 - 4;
+  //     doc.text("Quotation", leftX + boxW + 20 + boxW / 2, titleY, {
+  //       align: "center",
+  //     });
+
+  //     // Items Table
+  //     const tableData = items.map((item, idx) => [
+  //       idx + 1,
+  //       item.productName,
+  //       item.brandName,
+  //       "pcs",
+  //       item.quantity,
+  //       item.unitPrice.toFixed(2),
+  //       item.subtotal.toFixed(2),
+  //     ]);
+
+  //     autoTable(doc, {
+  //       startY: boxY + boxH + 30,
+  //       head: [
+  //         ["SN", "Description", "Brand", "Unit", "Qty", "Unit Price", "Total"],
+  //       ],
+  //       body: tableData,
+  //       theme: "grid",
+  //       styles: { fontSize: 10, cellPadding: 3 },
+  //       headStyles: { fillColor: [200, 200, 200] },
+  //       columnStyles: {
+  //         0: { halign: "center" },
+  //         3: { halign: "center" },
+  //         4: { halign: "center" },
+  //         5: { halign: "right" },
+  //         6: { halign: "right" },
+  //       },
+  //     });
+
+  //     // @ts-ignore
+  //     let lastY = doc.lastAutoTable.finalY + 10;
+
+  //     // Notes Table
+  //     autoTable(doc, {
+  //       startY: lastY,
+  //       head: [["Notes & Special Comments:"]],
+  //       body: [
+  //         ["• The Quoted price is inclusive of all applicable taxes and VAT"],
+  //         ["• Payment: 100% within 7 days after delivery."],
+  //         ["• Delivery and Installation will be free of cost"],
+  //         ["• Delivery: Within 5–15 Days of PO acceptance"],
+  //         ["• Validity of Quotation: 30 Days"],
+  //       ],
+  //       theme: "grid",
+  //       styles: { fontSize: 10, cellPadding: 5 },
+  //       headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
+  //       columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
+  //     });
+
+  //     // @ts-ignore
+  //     lastY = doc.lastAutoTable.finalY + 10;
+
+  //     // Warranty Table
+  //     autoTable(doc, {
+  //       startY: lastY,
+  //       head: [["Warranty Terms and Conditions:"]],
+  //       body: [
+  //         ["• In case of payment failure, warranty isn't applicable."],
+  //         ["• NEA voltage fluctuation damage is not covered."],
+  //         ["• Physical damage or tampering voids warranty."],
+  //       ],
+  //       theme: "grid",
+  //       styles: { fontSize: 10, cellPadding: 5 },
+  //       headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
+  //       columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
+  //     });
+
+  //     // Closing Text
+  //     // @ts-ignore
+  //     lastY = doc.lastAutoTable.finalY + 15;
+  //     doc.setFontSize(10);
+  //     const closingText =
+  //       "We will be happy to supply any further information you may need and trust that you call on us to fill your order, which will receive our attention promptly.";
+  //     const wrapped = doc.splitTextToSize(closingText, pageWidth - leftX * 2);
+  //     doc.text(wrapped, leftX, lastY);
+
+  //     // Signature & Stamp
+  //     lastY += wrapped.length * 12 + 20;
+  //     let sigY = lastY;
+  //     doc.setFontSize(10);
+  //     doc.text(
+  //       "To accept this quotation, please sign here and return:",
+  //       leftX,
+  //       sigY
+  //     );
+  //     sigY += 40;
+
+  //     const stamp = new Image();
+  //     stamp.src = "/setNepalStamp.png";
+  //     const stampWidth = 120;
+  //     const stampHeight = 80;
+  //     const rightXStamp = pageWidth - leftX - stampWidth;
+  //     doc.addImage(stamp, "PNG", rightXStamp, sigY, stampWidth, stampHeight);
+
+  //     doc.setFontSize(12);
+  //     doc.text("For: Set Nepal Pvt. Ltd", rightXStamp, sigY + stampHeight + 10);
+
+  //     // Save PDF
+  //     doc.save("quotation.pdf");
+
+  //     // Reset form
+  //     setFormData({
+  //       organization: "",
+  //       name: "",
+  //       email: "",
+  //       phone: "",
+  //       address: "",
+  //       message: "",
+  //     });
+  //     setSelections([{ category: null, products: [] }]);
+  //     setSearchQueries([""]);
+  //     setCurrentPages([1]);
+  //     setStep(1);
+  //   } catch (err: any) {
+  //     toast.error(err.response?.data?.error || "Submission failed");
+  //     console.error(err);
+  //   }
+  // };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -133,10 +362,17 @@ export default function Quotation() {
         return;
       }
 
-      // Prepare items
+      const TAX_RATE = 0.13; // 13%
+
+      // Prepare items with tax deducted from unit price
       const items = selections.flatMap((sel) =>
         sel.products.map((p) => {
           const prod = products.find((prod) => prod.id === p.productId);
+          const originalPrice = prod?.price ?? 0;
+
+          const unitPriceWithoutTax = originalPrice / (1 + TAX_RATE);
+          const subtotal = unitPriceWithoutTax * p.quantity;
+
           return {
             category: sel.category?.name ?? "N/A",
             productId: p.productId,
@@ -146,8 +382,8 @@ export default function Quotation() {
                 ? prod.brand.name
                 : "N/A",
             quantity: p.quantity,
-            unitPrice: prod?.price ?? 0,
-            subtotal: (prod?.price ?? 0) * p.quantity,
+            unitPrice: parseFloat(unitPriceWithoutTax.toFixed(2)),
+            subtotal: parseFloat(subtotal.toFixed(2)),
           };
         })
       );
@@ -169,6 +405,11 @@ export default function Quotation() {
 
       toast.success(res.data.message || "Quotation submitted successfully!");
 
+      // Calculate totals
+      const subtotalSum = items.reduce((acc, item) => acc + item.subtotal, 0);
+      const taxAmount = parseFloat((subtotalSum * TAX_RATE).toFixed(2));
+      const grandTotal = parseFloat((subtotalSum + taxAmount).toFixed(2));
+
       // PDF Generation
       const doc = new jsPDF("p", "pt", "a4");
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -185,25 +426,18 @@ export default function Quotation() {
         doc.addImage(quality, "PNG", rightX, 20, 140, 120);
 
         doc.setFontSize(10);
-
-        // Set "Set Nepal" in green
         doc.setTextColor(155, 182, 72);
         doc.text("Set Nepal", leftX, 170);
-
-        // Reset to black
         doc.setTextColor(0, 0, 0);
         doc.text("Bafal Kathmandu", leftX, 185);
         doc.text("01-5312298", leftX, 200);
 
         doc.text("Contact No.: 015312298", rightX, 170);
         doc.text("Whatsapp: 9851331773", rightX, 185);
-
-        // Make email clickable
         const emailLink = "info.setnepal@gmail.com";
         doc.textWithLink(`Email: ${emailLink}`, rightX, 200, {
           url: `mailto:${emailLink}`,
         });
-
         doc.text(`Date: ${new Date().toLocaleDateString()}`, rightX, 215);
       }
 
@@ -212,7 +446,7 @@ export default function Quotation() {
       const boxH = 60;
       const boxW = (pageWidth - leftX * 2 - 20) / 2;
 
-      // Left box: Customer Info
+      // Customer Info
       doc.rect(leftX, boxY, boxW, boxH);
       let infoY = boxY + 15;
       doc.setFontSize(10);
@@ -224,7 +458,7 @@ export default function Quotation() {
       infoY += 12;
       doc.text(`Address: ${address}`, leftX + 10, infoY);
 
-      // Right box: Quotation title
+      // Quotation title
       doc.rect(leftX + boxW + 20, boxY, boxW, boxH);
       const fontSize = 24;
       doc.setFontSize(fontSize);
@@ -233,7 +467,8 @@ export default function Quotation() {
         align: "center",
       });
 
-      // Items Table
+      // Prepare table data
+      // Prepare table data
       const tableData = items.map((item, idx) => [
         idx + 1,
         item.productName,
@@ -244,6 +479,40 @@ export default function Quotation() {
         item.subtotal.toFixed(2),
       ]);
 
+      // Add Subtotal row
+      tableData.push([
+        "", // SN
+        "Subtotal", // Description
+        "",
+        "",
+        "", // Brand, Unit, Qty empty
+        "", // Unit Price column
+        subtotalSum.toFixed(2), // Total column
+      ]);
+
+      // Add Tax row
+      tableData.push([
+        "", // SN
+        "Tax (13%)", // Description
+        "",
+        "",
+        "", // Brand, Unit, Qty empty
+        "",
+        taxAmount.toFixed(2), // Total column
+      ]);
+
+      // Add Grand Total row
+      // tableData.push([
+      //   "", // SN
+      //   "Grand Total", // Description
+      //   "",
+      //   "",
+      //   "", // Brand, Unit, Qty empty
+      //   grandTotal.toFixed(2), // Unit Price column
+      //   grandTotal.toFixed(2), // Total column
+      // ]);
+
+      // Draw table
       autoTable(doc, {
         startY: boxY + boxH + 30,
         head: [
@@ -259,6 +528,50 @@ export default function Quotation() {
           4: { halign: "center" },
           5: { halign: "right" },
           6: { halign: "right" },
+        },
+        didParseCell: (data) => {
+          // Highlight the last three rows (Subtotal, Tax, Grand Total)
+          if (data.row.index >= tableData.length - 3) {
+            data.cell.styles.fontStyle = "bold";
+            data.cell.styles.fillColor = [220, 220, 220];
+          }
+        },
+      });
+
+      // Add Grand Total row in the same table
+      tableData.push([
+        "", // SN empty
+        "Grand Total", // Description
+        "", // Brand empty
+        "", // Unit empty
+        "", // Qty empty
+        subtotalSum.toFixed(2), // Unit Price column shows subtotal sum
+        grandTotal.toFixed(2), // Total column shows grand total
+      ]);
+
+      // Draw table
+      autoTable(doc, {
+        startY: boxY + boxH + 30,
+        head: [
+          ["SN", "Description", "Brand", "Unit", "Qty", "Unit Price", "Total"],
+        ],
+        body: tableData,
+        theme: "grid",
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [200, 200, 200] },
+        columnStyles: {
+          0: { halign: "center" },
+          3: { halign: "center" },
+          4: { halign: "center" },
+          5: { halign: "right" },
+          6: { halign: "right" },
+        },
+        didParseCell: (data) => {
+          // Highlight Grand Total row
+          if (data.row.index === tableData.length - 1) {
+            data.cell.styles.fontStyle = "bold";
+            data.cell.styles.fillColor = [220, 220, 220];
+          }
         },
       });
 
@@ -356,74 +669,120 @@ export default function Quotation() {
     products.filter((p) => p.categoryId === categoryId);
 
   return (
-    <div className="mt-16 font-poppins min-h-screen pb-12">
+    <div className="min-h-screen flex items-center justify-center font-poppins py-12">
       <ToastContainer position="top-right" autoClose={3000} theme="light" />
 
       {/* Step 1 */}
       {step === 1 && (
-        <div className="flex justify-center px-4">
-          <div className="w-full max-w-3xl bg-white rounded-xl shadow-xl p-6">
-            <Stepper current={1} />
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Personal Details
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FloatingInput
+        <div className="w-full md:max-w-3xl sm:max-w-full bg-white rounded-xl shadow-xl p-6">
+          <Stepper current={1} />
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+            Personal Details
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col sm:col-span-1">
+              <label
+                htmlFor="organization"
+                className="mb-1 font-medium text-gray-700"
+              >
+                Organization <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="organization"
-                label="Organization"
+                type="text"
                 value={formData.organization}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-1">
+              <label htmlFor="name" className="mb-1 font-medium text-gray-700">
+                Name <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="name"
-                label="Name"
+                type="text"
                 value={formData.name}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-1">
+              <label htmlFor="email" className="mb-1 font-medium text-gray-700">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="email"
-                label="Email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-1">
+              <label htmlFor="phone" className="mb-1 font-medium text-gray-700">
+                Phone <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="phone"
-                label="Phone"
+                type="text"
                 value={formData.phone}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-2">
+              <label
+                htmlFor="address"
+                className="mb-1 font-medium text-gray-700"
+              >
+                Address <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="address"
-                label="Address"
-                fullWidth
+                type="text"
                 value={formData.address}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-2">
+              <label
+                htmlFor="message"
+                className="mb-1 font-medium text-gray-700"
+              >
+                Message
+              </label>
+              <textarea
                 id="message"
-                label="Message"
-                textarea
-                fullWidth
                 value={formData.message}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648] resize-none"
+                rows={4}
               />
             </div>
-            <div className="flex justify-end mt-6">
-              <button
-                onClick={handleNextStep1}
-                className="bg-[#9bb648] text-white py-2 px-6 rounded-lg font-semibold hover:opacity-90"
-              >
-                Next →
-              </button>
-            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-end mt-6 gap-2">
+            <button
+              onClick={handleNextStep1}
+              className="w-full sm:w-auto bg-[#9bb648] text-white py-2 px-6 rounded-lg font-semibold hover:opacity-90"
+            >
+              Next →
+            </button>
           </div>
         </div>
       )}
 
       {/* Step 2 */}
       {step === 2 && (
-        <div className="flex justify-center px-4">
+        <div className="flex justify-center px-4 w-full">
           <div className="w-full max-w-3xl bg-white rounded-xl shadow-xl p-6">
             <Stepper current={2} />
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -611,7 +970,6 @@ export default function Quotation() {
         </div>
       )}
 
-      {/* Step 3 */}
       {/* Step 3 */}
       {step === 3 && (
         <div className="flex justify-center px-4">

@@ -19,6 +19,7 @@ import { GrGallery } from "react-icons/gr";
 import { TbQuotes } from "react-icons/tb";
 import { User } from "lucide-react";
 import { GiAutoRepair } from "react-icons/gi";
+import { FaRegUserCircle } from "react-icons/fa";
 
 export default function Sidebar() {
   const [activeView, setActiveView] = useState("dashboard");
@@ -117,6 +118,12 @@ export default function Sidebar() {
       icon: <IoMdSettings />,
       path: "/admin/settings",
     },
+    {
+      id: "user",
+      label: "Create User",
+      icon: <FaRegUserCircle />,
+      path: "/admin/create-user",
+    },
   ];
 
   const handleClick = (item: MenuItem) => {
@@ -132,11 +139,11 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="w-20 lg:w-60 p-4 flex flex-col justify-start items-center min-h-screen font-poppins"
+      className="w-20 lg:w-60 p-2 flex flex-col justify-start items-center min-h-screen font-poppins"
       style={{ backgroundColor: "#aec958" }}
     >
       {/* Menu Items */}
-      <div className="flex flex-col w-full gap-2">
+      <div className="flex flex-col w-full gap-1">
         {menuItems.map((item) => (
           <button
             key={item.id}

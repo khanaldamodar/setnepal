@@ -4,6 +4,7 @@ import { ProductFilters } from "@/components/Productpage-components/product-filt
 import { ProductGrid } from "@/components/Productpage-components/product-grid";
 import { ProductPagination } from "@/components/Productpage-components/product-pagination";
 import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -11,6 +12,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<{
     categories: string[];
     brands: string[];
@@ -22,6 +24,40 @@ export default function ProductsPage() {
     priceRange: [0, 1000000],
     minRating: 0,
   });
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const search = searchParams.get("search") || "";
+    setSearchQuery(search); // pre-fill input
+    setCurrentPage(1); // reset pagination
+  }, [searchParams]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product: any) => {
+      const categoryMatch =
+        filters.categories.length === 0 ||
+        filters.categories.includes(product.categoryName);
+
+      const brandMatch =
+        filters.brands.length === 0 ||
+        filters.brands.includes(product.brandName);
+
+      const priceMatch =
+        product.price >= filters.priceRange[0] &&
+        product.price <= filters.priceRange[1];
+
+      const ratingMatch = product.rating >= filters.minRating;
+
+      const searchMatch =
+        searchQuery === "" ||
+        product.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return (
+        categoryMatch && brandMatch && priceMatch && ratingMatch && searchMatch
+      );
+    });
+  }, [filters, products, searchQuery]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -55,25 +91,25 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((product: any) => {
-      const categoryMatch =
-        filters.categories.length === 0 ||
-        filters.categories.includes(product.categoryName);
+  // const filteredProducts = useMemo(() => {
+  //   return products.filter((product: any) => {
+  //     const categoryMatch =
+  //       filters.categories.length === 0 ||
+  //       filters.categories.includes(product.categoryName);
 
-      const brandMatch =
-        filters.brands.length === 0 ||
-        filters.brands.includes(product.brandName);
+  //     const brandMatch =
+  //       filters.brands.length === 0 ||
+  //       filters.brands.includes(product.brandName);
 
-      const priceMatch =
-        product.price >= filters.priceRange[0] &&
-        product.price <= filters.priceRange[1];
+  //     const priceMatch =
+  //       product.price >= filters.priceRange[0] &&
+  //       product.price <= filters.priceRange[1];
 
-      const ratingMatch = product.rating >= filters.minRating;
+  //     const ratingMatch = product.rating >= filters.minRating;
 
-      return categoryMatch && brandMatch && priceMatch && ratingMatch;
-    });
-  }, [filters, products]);
+  //     return categoryMatch && brandMatch && priceMatch && ratingMatch;
+  //   });
+  // }, [filters, products]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
@@ -91,6 +127,31 @@ export default function ProductsPage() {
   return (
     <main className="min-h-screen font-poppins py-30 md:py-30">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-4 flex items-center gap-2">
+          {/* <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 rounded border border-border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+          /> */}
+
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 rounded border border-border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+          />
+
+          <button
+            onClick={() => setCurrentPage(1)} // Reset page on search
+            className="rounded bg-primary px-4 py-2 text-[] hover:bg-primary/90 bg-white"
+          >
+            Search
+          </button>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Products</h1>
