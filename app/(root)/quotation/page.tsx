@@ -362,10 +362,17 @@ export default function Quotation() {
         return;
       }
 
-      // Prepare items
+      const TAX_RATE = 0.13; // 13%
+
+      // Prepare items with tax deducted from unit price
       const items = selections.flatMap((sel) =>
         sel.products.map((p) => {
           const prod = products.find((prod) => prod.id === p.productId);
+          const originalPrice = prod?.price ?? 0;
+
+          const unitPriceWithoutTax = originalPrice / (1 + TAX_RATE);
+          const subtotal = unitPriceWithoutTax * p.quantity;
+
           return {
             category: sel.category?.name ?? "N/A",
             productId: p.productId,
@@ -375,8 +382,8 @@ export default function Quotation() {
                 ? prod.brand.name
                 : "N/A",
             quantity: p.quantity,
-            unitPrice: prod?.price ?? 0,
-            subtotal: (prod?.price ?? 0) * p.quantity,
+            unitPrice: parseFloat(unitPriceWithoutTax.toFixed(2)),
+            subtotal: parseFloat(subtotal.toFixed(2)),
           };
         })
       );
@@ -386,7 +393,6 @@ export default function Quotation() {
         return;
       }
 
-      // Save to DB
       const res = await axios.post("/api/quotation", {
         name,
         email,
@@ -399,7 +405,12 @@ export default function Quotation() {
 
       toast.success(res.data.message || "Quotation submitted successfully!");
 
-      // PDF GENERATION
+      // Calculate totals
+      const subtotalSum = items.reduce((acc, item) => acc + item.subtotal, 0);
+      const taxAmount = parseFloat((subtotalSum * TAX_RATE).toFixed(2));
+      const grandTotal = parseFloat((subtotalSum + taxAmount).toFixed(2));
+
+      // PDF Generation
       const doc = new jsPDF("p", "pt", "a4");
       const pageWidth = doc.internal.pageSize.getWidth();
       const leftX = 40;
@@ -415,30 +426,27 @@ export default function Quotation() {
         doc.addImage(quality, "PNG", rightX, 20, 140, 120);
 
         doc.setFontSize(10);
-
-        doc.setTextColor(155, 182, 72); // green
+        doc.setTextColor(155, 182, 72);
         doc.text("Set Nepal", leftX, 170);
-
         doc.setTextColor(0, 0, 0);
         doc.text("Bafal Kathmandu", leftX, 185);
         doc.text("01-5312298", leftX, 200);
 
         doc.text("Contact No.: 015312298", rightX, 170);
         doc.text("Whatsapp: 9851331773", rightX, 185);
-
         const emailLink = "info.setnepal@gmail.com";
         doc.textWithLink(`Email: ${emailLink}`, rightX, 200, {
           url: `mailto:${emailLink}`,
         });
-
         doc.text(`Date: ${new Date().toLocaleDateString()}`, rightX, 215);
       }
 
-      // Customer + quotation boxes
+      // Boxes
       const boxY = 230;
       const boxH = 60;
       const boxW = (pageWidth - leftX * 2 - 20) / 2;
 
+      // Customer Info
       doc.rect(leftX, boxY, boxW, boxH);
       let infoY = boxY + 15;
       doc.setFontSize(10);
@@ -452,17 +460,15 @@ export default function Quotation() {
 
       // Quotation title
       doc.rect(leftX + boxW + 20, boxY, boxW, boxH);
-      doc.setFontSize(24);
-      doc.text(
-        "Quotation",
-        leftX + boxW + 20 + boxW / 2,
-        boxY + boxH / 2 + 10,
-        {
-          align: "center",
-        }
-      );
+      const fontSize = 24;
+      doc.setFontSize(fontSize);
+      const titleY = boxY + boxH / 2 + fontSize / 2 - 4;
+      doc.text("Quotation", leftX + boxW + 20 + boxW / 2, titleY, {
+        align: "center",
+      });
 
-      // Table Data
+      // Prepare table data
+      // Prepare table data
       const tableData = items.map((item, idx) => [
         idx + 1,
         item.productName,
@@ -473,53 +479,46 @@ export default function Quotation() {
         item.subtotal.toFixed(2),
       ]);
 
-      // CALCULATIONS
-      const subTotal = items.reduce((sum, i) => sum + i.subtotal, 0);
-      const thirteenPercent = subTotal * 0.13;
-      const grandTotal = subTotal - thirteenPercent;
+      // Add Subtotal row
+      tableData.push([
+        "", // SN
+        "Subtotal", // Description
+        "",
+        "",
+        "", // Brand, Unit, Qty empty
+        "", // Unit Price column
+        subtotalSum.toFixed(2), // Total column
+      ]);
 
-      // MAIN TABLE
+      // Add Tax row
+      tableData.push([
+        "", // SN
+        "Tax (13%)", // Description
+        "",
+        "",
+        "", // Brand, Unit, Qty empty
+        "",
+        taxAmount.toFixed(2), // Total column
+      ]);
+
+      // Add Grand Total row
+      // tableData.push([
+      //   "", // SN
+      //   "Grand Total", // Description
+      //   "",
+      //   "",
+      //   "", // Brand, Unit, Qty empty
+      //   grandTotal.toFixed(2), // Unit Price column
+      //   grandTotal.toFixed(2), // Total column
+      // ]);
+
+      // Draw table
       autoTable(doc, {
         startY: boxY + boxH + 30,
         head: [
           ["SN", "Description", "Brand", "Unit", "Qty", "Unit Price", "Total"],
         ],
-        body: [
-          ...tableData,
-          [
-            {
-              content: "Sub Total:",
-              colSpan: 6,
-              styles: { halign: "right", fontStyle: "bold" },
-            },
-            {
-              content: subTotal.toFixed(2),
-              styles: { halign: "right", fontStyle: "bold" },
-            },
-          ],
-          [
-            {
-              content: "(-) 13%:",
-              colSpan: 6,
-              styles: { halign: "right", fontStyle: "bold" },
-            },
-            {
-              content: `-${thirteenPercent.toFixed(2)}`,
-              styles: { halign: "right", fontStyle: "bold" },
-            },
-          ],
-          [
-            {
-              content: "Grand Total:",
-              colSpan: 6,
-              styles: { halign: "right", fontStyle: "bold" },
-            },
-            {
-              content: grandTotal.toFixed(2),
-              styles: { halign: "right", fontStyle: "bold" },
-            },
-          ],
-        ],
+        body: tableData,
         theme: "grid",
         styles: { fontSize: 10, cellPadding: 3 },
         headStyles: { fillColor: [200, 200, 200] },
@@ -530,12 +529,56 @@ export default function Quotation() {
           5: { halign: "right" },
           6: { halign: "right" },
         },
+        didParseCell: (data) => {
+          // Highlight the last three rows (Subtotal, Tax, Grand Total)
+          if (data.row.index >= tableData.length - 3) {
+            data.cell.styles.fontStyle = "bold";
+            data.cell.styles.fillColor = [220, 220, 220];
+          }
+        },
       });
 
-      // Notes
+      // Add Grand Total row in the same table
+      tableData.push([
+        "", // SN empty
+        "Grand Total", // Description
+        "", // Brand empty
+        "", // Unit empty
+        "", // Qty empty
+        subtotalSum.toFixed(2), // Unit Price column shows subtotal sum
+        grandTotal.toFixed(2), // Total column shows grand total
+      ]);
+
+      // Draw table
+      autoTable(doc, {
+        startY: boxY + boxH + 30,
+        head: [
+          ["SN", "Description", "Brand", "Unit", "Qty", "Unit Price", "Total"],
+        ],
+        body: tableData,
+        theme: "grid",
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [200, 200, 200] },
+        columnStyles: {
+          0: { halign: "center" },
+          3: { halign: "center" },
+          4: { halign: "center" },
+          5: { halign: "right" },
+          6: { halign: "right" },
+        },
+        didParseCell: (data) => {
+          // Highlight Grand Total row
+          if (data.row.index === tableData.length - 1) {
+            data.cell.styles.fontStyle = "bold";
+            data.cell.styles.fillColor = [220, 220, 220];
+          }
+        },
+      });
+
       // @ts-ignore
       let lastY = doc.lastAutoTable.finalY + 10;
 
+      // Notes Table
       autoTable(doc, {
         startY: lastY,
         head: [["Notes & Special Comments:"]],
@@ -549,12 +592,13 @@ export default function Quotation() {
         theme: "grid",
         styles: { fontSize: 10, cellPadding: 5 },
         headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
+        columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
       });
 
-      // Warranty
       // @ts-ignore
       lastY = doc.lastAutoTable.finalY + 10;
 
+      // Warranty Table
       autoTable(doc, {
         startY: lastY,
         head: [["Warranty Terms and Conditions:"]],
@@ -566,9 +610,10 @@ export default function Quotation() {
         theme: "grid",
         styles: { fontSize: 10, cellPadding: 5 },
         headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
+        columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
       });
 
-      // Closing text
+      // Closing Text
       // @ts-ignore
       lastY = doc.lastAutoTable.finalY + 15;
       doc.setFontSize(10);
@@ -577,39 +622,31 @@ export default function Quotation() {
       const wrapped = doc.splitTextToSize(closingText, pageWidth - leftX * 2);
       doc.text(wrapped, leftX, lastY);
 
-      // FINAL STAMP POSITION (AUTO MOVES DOWN IF TABLE IS LONG)
-      let finalY = lastY + wrapped.length * 12 + 20;
-
+      // Signature & Stamp
+      lastY += wrapped.length * 12 + 20;
+      let sigY = lastY;
       doc.setFontSize(10);
       doc.text(
         "To accept this quotation, please sign here and return:",
         leftX,
-        finalY
+        sigY
       );
+      sigY += 40;
 
-      finalY += 30; // moved upward slightly
-
-      // Stamp
       const stamp = new Image();
       stamp.src = "/setNepalStamp.png";
       const stampWidth = 120;
       const stampHeight = 80;
-      const rightStampX = pageWidth - leftX - stampWidth;
+      const rightXStamp = pageWidth - leftX - stampWidth;
+      doc.addImage(stamp, "PNG", rightXStamp, sigY, stampWidth, stampHeight);
 
-      doc.addImage(stamp, "PNG", rightStampX, finalY, stampWidth, stampHeight);
-
-      // Signature text
       doc.setFontSize(12);
-      doc.text(
-        "For: Set Nepal Pvt. Ltd",
-        rightStampX,
-        finalY + stampHeight - 5
-      );
+      doc.text("For: Set Nepal Pvt. Ltd", rightXStamp, sigY + stampHeight + 10);
 
       // Save PDF
       doc.save("quotation.pdf");
 
-      // Reset Form
+      // Reset form
       setFormData({
         organization: "",
         name: "",
@@ -618,7 +655,6 @@ export default function Quotation() {
         address: "",
         message: "",
       });
-
       setSelections([{ category: null, products: [] }]);
       setSearchQueries([""]);
       setCurrentPages([1]);
