@@ -123,6 +123,235 @@ export default function Quotation() {
     setStep(3);
   };
 
+  // const handleSubmit = async (e: FormEvent) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const { name, email, phone, organization, address, message } = formData;
+  //     if (!name || !organization || !address) {
+  //       toast.error("Please fill all required fields.");
+  //       return;
+  //     }
+
+  //     // Prepare items
+  //     const items = selections.flatMap((sel) =>
+  //       sel.products.map((p) => {
+  //         const prod = products.find((prod) => prod.id === p.productId);
+  //         return {
+  //           category: sel.category?.name ?? "N/A",
+  //           productId: p.productId,
+  //           productName: prod?.name ?? "N/A",
+  //           brandName:
+  //             prod?.brand && typeof prod.brand === "object"
+  //               ? prod.brand.name
+  //               : "N/A",
+  //           quantity: p.quantity,
+  //           unitPrice: prod?.price ?? 0,
+  //           subtotal: (prod?.price ?? 0) * p.quantity,
+  //         };
+  //       })
+  //     );
+
+  //     if (items.length === 0) {
+  //       toast.error("Please select at least one product.");
+  //       return;
+  //     }
+
+  //     const res = await axios.post("/api/quotation", {
+  //       name,
+  //       email,
+  //       phone,
+  //       address,
+  //       companyName: organization,
+  //       message,
+  //       items,
+  //     });
+
+  //     toast.success(res.data.message || "Quotation submitted successfully!");
+
+  //     // PDF Generation
+  //     const doc = new jsPDF("p", "pt", "a4");
+  //     const pageWidth = doc.internal.pageSize.getWidth();
+  //     const leftX = 40;
+  //     const rightX = pageWidth - 200;
+
+  //     if (typeof window !== "undefined") {
+  //       const logo = new Image();
+  //       logo.src = "/logo.jpeg";
+  //       const quality = new Image();
+  //       quality.src = "/qualityAssured.png";
+
+  //       doc.addImage(logo, "JPEG", leftX, 20, 230, 150);
+  //       doc.addImage(quality, "PNG", rightX, 20, 140, 120);
+
+  //       doc.setFontSize(10);
+
+  //       // Set "Set Nepal" in green
+  //       doc.setTextColor(155, 182, 72);
+  //       doc.text("Set Nepal", leftX, 170);
+
+  //       // Reset to black
+  //       doc.setTextColor(0, 0, 0);
+  //       doc.text("Bafal Kathmandu", leftX, 185);
+  //       doc.text("01-5312298", leftX, 200);
+
+  //       doc.text("Contact No.: 015312298", rightX, 170);
+  //       doc.text("Whatsapp: 9851331773", rightX, 185);
+
+  //       // Make email clickable
+  //       const emailLink = "info.setnepal@gmail.com";
+  //       doc.textWithLink(`Email: ${emailLink}`, rightX, 200, {
+  //         url: `mailto:${emailLink}`,
+  //       });
+
+  //       doc.text(`Date: ${new Date().toLocaleDateString()}`, rightX, 215);
+  //     }
+
+  //     // Boxes
+  //     const boxY = 230;
+  //     const boxH = 60;
+  //     const boxW = (pageWidth - leftX * 2 - 20) / 2;
+
+  //     // Left box: Customer Info
+  //     doc.rect(leftX, boxY, boxW, boxH);
+  //     let infoY = boxY + 15;
+  //     doc.setFontSize(10);
+  //     doc.text("Customer Info:", leftX + 10, infoY);
+  //     infoY += 12;
+  //     doc.text(`Organization: ${organization}`, leftX + 10, infoY);
+  //     infoY += 12;
+  //     doc.text(`Name: ${name}`, leftX + 10, infoY);
+  //     infoY += 12;
+  //     doc.text(`Address: ${address}`, leftX + 10, infoY);
+
+  //     // Right box: Quotation title
+  //     doc.rect(leftX + boxW + 20, boxY, boxW, boxH);
+  //     const fontSize = 24;
+  //     doc.setFontSize(fontSize);
+  //     const titleY = boxY + boxH / 2 + fontSize / 2 - 4;
+  //     doc.text("Quotation", leftX + boxW + 20 + boxW / 2, titleY, {
+  //       align: "center",
+  //     });
+
+  //     // Items Table
+  //     const tableData = items.map((item, idx) => [
+  //       idx + 1,
+  //       item.productName,
+  //       item.brandName,
+  //       "pcs",
+  //       item.quantity,
+  //       item.unitPrice.toFixed(2),
+  //       item.subtotal.toFixed(2),
+  //     ]);
+
+  //     autoTable(doc, {
+  //       startY: boxY + boxH + 30,
+  //       head: [
+  //         ["SN", "Description", "Brand", "Unit", "Qty", "Unit Price", "Total"],
+  //       ],
+  //       body: tableData,
+  //       theme: "grid",
+  //       styles: { fontSize: 10, cellPadding: 3 },
+  //       headStyles: { fillColor: [200, 200, 200] },
+  //       columnStyles: {
+  //         0: { halign: "center" },
+  //         3: { halign: "center" },
+  //         4: { halign: "center" },
+  //         5: { halign: "right" },
+  //         6: { halign: "right" },
+  //       },
+  //     });
+
+  //     // @ts-ignore
+  //     let lastY = doc.lastAutoTable.finalY + 10;
+
+  //     // Notes Table
+  //     autoTable(doc, {
+  //       startY: lastY,
+  //       head: [["Notes & Special Comments:"]],
+  //       body: [
+  //         ["• The Quoted price is inclusive of all applicable taxes and VAT"],
+  //         ["• Payment: 100% within 7 days after delivery."],
+  //         ["• Delivery and Installation will be free of cost"],
+  //         ["• Delivery: Within 5–15 Days of PO acceptance"],
+  //         ["• Validity of Quotation: 30 Days"],
+  //       ],
+  //       theme: "grid",
+  //       styles: { fontSize: 10, cellPadding: 5 },
+  //       headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
+  //       columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
+  //     });
+
+  //     // @ts-ignore
+  //     lastY = doc.lastAutoTable.finalY + 10;
+
+  //     // Warranty Table
+  //     autoTable(doc, {
+  //       startY: lastY,
+  //       head: [["Warranty Terms and Conditions:"]],
+  //       body: [
+  //         ["• In case of payment failure, warranty isn't applicable."],
+  //         ["• NEA voltage fluctuation damage is not covered."],
+  //         ["• Physical damage or tampering voids warranty."],
+  //       ],
+  //       theme: "grid",
+  //       styles: { fontSize: 10, cellPadding: 5 },
+  //       headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
+  //       columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
+  //     });
+
+  //     // Closing Text
+  //     // @ts-ignore
+  //     lastY = doc.lastAutoTable.finalY + 15;
+  //     doc.setFontSize(10);
+  //     const closingText =
+  //       "We will be happy to supply any further information you may need and trust that you call on us to fill your order, which will receive our attention promptly.";
+  //     const wrapped = doc.splitTextToSize(closingText, pageWidth - leftX * 2);
+  //     doc.text(wrapped, leftX, lastY);
+
+  //     // Signature & Stamp
+  //     lastY += wrapped.length * 12 + 20;
+  //     let sigY = lastY;
+  //     doc.setFontSize(10);
+  //     doc.text(
+  //       "To accept this quotation, please sign here and return:",
+  //       leftX,
+  //       sigY
+  //     );
+  //     sigY += 40;
+
+  //     const stamp = new Image();
+  //     stamp.src = "/setNepalStamp.png";
+  //     const stampWidth = 120;
+  //     const stampHeight = 80;
+  //     const rightXStamp = pageWidth - leftX - stampWidth;
+  //     doc.addImage(stamp, "PNG", rightXStamp, sigY, stampWidth, stampHeight);
+
+  //     doc.setFontSize(12);
+  //     doc.text("For: Set Nepal Pvt. Ltd", rightXStamp, sigY + stampHeight + 10);
+
+  //     // Save PDF
+  //     doc.save("quotation.pdf");
+
+  //     // Reset form
+  //     setFormData({
+  //       organization: "",
+  //       name: "",
+  //       email: "",
+  //       phone: "",
+  //       address: "",
+  //       message: "",
+  //     });
+  //     setSelections([{ category: null, products: [] }]);
+  //     setSearchQueries([""]);
+  //     setCurrentPages([1]);
+  //     setStep(1);
+  //   } catch (err: any) {
+  //     toast.error(err.response?.data?.error || "Submission failed");
+  //     console.error(err);
+  //   }
+  // };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -157,6 +386,7 @@ export default function Quotation() {
         return;
       }
 
+      // Save to DB
       const res = await axios.post("/api/quotation", {
         name,
         email,
@@ -169,7 +399,7 @@ export default function Quotation() {
 
       toast.success(res.data.message || "Quotation submitted successfully!");
 
-      // PDF Generation
+      // PDF GENERATION
       const doc = new jsPDF("p", "pt", "a4");
       const pageWidth = doc.internal.pageSize.getWidth();
       const leftX = 40;
@@ -186,11 +416,9 @@ export default function Quotation() {
 
         doc.setFontSize(10);
 
-        // Set "Set Nepal" in green
-        doc.setTextColor(155, 182, 72);
+        doc.setTextColor(155, 182, 72); // green
         doc.text("Set Nepal", leftX, 170);
 
-        // Reset to black
         doc.setTextColor(0, 0, 0);
         doc.text("Bafal Kathmandu", leftX, 185);
         doc.text("01-5312298", leftX, 200);
@@ -198,7 +426,6 @@ export default function Quotation() {
         doc.text("Contact No.: 015312298", rightX, 170);
         doc.text("Whatsapp: 9851331773", rightX, 185);
 
-        // Make email clickable
         const emailLink = "info.setnepal@gmail.com";
         doc.textWithLink(`Email: ${emailLink}`, rightX, 200, {
           url: `mailto:${emailLink}`,
@@ -207,12 +434,11 @@ export default function Quotation() {
         doc.text(`Date: ${new Date().toLocaleDateString()}`, rightX, 215);
       }
 
-      // Boxes
+      // Customer + quotation boxes
       const boxY = 230;
       const boxH = 60;
       const boxW = (pageWidth - leftX * 2 - 20) / 2;
 
-      // Left box: Customer Info
       doc.rect(leftX, boxY, boxW, boxH);
       let infoY = boxY + 15;
       doc.setFontSize(10);
@@ -224,16 +450,19 @@ export default function Quotation() {
       infoY += 12;
       doc.text(`Address: ${address}`, leftX + 10, infoY);
 
-      // Right box: Quotation title
+      // Quotation title
       doc.rect(leftX + boxW + 20, boxY, boxW, boxH);
-      const fontSize = 24;
-      doc.setFontSize(fontSize);
-      const titleY = boxY + boxH / 2 + fontSize / 2 - 4;
-      doc.text("Quotation", leftX + boxW + 20 + boxW / 2, titleY, {
-        align: "center",
-      });
+      doc.setFontSize(24);
+      doc.text(
+        "Quotation",
+        leftX + boxW + 20 + boxW / 2,
+        boxY + boxH / 2 + 10,
+        {
+          align: "center",
+        }
+      );
 
-      // Items Table
+      // Table Data
       const tableData = items.map((item, idx) => [
         idx + 1,
         item.productName,
@@ -244,12 +473,53 @@ export default function Quotation() {
         item.subtotal.toFixed(2),
       ]);
 
+      // CALCULATIONS
+      const subTotal = items.reduce((sum, i) => sum + i.subtotal, 0);
+      const thirteenPercent = subTotal * 0.13;
+      const grandTotal = subTotal - thirteenPercent;
+
+      // MAIN TABLE
       autoTable(doc, {
         startY: boxY + boxH + 30,
         head: [
           ["SN", "Description", "Brand", "Unit", "Qty", "Unit Price", "Total"],
         ],
-        body: tableData,
+        body: [
+          ...tableData,
+          [
+            {
+              content: "Sub Total:",
+              colSpan: 6,
+              styles: { halign: "right", fontStyle: "bold" },
+            },
+            {
+              content: subTotal.toFixed(2),
+              styles: { halign: "right", fontStyle: "bold" },
+            },
+          ],
+          [
+            {
+              content: "(-) 13%:",
+              colSpan: 6,
+              styles: { halign: "right", fontStyle: "bold" },
+            },
+            {
+              content: `-${thirteenPercent.toFixed(2)}`,
+              styles: { halign: "right", fontStyle: "bold" },
+            },
+          ],
+          [
+            {
+              content: "Grand Total:",
+              colSpan: 6,
+              styles: { halign: "right", fontStyle: "bold" },
+            },
+            {
+              content: grandTotal.toFixed(2),
+              styles: { halign: "right", fontStyle: "bold" },
+            },
+          ],
+        ],
         theme: "grid",
         styles: { fontSize: 10, cellPadding: 3 },
         headStyles: { fillColor: [200, 200, 200] },
@@ -262,10 +532,10 @@ export default function Quotation() {
         },
       });
 
+      // Notes
       // @ts-ignore
       let lastY = doc.lastAutoTable.finalY + 10;
 
-      // Notes Table
       autoTable(doc, {
         startY: lastY,
         head: [["Notes & Special Comments:"]],
@@ -279,13 +549,12 @@ export default function Quotation() {
         theme: "grid",
         styles: { fontSize: 10, cellPadding: 5 },
         headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
-        columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
       });
 
+      // Warranty
       // @ts-ignore
       lastY = doc.lastAutoTable.finalY + 10;
 
-      // Warranty Table
       autoTable(doc, {
         startY: lastY,
         head: [["Warranty Terms and Conditions:"]],
@@ -297,10 +566,9 @@ export default function Quotation() {
         theme: "grid",
         styles: { fontSize: 10, cellPadding: 5 },
         headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
-        columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
       });
 
-      // Closing Text
+      // Closing text
       // @ts-ignore
       lastY = doc.lastAutoTable.finalY + 15;
       doc.setFontSize(10);
@@ -309,31 +577,39 @@ export default function Quotation() {
       const wrapped = doc.splitTextToSize(closingText, pageWidth - leftX * 2);
       doc.text(wrapped, leftX, lastY);
 
-      // Signature & Stamp
-      lastY += wrapped.length * 12 + 20;
-      let sigY = lastY;
+      // FINAL STAMP POSITION (AUTO MOVES DOWN IF TABLE IS LONG)
+      let finalY = lastY + wrapped.length * 12 + 20;
+
       doc.setFontSize(10);
       doc.text(
         "To accept this quotation, please sign here and return:",
         leftX,
-        sigY
+        finalY
       );
-      sigY += 40;
 
+      finalY += 30; // moved upward slightly
+
+      // Stamp
       const stamp = new Image();
       stamp.src = "/setNepalStamp.png";
       const stampWidth = 120;
       const stampHeight = 80;
-      const rightXStamp = pageWidth - leftX - stampWidth;
-      doc.addImage(stamp, "PNG", rightXStamp, sigY, stampWidth, stampHeight);
+      const rightStampX = pageWidth - leftX - stampWidth;
 
+      doc.addImage(stamp, "PNG", rightStampX, finalY, stampWidth, stampHeight);
+
+      // Signature text
       doc.setFontSize(12);
-      doc.text("For: Set Nepal Pvt. Ltd", rightXStamp, sigY + stampHeight + 10);
+      doc.text(
+        "For: Set Nepal Pvt. Ltd",
+        rightStampX,
+        finalY + stampHeight - 5
+      );
 
       // Save PDF
       doc.save("quotation.pdf");
 
-      // Reset form
+      // Reset Form
       setFormData({
         organization: "",
         name: "",
@@ -342,6 +618,7 @@ export default function Quotation() {
         address: "",
         message: "",
       });
+
       setSelections([{ category: null, products: [] }]);
       setSearchQueries([""]);
       setCurrentPages([1]);

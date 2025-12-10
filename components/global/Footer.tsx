@@ -175,15 +175,16 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
       <div className="border-t border-gray-700 mt-5 text-center text-sm text-black-500">
         <p>
           © {new Date().getFullYear()}{" "}
-          <span className="text-[#aec958] font-medium">
-            {settings.companyName || "Set Nepal"}
+          <span className="text-[#aec958] font-medium ">
+            {`${settings.companyName} ` || "Set Nepal."}
           </span>
-          . All rights reserved.
-        </p>
-        <p>
-          Developed by
-          <span className="text-[#aec958] font-medium cursor-pointer">
-            <a href="https://www.shaktatechnology.com/">
+          <span className="pr-3">All rights reserved. </span>
+          <span className="">
+            Developed by{" "}
+            <a
+              href="https://www.shaktatechnology.com/"
+              className="text-[#aec958] font-medium cursor-pointer"
+            >
               {" Shakta Technology "}
             </a>
           </span>
