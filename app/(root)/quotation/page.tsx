@@ -356,74 +356,120 @@ export default function Quotation() {
     products.filter((p) => p.categoryId === categoryId);
 
   return (
-    <div className="mt-16 font-poppins min-h-screen pb-12">
+    <div className="min-h-screen flex items-center justify-center font-poppins py-12">
       <ToastContainer position="top-right" autoClose={3000} theme="light" />
 
       {/* Step 1 */}
       {step === 1 && (
-        <div className="flex justify-center px-4">
-          <div className="w-full max-w-3xl bg-white rounded-xl shadow-xl p-6">
-            <Stepper current={1} />
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Personal Details
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FloatingInput
+        <div className="w-full md:max-w-3xl sm:max-w-full bg-white rounded-xl shadow-xl p-6">
+          <Stepper current={1} />
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+            Personal Details
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col sm:col-span-1">
+              <label
+                htmlFor="organization"
+                className="mb-1 font-medium text-gray-700"
+              >
+                Organization <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="organization"
-                label="Organization"
+                type="text"
                 value={formData.organization}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-1">
+              <label htmlFor="name" className="mb-1 font-medium text-gray-700">
+                Name <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="name"
-                label="Name"
+                type="text"
                 value={formData.name}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-1">
+              <label htmlFor="email" className="mb-1 font-medium text-gray-700">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="email"
-                label="Email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-1">
+              <label htmlFor="phone" className="mb-1 font-medium text-gray-700">
+                Phone <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="phone"
-                label="Phone"
+                type="text"
                 value={formData.phone}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-2">
+              <label
+                htmlFor="address"
+                className="mb-1 font-medium text-gray-700"
+              >
+                Address <span className="text-red-500">*</span>
+              </label>
+              <input
                 id="address"
-                label="Address"
-                fullWidth
+                type="text"
                 value={formData.address}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648]"
               />
-              <FloatingInput
+            </div>
+
+            <div className="flex flex-col sm:col-span-2">
+              <label
+                htmlFor="message"
+                className="mb-1 font-medium text-gray-700"
+              >
+                Message
+              </label>
+              <textarea
                 id="message"
-                label="Message"
-                textarea
-                fullWidth
                 value={formData.message}
                 onChange={handleChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#9bb648] resize-none"
+                rows={4}
               />
             </div>
-            <div className="flex justify-end mt-6">
-              <button
-                onClick={handleNextStep1}
-                className="bg-[#9bb648] text-white py-2 px-6 rounded-lg font-semibold hover:opacity-90"
-              >
-                Next →
-              </button>
-            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-end mt-6 gap-2">
+            <button
+              onClick={handleNextStep1}
+              className="w-full sm:w-auto bg-[#9bb648] text-white py-2 px-6 rounded-lg font-semibold hover:opacity-90"
+            >
+              Next →
+            </button>
           </div>
         </div>
       )}
 
       {/* Step 2 */}
       {step === 2 && (
-        <div className="flex justify-center px-4">
+        <div className="flex justify-center px-4 w-full">
           <div className="w-full max-w-3xl bg-white rounded-xl shadow-xl p-6">
             <Stepper current={2} />
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -611,7 +657,6 @@ export default function Quotation() {
         </div>
       )}
 
-      {/* Step 3 */}
       {/* Step 3 */}
       {step === 3 && (
         <div className="flex justify-center px-4">
