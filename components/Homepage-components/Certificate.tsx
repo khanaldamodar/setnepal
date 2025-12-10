@@ -21,6 +21,19 @@ const CertificateSliderPage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Fetch certificates from API
+  // useEffect(() => {
+  //   const fetchCertificates = async () => {
+  //     try {
+  //       const res = await fetch("/api/certificates");
+  //       const data = await res.json();
+  //       setCertificates(data.certificates || []);
+  //     } catch (err) {
+  //       console.error("Failed to fetch certificates:", err);
+  //     }
+  //   };
+  //   fetchCertificates();
+  // }, []);
+
   useEffect(() => {
     const fetchCertificates = async () => {
       try {
@@ -33,6 +46,11 @@ const CertificateSliderPage = () => {
     };
     fetchCertificates();
   }, []);
+
+  
+  if (!certificates || certificates.length === 0) {
+    return null;
+  }
 
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
     {
