@@ -662,28 +662,50 @@ export default function Quotation() {
       const wrapped = doc.splitTextToSize(closingText, pageWidth - leftX * 2);
       doc.text(wrapped, leftX, lastY);
 
-      lastY += wrapped.length * 12 + 20;
-      let sigY = lastY;
-      doc.setFontSize(10);
-      doc.text(
-        "To accept this quotation, please sign here and return:",
-        leftX,
-        sigY
-      );
-      sigY += 10;
+      lastY += wrapped.length * 12 + 10;
+      // Positioning
+      // Define box dimensions
+      const boxWidth = (pageWidth - leftX * 2 - 20) / 2;
+      const boxHeight = 80; // height of signature/stamp section
+      const paddingBottom = 5; // minimum padding required at bottom
 
+      // Check if the box fits on current page
+      let sigY = doc.lastAutoTable.finalY + 40; // space below previous content
+      if (
+        sigY + boxHeight + paddingBottom >
+        doc.internal.pageSize.getHeight()
+      ) {
+        // Not enough space, move to next page
+        doc.addPage();
+        sigY = 40; // top margin on new page
+      }
+
+      // LEFT "div" - Signature
+      doc.setFontSize(10);
+      const leftText = "To accept this quotation, please sign here and return:";
+      const textY = sigY + boxHeight - 10; // 10px padding from bottom
+      doc.text(leftText, leftX + 10, textY);
+
+      // RIGHT "div" - Stamp & For
       const stamp = new Image();
       stamp.src = "/setNepalStamp.png";
-      const stampWidth = 200;
-      const stampHeight = 70;
-      const rightXStamp = pageWidth - leftX - 220;
-      doc.addImage(stamp, "PNG", rightXStamp, sigY, stampWidth, stampHeight);
+      const stampWidth = 150;
+      const stampHeight = 50;
+      doc.addImage(
+        stamp,
+        "PNG",
+        leftX + boxWidth + 30,
+        sigY + 10,
+        stampWidth,
+        stampHeight
+      );
 
+      // "For: ..." text below stamp
       doc.setFontSize(12);
       doc.text(
         "For: Scientific Equipment Traders Pvt. Ltd.",
-        rightXStamp,
-        sigY + stampHeight + 10
+        leftX + boxWidth + 30,
+        sigY + 10 + stampHeight + 10
       );
 
       // Save
