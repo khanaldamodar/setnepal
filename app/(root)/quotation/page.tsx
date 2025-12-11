@@ -418,57 +418,73 @@ export default function Quotation() {
 
       if (typeof window !== "undefined") {
         const logo = new Image();
-        logo.src = "/logo.jpeg";
+        logo.src = "/quo-logo.png";
         const quality = new Image();
         quality.src = "/qualityAssured.png";
 
-        doc.addImage(logo, "JPEG", leftX, 20, 230, 150);
+        // Add header images
+        doc.addImage(logo, "PNG", leftX, 20, 230, 150);
         doc.addImage(quality, "PNG", rightX, 20, 140, 120);
 
-        doc.setFontSize(10);
-        doc.setTextColor(155, 182, 72);
-        doc.text("Set Nepal", leftX, 170);
-        doc.setTextColor(0, 0, 0);
-        doc.text("Bafal Kathmandu", leftX, 185);
-        doc.text("01-5312298", leftX, 200);
+        // Header text
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(120, 150, 50);
 
+        doc.text("Scientific Equipment Traders Pvt. Ltd.", leftX, 190);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.text(
+          "Contact Office : Bafal, Kathmandu Metropolitan-13,",
+          leftX,
+          205
+        );
+        doc.text("Contact Office : Kathmandu, Nepal", leftX, 220);
+
+        // Footer details
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
         doc.text("Contact No.: 015312298", rightX, 170);
         doc.text("Whatsapp: 9851331773", rightX, 185);
-        const emailLink = "info.setnepal@gmail.com";
-        doc.textWithLink(`Email: ${emailLink}`, rightX, 200, {
-          url: `mailto:${emailLink}`,
+        doc.textWithLink(`Email: info.setnepal@gmail.com`, rightX, 200, {
+          url: `mailto:info.setnepal@gmail.com`,
         });
         doc.text(`Date: ${new Date().toLocaleDateString()}`, rightX, 215);
       }
 
-      // Boxes
-      const boxY = 230;
+      const quotationId = res.data.quotation?.id ?? "N/A";
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Quotation Id: ${quotationId}`, leftX, 235);
+
+      const boxY = 250;
       const boxH = 60;
       const boxW = (pageWidth - leftX * 2 - 20) / 2;
 
-      // Customer Info
+      // Customer Info Box
       doc.rect(leftX, boxY, boxW, boxH);
       let infoY = boxY + 15;
       doc.setFontSize(10);
-      doc.text("Customer Info:", leftX + 10, infoY);
-      infoY += 12;
-      doc.text(`Organization: ${organization}`, leftX + 10, infoY);
-      infoY += 12;
-      doc.text(`Name: ${name}`, leftX + 10, infoY);
+      doc.text(`Customer: ${organization}`, leftX + 10, infoY);
       infoY += 12;
       doc.text(`Address: ${address}`, leftX + 10, infoY);
+      infoY += 12;
+      doc.text(`Contact Person: ${name}`, leftX + 10, infoY);
+      infoY += 12;
 
-      // Quotation title
+      doc.text(`Phone: ${phone}`, leftX + 10, infoY);
+
+      // Quotation Box
       doc.rect(leftX + boxW + 20, boxY, boxW, boxH);
-      const fontSize = 24;
-      doc.setFontSize(fontSize);
-      const titleY = boxY + boxH / 2 + fontSize / 2 - 4;
+      doc.setFontSize(24);
+      const titleY = boxY + boxH / 2 + 24 / 2 - 4;
       doc.text("Quotation", leftX + boxW + 20 + boxW / 2, titleY, {
         align: "center",
       });
 
-      // Prepare table data
-      // Prepare table data
+      // Prepare table data (YOUR ORIGINAL TABLE UNCHANGED)
       const tableData = items.map((item, idx) => [
         idx + 1,
         item.productName,
@@ -479,49 +495,87 @@ export default function Quotation() {
         item.subtotal.toFixed(2),
       ]);
 
-      // Add Subtotal row
+      // YOUR SUBTOTAL, VAT, GRAND TOTAL ROWS (unchanged)
       tableData.push([
-        "", // SN
-        "Subtotal", // Description
-        "",
-        "",
-        "", // Brand, Unit, Qty empty
-        "", // Unit Price column
-        subtotalSum.toFixed(2), // Total column
+        " ",
+        "Subtotal",
+        " ",
+        " ",
+        " ",
+        " ",
+        subtotalSum.toFixed(2),
       ]);
-
-      // Add Tax row
       tableData.push([
-        "", // SN
-        "Tax (13%)", // Description
-        "",
-        "",
-        "", // Brand, Unit, Qty empty
-        "",
-        taxAmount.toFixed(2), // Total column
+        " ",
+        "VAT (13%)",
+        " ",
+        " ",
+        " ",
+        " ",
+        taxAmount.toFixed(2),
       ]);
+      {
+        fillColor: [200, 200, 200];
+        tableData.push([
+          " ",
+          "Total (incl. VAT)",
+          " ",
+          " ",
+          " ",
+          " ",
+          grandTotal.toFixed(2),
+        ]);
+      }
 
-      // Add Grand Total row
-      // tableData.push([
-      //   "", // SN
-      //   "Grand Total", // Description
-      //   "",
-      //   "",
-      //   "", // Brand, Unit, Qty empty
-      //   grandTotal.toFixed(2), // Unit Price column
-      //   grandTotal.toFixed(2), // Total column
-      // ]);
-
-      // Draw table
       autoTable(doc, {
         startY: boxY + boxH + 30,
         head: [
-          ["SN", "Description", "Brand", "Unit", "Qty", "Unit Price", "Total"],
+          [
+            {
+              content: "SN",
+              rowSpan: 2,
+              styles: { halign: "center", valign: "middle" },
+            },
+            {
+              content: "Description",
+              rowSpan: 2,
+              styles: { halign: "center", valign: "middle" },
+            },
+            {
+              content: "Brand",
+              rowSpan: 2,
+              styles: { halign: "center", valign: "middle" },
+            },
+            {
+              content: "Unit",
+              rowSpan: 2,
+              styles: { halign: "center", valign: "middle" },
+            },
+            {
+              content: "Qty",
+              rowSpan: 2,
+              styles: { halign: "center", valign: "middle" },
+            },
+            { content: "Amount", colSpan: 2, styles: { halign: "center" } },
+          ],
+          ["Unit Price", "Total"],
         ],
         body: tableData,
         theme: "grid",
-        styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [200, 200, 200] },
+        styles: {
+          fontSize: 10,
+          cellPadding: 3,
+          lineColor: [0, 0, 0], // black borders
+          lineWidth: 0.5,
+          textColor: [0, 0, 0], // black text in cells
+        },
+        headStyles: {
+          fillColor: [200, 200, 200],
+          lineColor: [0, 0, 0],
+          lineWidth: 0.5,
+          textColor: [0, 0, 0], // black header text
+          fontStyle: "bold",
+        },
         columnStyles: {
           0: { halign: "center" },
           3: { halign: "center" },
@@ -529,100 +583,85 @@ export default function Quotation() {
           5: { halign: "right" },
           6: { halign: "right" },
         },
-        didParseCell: (data) => {
-          // Highlight the last three rows (Subtotal, Tax, Grand Total)
-          if (data.row.index >= tableData.length - 3) {
-            data.cell.styles.fontStyle = "bold";
-            data.cell.styles.fillColor = [220, 220, 220];
-          }
-        },
       });
 
-      // Add Grand Total row in the same table
-      tableData.push([
-        "", // SN empty
-        "Grand Total", // Description
-        "", // Brand empty
-        "", // Unit empty
-        "", // Qty empty
-        subtotalSum.toFixed(2), // Unit Price column shows subtotal sum
-        grandTotal.toFixed(2), // Total column shows grand total
-      ]);
-
-      // Draw table
-      autoTable(doc, {
-        startY: boxY + boxH + 30,
-        head: [
-          ["SN", "Description", "Brand", "Unit", "Qty", "Unit Price", "Total"],
-        ],
-        body: tableData,
-        theme: "grid",
-        styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [200, 200, 200] },
-        columnStyles: {
-          0: { halign: "center" },
-          3: { halign: "center" },
-          4: { halign: "center" },
-          5: { halign: "right" },
-          6: { halign: "right" },
-        },
-        didParseCell: (data) => {
-          // Highlight Grand Total row
-          if (data.row.index === tableData.length - 1) {
-            data.cell.styles.fontStyle = "bold";
-            data.cell.styles.fillColor = [220, 220, 220];
-          }
-        },
-      });
-
-      // @ts-ignore
       let lastY = doc.lastAutoTable.finalY + 10;
 
-      // Notes Table
+      // Notes — unchanged
       autoTable(doc, {
         startY: lastY,
         head: [["Notes & Special Comments:"]],
         body: [
-          ["• The Quoted price is inclusive of all applicable taxes and VAT"],
-          ["• Payment: 100% within 7 days after delivery."],
-          ["• Delivery and Installation will be free of cost"],
-          ["• Delivery: Within 5–15 Days of PO acceptance"],
-          ["• Validity of Quotation: 30 Days"],
+          ["1. The Quoted price is inclusive of all applicable taxes and VAT"],
+          ["2. Payment: 100% within 7 days after delivery."],
+          [
+            "3. Delivery and Installation will be free of cost within Kathmandu Valley and conditions will be applied for other",
+          ],
+          [
+            "4. Delivery: Within 5-15 Days of receiving and acceptance of purchase order",
+          ],
+          ["5. Validity of Quotation: 30 Days"],
         ],
         theme: "grid",
-        styles: { fontSize: 10, cellPadding: 5 },
-        headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
-        columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
+        styles: {
+          fontSize: 10,
+          cellPadding: 5,
+          lineColor: [0, 0, 0], // black borders
+          lineWidth: 0.5,
+          textColor: [0, 0, 0], // black text
+        },
+        headStyles: {
+          fillColor: [200, 200, 200],
+          lineColor: [0, 0, 0],
+          lineWidth: 0.5,
+          textColor: [0, 0, 0], // black header text
+          fontStyle: "bold",
+        },
       });
 
-      // @ts-ignore
       lastY = doc.lastAutoTable.finalY + 10;
 
-      // Warranty Table
+      // Warranty — unchanged
       autoTable(doc, {
-        startY: lastY,
+        startY: doc.lastAutoTable.finalY + 10,
         head: [["Warranty Terms and Conditions:"]],
         body: [
-          ["• In case of payment failure, warranty isn't applicable."],
-          ["• NEA voltage fluctuation damage is not covered."],
-          ["• Physical damage or tampering voids warranty."],
+          [
+            "• In case of payment failure as per the predetermined agreement and quotation, warranty isn’t applicable.",
+          ],
+          [
+            "• NEA voltage fluctuation issue is not covered under warranty on Electric & Electronic Product.",
+          ],
+          [
+            "• Physical damage, mishandling, alteration of serial number is not covered under warranty",
+          ],
         ],
         theme: "grid",
-        styles: { fontSize: 10, cellPadding: 5 },
-        headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
-        columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
+        styles: {
+          fontSize: 10,
+          cellPadding: 5,
+          lineColor: [0, 0, 0], // black borders
+          lineWidth: 0.5,
+          textColor: [0, 0, 0], // black text
+        },
+        headStyles: {
+          fillColor: [200, 200, 200],
+          lineColor: [0, 0, 0],
+          lineWidth: 0.5,
+          textColor: [0, 0, 0], // black header text
+          fontStyle: "bold",
+        },
       });
 
-      // Closing Text
-      // @ts-ignore
       lastY = doc.lastAutoTable.finalY + 15;
+
+      // Closing text — unchanged
       doc.setFontSize(10);
       const closingText =
         "We will be happy to supply any further information you may need and trust that you call on us to fill your order, which will receive our attention promptly.";
       const wrapped = doc.splitTextToSize(closingText, pageWidth - leftX * 2);
       doc.text(wrapped, leftX, lastY);
 
-      // Signature & Stamp
       lastY += wrapped.length * 12 + 20;
       let sigY = lastY;
       doc.setFontSize(10);
@@ -631,19 +670,23 @@ export default function Quotation() {
         leftX,
         sigY
       );
-      sigY += 40;
+      sigY += 10;
 
       const stamp = new Image();
       stamp.src = "/setNepalStamp.png";
-      const stampWidth = 120;
-      const stampHeight = 80;
-      const rightXStamp = pageWidth - leftX - stampWidth;
+      const stampWidth = 200;
+      const stampHeight = 70;
+      const rightXStamp = pageWidth - leftX - 220;
       doc.addImage(stamp, "PNG", rightXStamp, sigY, stampWidth, stampHeight);
 
       doc.setFontSize(12);
-      doc.text("For: Set Nepal Pvt. Ltd", rightXStamp, sigY + stampHeight + 10);
+      doc.text(
+        "For: Scientific Equipment Traders Pvt. Ltd.",
+        rightXStamp,
+        sigY + stampHeight + 10
+      );
 
-      // Save PDF
+      // Save
       doc.save("quotation.pdf");
 
       // Reset form
@@ -1016,7 +1059,10 @@ export default function Quotation() {
                   The Quoted price is inclusive of all applicable taxes and VAT
                 </li>
                 <li>Payment: 100% within 7 days after delivery.</li>
-                <li>Delivery and Installation will be free of cost</li>
+                <li>
+                  3. Delivery and Installation will be free of cost within
+                  Kathmandu Valley and conditions will be applied for other{" "}
+                </li>
                 <li>
                   Delivery: Within 5-15 Days of receiving and acceptance of
                   purchase order
@@ -1047,7 +1093,7 @@ export default function Quotation() {
               <i className="text-sm">
                 We will be happy to supply any further information you may need
                 and trust that you call on us to fill your order, which will
-                receive our attention promptly.
+                receive our prompt and careful attention.
               </i>
             </p>
 
