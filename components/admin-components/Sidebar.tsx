@@ -144,23 +144,35 @@ export default function Sidebar() {
     >
       {/* Menu Items */}
       <div className="flex flex-col w-full gap-1">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => handleClick(item)}
-            className={`w-full flex items-center justify-start gap-2 text-white
-              rounded-md transition-all duration-200 py-1 px-1 cursor-pointer
-              ${
-                activeView === item.id
-                  ? "bg-[#4998d1]"
-                  : "hover:bg-[#4998d1] bg-transparent"
-              }`}
-          >
-            {item.icon}
-            {/* Label hidden on sm/md, visible on lg+ */}
-            <span className="text-base hidden lg:inline">{item.label}</span>
-          </button>
-        ))}
+        {menuItems.map((item) => {
+          if (item.id === "user") {
+            const allowedEmailsForCreateUser = [
+              "scientificequipmenttraders@gmail.com",
+              "info.setnepal@gmail.com",
+              "damodar@example.com",
+            ];
+            if (!allowedEmailsForCreateUser.includes(email)) {
+              return null;
+            }
+          }
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleClick(item)}
+              className={`w-full flex items-center justify-start gap-2 text-white
+          rounded-md transition-all duration-200 py-1 px-1 cursor-pointer
+          ${
+            activeView === item.id
+              ? "bg-[#4998d1]"
+              : "hover:bg-[#4998d1] bg-transparent"
+          }`}
+            >
+              {item.icon}
+              <span className="text-base hidden lg:inline">{item.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Footer 
