@@ -21,6 +21,7 @@ interface SettingsType {
   phone1?: string;
   phone2?: string;
   email1?: string;
+  email2?: string;
   address?: string;
   city?: string;
   postalCode?: string;
@@ -155,10 +156,10 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
                 <span>{settings.phone2}</span>
               </li>
             )}
-            {settings.email1 && (
+            {settings.email2 && (
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-green-500" />
-                <span>{settings.email1}</span>
+                <span>{settings?.email2}</span>
               </li>
             )}
             {settings.address && (
