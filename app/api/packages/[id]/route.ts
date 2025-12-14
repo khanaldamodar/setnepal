@@ -1,127 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
-import { uploadFileToCloudinary } from "../../products/route";
+import { uploadFileToLocal, deleteLocalFile } from "@/lib/local-uploader";
 
-/**
- * @swagger
- * /api/packages/{id}:
- *   get:
- *     summary: Get package details by ID
- *     description: Fetch a single package by its ID including products, category, and creator information.
- *     tags:
- *       - Packages
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: Numeric ID of the package
- *         schema:
- *           type: integer
- *           example: 3
- *     responses:
- *       200:
- *         description: Package fetched successfully
- *       400:
- *         description: Invalid package ID
- *       404:
- *         description: Package not found
- *       500:
- *         description: Failed to fetch package
- *
- *   put:
- *     summary: Update an existing package
- *     description: Update package fields including name, description, price, stock, category, product list, and image.
- *     tags:
- *       - Packages
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: Numeric ID of the package to update
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: "Updated Package Name"
- *               description:
- *                 type: string
- *                 example: "This is an updated description."
- *               price:
- *                 type: number
- *                 example: 199.99
- *               discount:
- *                 type: number
- *                 example: 10
- *               stock:
- *                 type: integer
- *                 example: 50
- *               isFeatured:
- *                 type: boolean
- *                 example: true
- *               isActive:
- *                 type: boolean
- *                 example: true
- *               categoryId:
- *                 type: integer
- *                 nullable: true
- *                 example: 2
- *               productIds[]:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 example: [1, 4, 7]
- *               image:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Package updated successfully
- *       400:
- *         description: Invalid input or category/product errors
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Package not found
- *       500:
- *         description: Failed to update package
- *
- *   delete:
- *     summary: Delete a package by ID
- *     description: Permanently delete a package from the system.
- *     tags:
- *       - Packages
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: Numeric ID of the package to delete
- *         schema:
- *           type: integer
- *           example: 5
- *     responses:
- *       200:
- *         description: Package deleted successfully
- *       400:
- *         description: Invalid package ID
- *       404:
- *         description: Package not found
- *       500:
- *         description: Failed to delete package
- */
-
-// ✅ GET /api/packages/[id]
 export async function GET(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -131,7 +12,10 @@ export async function GET(
     const numericId = parseInt(id, 10);
 
     if (isNaN(numericId)) {
-      return NextResponse.json({ message: "Invalid Package ID" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid Package ID" },
+        { status: 400 }
+      );
     }
 
     const pkg = await prisma.package.findUnique({
@@ -143,16 +27,21 @@ export async function GET(
     });
 
     if (!pkg) {
-      return NextResponse.json({ message: "Package not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Package not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(pkg, { status: 200 });
   } catch (err) {
     console.error("Error fetching package:", err);
-    return NextResponse.json({ message: "Failed to fetch package" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to fetch package" },
+      { status: 500 }
+    );
   }
 }
-
 
 export async function PUT(
   req: NextRequest,
@@ -179,9 +68,7 @@ export async function PUT(
     const discount = formData.get("discount")
       ? Number(formData.get("discount"))
       : null;
-    const stock = formData.get("stock")
-      ? Number(formData.get("stock"))
-      : null;
+    const stock = formData.get("stock") ? Number(formData.get("stock")) : null;
     const isFeatured =
       formData.get("isFeatured") !== null
         ? formData.get("isFeatured") === "true"
@@ -201,9 +88,7 @@ export async function PUT(
 
     const productIdsRaw = formData.getAll("productIds[]");
     const productIds =
-      productIdsRaw.length > 0
-        ? productIdsRaw.map((id) => Number(id))
-        : null;
+      productIdsRaw.length > 0 ? productIdsRaw.map((id) => Number(id)) : null;
 
     // Ensure package exists
     const existingPackage = await prisma.package.findUnique({
@@ -254,7 +139,10 @@ export async function PUT(
     // Upload new image if provided
     let imageUrl = existingPackage.imageUrl;
     if (imageFile && imageFile.size > 0) {
-      imageUrl = await uploadFileToCloudinary(imageFile, "packages");
+      if (existingPackage.imageUrl) {
+        await deleteLocalFile(existingPackage.imageUrl);
+      }
+      imageUrl = await uploadFileToLocal(imageFile, "packages");
     }
 
     // Update package
@@ -294,7 +182,6 @@ export async function PUT(
   }
 }
 
-
 // ✅ DELETE /api/packages/[id]
 export async function DELETE(
   req: NextRequest,
@@ -305,7 +192,10 @@ export async function DELETE(
     const numericId = parseInt(id, 10);
 
     if (isNaN(numericId)) {
-      return NextResponse.json({ message: "Invalid Package ID" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid Package ID" },
+        { status: 400 }
+      );
     }
 
     const existingPackage = await prisma.package.findUnique({
@@ -313,15 +203,27 @@ export async function DELETE(
     });
 
     if (!existingPackage) {
-      return NextResponse.json({ message: "Package not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Package not found" },
+        { status: 404 }
+      );
     }
 
     // Delete the package (if product relationships exist, they’ll be handled by Prisma)
+    if (existingPackage.imageUrl) {
+      await deleteLocalFile(existingPackage.imageUrl);
+    }
     await prisma.package.delete({ where: { id: numericId } });
 
-    return NextResponse.json({ message: "Package deleted successfully" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Package deleted successfully" },
+      { status: 200 }
+    );
   } catch (err) {
     console.error("Error deleting package:", err);
-    return NextResponse.json({ message: "Failed to delete package" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to delete package" },
+      { status: 500 }
+    );
   }
 }

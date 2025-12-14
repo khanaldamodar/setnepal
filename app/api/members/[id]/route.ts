@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth";
-import cloudinary from "@/lib/cloudinary"
+import { uploadFileToLocal, deleteLocalFile } from "@/lib/local-uploader";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/prisma";
@@ -18,6 +18,21 @@ export async function DELETE(
         { message: "Invalid Member ID" },
         { status: 400 }
       );
+    }
+
+    const member = await prisma.members.findUnique({
+      where: { id: numericId },
+    });
+
+    if (!member) {
+      return NextResponse.json(
+        { message: "Member not found" },
+        { status: 404 }
+      );
+    }
+
+    if (member.photo) {
+      await deleteLocalFile(member.photo);
     }
 
     const deletedmembers = await prisma.members.delete({
@@ -43,7 +58,6 @@ export async function GET(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {}
-
 
 export async function PUT(
   req: NextRequest,
@@ -83,7 +97,10 @@ export async function PUT(
 
     // ❗ If new file uploaded → upload to Cloudinary
     if (file && typeof file === "object") {
-      photoUrl = await uploadFileToCloudinary(file, "members");
+      if (existing.photo) {
+        await deleteLocalFile(existing.photo);
+      }
+      photoUrl = await uploadFileToLocal(file, "members");
     }
 
     // Update the member
@@ -114,17 +131,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-}
-
-async function uploadFileToCloudinary(file: File, folder: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: "auto" },
-      (error, result) => {
-        if (error) reject(error)
-        else resolve(result!.secure_url)
-      }
-    )
-    file.arrayBuffer().then((buffer) => uploadStream.end(Buffer.from(buffer))).catch(reject)
-  })
 }

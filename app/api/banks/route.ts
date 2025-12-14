@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import cloudinary from "@/lib/cloudinary";
+import { uploadFileToLocal } from "@/lib/local-uploader";
 
 export async function GET() {
   try {
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     // Upload image if exists
     if (file && typeof file === "object") {
-      photoUrl = await uploadFileToCloudinary(file, "banks");
+      photoUrl = await uploadFileToLocal(file, "banks");
     }
 
     // Create Bank QR in Prisma
@@ -60,23 +60,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
-
-async function uploadFileToCloudinary(
-  file: File,
-  folder: string
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: "auto" },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result!.secure_url);
-      }
-    );
-    file
-      .arrayBuffer()
-      .then((buffer) => uploadStream.end(Buffer.from(buffer)))
-      .catch(reject);
-  });
 }

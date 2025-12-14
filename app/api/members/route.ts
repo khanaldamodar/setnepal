@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import cloudinary from "@/lib/cloudinary"
+import { uploadFileToLocal } from "@/lib/local-uploader";
 
 export async function GET() {
   try {
@@ -12,7 +12,7 @@ export async function GET() {
       });
     }
     return NextResponse.json(
-      { message: "members Fetched Success!", "members": members },
+      { message: "members Fetched Success!", members: members },
       { status: 200 }
     );
   } catch (err) {
@@ -22,8 +22,6 @@ export async function GET() {
     );
   }
 }
-
-
 
 export async function POST(req: Request) {
   try {
@@ -47,7 +45,7 @@ export async function POST(req: Request) {
 
     // Upload image if exists
     if (file && typeof file === "object") {
-      photoUrl = await uploadFileToCloudinary(file, "members");
+      photoUrl = await uploadFileToLocal(file, "members");
     }
 
     // Create Member in Prisma
@@ -70,17 +68,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
-
-async function uploadFileToCloudinary(file: File, folder: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: "auto" },
-      (error, result) => {
-        if (error) reject(error)
-        else resolve(result!.secure_url)
-      }
-    )
-    file.arrayBuffer().then((buffer) => uploadStream.end(Buffer.from(buffer))).catch(reject)
-  })
 }

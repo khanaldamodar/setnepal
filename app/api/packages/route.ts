@@ -1,66 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
-import cloudinary from "@/lib/cloudinary";
+import { uploadFileToLocal } from "@/lib/local-uploader";
 
-/**
- * @swagger
- * /api/packages:
- *   get:
- *     summary: Get all packages
- *     tags:
- *       - Packages
- *     responses:
- *       200:
- *         description: List of all packages with their products and creator
- *
- *   post:
- *     summary: Create a new package
- *     tags:
- *       - Packages
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             required: [name, price]
- *             properties:
- *               name:
- *                 type: string
- *               description:
- *                 type: string
- *               price:
- *                 type: number
- *               categoryId:
- *                 type: number
- *               discount:
- *                 type: number
- *               stock:
- *                 type: integer
- *               isFeatured:
- *                 type: boolean
- *               isActive:
- *                 type: boolean
- *               productIds:
- *                 type: array
- *                 items:
- *                   type: integer
- *               image:
- *                 type: string
- *                 format: binary
- *     responses:
- *       201:
- *         description: Package created successfully
- *       400:
- *         description: Invalid input
- *       401:
- *         description: Unauthorized
- */
-
-// ✅ GET all packages
 export async function GET(req: NextRequest) {
   try {
     const packages = await prisma.package.findMany({
@@ -80,7 +22,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// ✅ POST: Create a new package (with Cloudinary image upload)
+//  POST: Create a new package (with Local image upload)
 export async function POST(req: NextRequest) {
   try {
     const user = requireAuth(req);
@@ -105,13 +47,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 🔹 Upload image to Cloudinary
     let imageUrl: string | null = null;
     if (imageFile && imageFile.size > 0) {
-      imageUrl = await uploadFileToCloudinary(imageFile, "packages");
+      imageUrl = await uploadFileToLocal(imageFile, "packages");
     }
-
-    // 🔹 Validate product IDs
     let connectProducts = undefined;
     if (productIds && productIds.length > 0) {
       const existingProducts = await prisma.product.findMany({
@@ -130,7 +69,6 @@ export async function POST(req: NextRequest) {
       };
     }
 
-    // 🔹 Create package
     const pkg = await prisma.package.create({
       data: {
         name,
@@ -156,25 +94,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// ✅ Helper function to upload file to Cloudinary
-async function uploadFileToCloudinary(
-  file: File,
-  folder: string
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: "auto" },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result!.secure_url);
-      }
-    );
-
-    file
-      .arrayBuffer()
-      .then((buffer) => uploadStream.end(Buffer.from(buffer)))
-      .catch(reject);
-  });
 }

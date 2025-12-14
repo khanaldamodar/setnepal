@@ -3,304 +3,8 @@ import prisma from "@/lib/prisma";
 import formidable from "formidable";
 import fs from "fs";
 import path from "path";
+import { deleteLocalFile } from "@/lib/local-uploader";
 
-/**
- * @swagger
- * /api/products/{id}:
- *   get:
- *     summary: Get product details by ID
- *     description: Fetch a single product by its unique identifier. The response includes related category, brand, and package information.
- *     operationId: getProductById
- *     tags:
- *       - Products
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: Numeric ID of the product to fetch.
- *         schema:
- *           type: integer
- *           example: 16
- *     responses:
- *       200:
- *         description: Product fetched successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Product fetched successfully
- *                 product:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       example: 16
- *                     name:
- *                       type: string
- *                       example: "Smart Board"
- *                     description:
- *                       type: string
- *                       example: "This is the Smart Board"
- *                     price:
- *                       type: number
- *                       example: 500
- *                     stock:
- *                       type: integer
- *                       example: 50
- *                     sku:
- *                       type: string
- *                       example: "12"
- *                     weight:
- *                       type: number
- *                       example: 1
- *                     imageUrl:
- *                       type: string
- *                       example: "https://res.cloudinary.com/dbuafmoqz/image/upload/v1762336213/products/xxqbuoeqymwf4l0c3aup.png"
- *                     gallery:
- *                       type: array
- *                       items:
- *                         type: string
- *                         example: "https://res.cloudinary.com/dbuafmoqz/image/upload/v1762336215/products/gallery/rdctbpdoajeoc5sns25p.jpg"
- *                     isFeatured:
- *                       type: boolean
- *                       example: true
- *                     isActive:
- *                       type: boolean
- *                       example: true
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2025-11-05T09:50:20.425Z"
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2025-11-05T09:50:20.425Z"
- *                     category:
- *                       type: object
- *                       nullable: true
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 1
- *                         name:
- *                           type: string
- *                           example: "Electronics"
- *                     brand:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 3
- *                         name:
- *                           type: string
- *                           example: "Samsung"
- *                     packages:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           id:
- *                             type: integer
- *                             example: 22
- *                           name:
- *                             type: string
- *                             example: "Holiday Combo"
- *                           price:
- *                             type: number
- *                             example: 199.99
- *       404:
- *         description: Product not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Product not found
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Failed to fetch product
- *
- *   put:
- *     summary: Update a product by ID
- *     description: Update existing product details such as name, price, images, and other attributes.
- *     operationId: updateProduct
- *     tags:
- *       - Products
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: Numeric ID of the product to update.
- *         schema:
- *           type: integer
- *           example: 16
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: "Updated Smart Board"
- *               description:
- *                 type: string
- *                 example: "Updated description for the product."
- *               price:
- *                 type: number
- *                 example: 600
- *               stock:
- *                 type: integer
- *                 example: 45
- *               sku:
- *                 type: string
- *                 example: "1234"
- *               weight:
- *                 type: number
- *                 example: 2
- *               categoryId:
- *                 type: integer
- *                 example: 1
- *               brandId:
- *                 type: integer
- *                 example: 3
- *               isFeatured:
- *                 type: boolean
- *                 example: true
- *               isActive:
- *                 type: boolean
- *                 example: true
- *               imageUrl:
- *                 type: string
- *                 example: "https://res.cloudinary.com/dbuafmoqz/image/upload/newimage.jpg"
- *               gallery:
- *                 type: array
- *                 items:
- *                   type: string
- *                   example: "https://res.cloudinary.com/dbuafmoqz/image/upload/gallery1.jpg"
- *     responses:
- *       200:
- *         description: Product updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Product updated successfully
- *                 product:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       example: 16
- *                     name:
- *                       type: string
- *                       example: "Updated Smart Board"
- *                     price:
- *                       type: number
- *                       example: 600
- *       400:
- *         description: Invalid product ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid product ID
- *       404:
- *         description: Product not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Product not found
- *       500:
- *         description: Failed to update product
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Failed to update product
- *
- *   delete:
- *     summary: Delete a product by ID
- *     description: Permanently delete a product from the database.
- *     operationId: deleteProduct
- *     tags:
- *       - Products
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: Numeric ID of the product to delete.
- *         schema:
- *           type: integer
- *           example: 16
- *     responses:
- *       200:
- *         description: Product deleted successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Product deleted successfully
- *       404:
- *         description: Product not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Product not found
- *       400:
- *         description: Invalid product ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid product ID
- *       500:
- *         description: Failed to delete product
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Failed to delete product
- */
 
 export async function GET(
   req: NextRequest,
@@ -452,6 +156,41 @@ export async function PUT(
       gallery,
     } = body;
 
+    // Handle Image Deletion on Update
+    if (imageUrl && existing.imageUrl && imageUrl !== existing.imageUrl) {
+      await deleteLocalFile(existing.imageUrl);
+    }
+
+    // Handle Gallery Images Deletion
+    if (gallery && existing.gallery) {
+      let oldGallery: string[] = [];
+      let newGallery: string[] = [];
+
+      try {
+        oldGallery = Array.isArray(existing.gallery)
+          ? (existing.gallery as string[])
+          : JSON.parse(existing.gallery as string);
+      } catch (e) {
+        if (Array.isArray(existing.gallery))
+          oldGallery = existing.gallery as string[];
+      }
+
+      try {
+        newGallery = Array.isArray(gallery) ? gallery : JSON.parse(gallery);
+      } catch (e) {
+        if (Array.isArray(gallery)) newGallery = gallery;
+      }
+
+      if (Array.isArray(oldGallery) && Array.isArray(newGallery)) {
+        const imagesToDelete = oldGallery.filter(
+          (url) => !newGallery.includes(url)
+        );
+        for (const url of imagesToDelete) {
+          await deleteLocalFile(url);
+        }
+      }
+    }
+
     const updated = await prisma.product.update({
       where: { id: numericId },
       data: {
@@ -510,6 +249,30 @@ export async function DELETE(
       );
     }
 
+    // Delete Main Image
+    if (product.imageUrl) {
+      await deleteLocalFile(product.imageUrl);
+    }
+
+    // Delete Gallery Images
+    if (product.gallery) {
+      let galleryImages: string[] = [];
+      try {
+        galleryImages = Array.isArray(product.gallery)
+          ? (product.gallery as string[])
+          : JSON.parse(product.gallery as string);
+      } catch (e) {
+        if (Array.isArray(product.gallery))
+          galleryImages = product.gallery as string[];
+      }
+
+      if (Array.isArray(galleryImages)) {
+        for (const url of galleryImages) {
+          await deleteLocalFile(url);
+        }
+      }
+    }
+
     // 1️⃣ Delete Quotation Items linked to this product
     await prisma.quotationItem.deleteMany({
       where: { productId: numericId },
@@ -523,7 +286,6 @@ export async function DELETE(
     const packages = await prisma.package.findMany({
       where: { products: { some: { id: numericId } } },
     });
-
 
     for (const pkg of packages) {
       await prisma.package.update({

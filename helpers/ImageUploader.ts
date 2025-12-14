@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import cloudinary from "@/lib/cloudinary";
+import { uploadFileToLocal } from "@/lib/local-uploader";
 
 // Helper function to handle form data with file uploads
 export async function handleFormDataUpload(req: NextRequest, user: any) {
@@ -31,16 +31,7 @@ export async function handleFormDataUpload(req: NextRequest, user: any) {
 
   if (mainImageFile) {
     try {
-      const mainImageBuffer = await mainImageFile.arrayBuffer();
-      const mainImageBase64 = Buffer.from(mainImageBuffer).toString("base64");
-      const mainImageDataUri = `data:${mainImageFile.type};base64,${mainImageBase64}`;
-
-      const uploadResult = await cloudinary.uploader.upload(mainImageDataUri, {
-        folder: "products",
-        resource_type: "image",
-      });
-
-      imageUrl = uploadResult.secure_url;
+      imageUrl = await uploadFileToLocal(mainImageFile, "products");
     } catch (uploadError) {
       console.error("Main image upload failed:", uploadError);
       return NextResponse.json(
@@ -57,19 +48,8 @@ export async function handleFormDataUpload(req: NextRequest, user: any) {
   for (const galleryFile of galleryFiles) {
     if (galleryFile) {
       try {
-        const galleryBuffer = await galleryFile.arrayBuffer();
-        const galleryBase64 = Buffer.from(galleryBuffer).toString("base64");
-        const galleryDataUri = `data:${galleryFile.type};base64,${galleryBase64}`;
-
-        const galleryUploadResult = await cloudinary.uploader.upload(
-          galleryDataUri,
-          {
-            folder: "products/gallery",
-            resource_type: "image",
-          }
-        );
-
-        galleryUrls.push(galleryUploadResult.secure_url);
+        const url = await uploadFileToLocal(galleryFile, "products/gallery");
+        galleryUrls.push(url);
       } catch (uploadError) {
         console.error("Gallery image upload failed:", uploadError);
         // Continue with other gallery images even if one fails
