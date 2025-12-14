@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -11,28 +11,14 @@ import { AutoplayPlugin } from "@/components/global/SliderAutoplay";
 
 interface Certificate {
   id: number;
-  title: string; // from DB
+  title: string;
   image: string;
-  description?: string;
 }
 
 const CertificateSliderPage = () => {
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  // ✅ Hooks FIRST
+  const [certificates, setCertificates] = useState<Certificate[] | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  // Fetch certificates from API
-  // useEffect(() => {
-  //   const fetchCertificates = async () => {
-  //     try {
-  //       const res = await fetch("/api/certificates");
-  //       const data = await res.json();
-  //       setCertificates(data.certificates || []);
-  //     } catch (err) {
-  //       console.error("Failed to fetch certificates:", err);
-  //     }
-  //   };
-  //   fetchCertificates();
-  // }, []);
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -40,104 +26,67 @@ const CertificateSliderPage = () => {
         const res = await fetch("/api/certificates");
         const data = await res.json();
         setCertificates(data.certificates || []);
-      } catch (err) {
-        console.error("Failed to fetch certificates:", err);
+      } catch {
+        setCertificates([]);
       }
     };
+
     fetchCertificates();
   }, []);
 
-  
-  if (!certificates || certificates.length === 0) {
-    return null;
-  }
-
+  // ✅ Hook ALWAYS called
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
     {
       loop: true,
-      slides: { perView: 3, spacing: 24 }, // 3 boxes on desktop
+      slides: { perView: 3, spacing: 24 },
       breakpoints: {
-        "(max-width: 1024px)": { slides: { perView: 2, spacing: 16 } }, // 2 boxes tablet
-        "(max-width: 768px)": { slides: { perView: 1, spacing: 12 } }, // 1 box mobile
+        "(max-width: 1024px)": { slides: { perView: 2, spacing: 16 } },
+        "(max-width: 768px)": { slides: { perView: 1, spacing: 12 } },
       },
       slideChanged(slider) {
         setCurrentSlide(slider.track.details.rel);
       },
     },
-    [AutoplayPlugin(3000)] // autoplay every 3s
+    certificates && certificates.length > 0 ? [AutoplayPlugin(3000)] : []
   );
 
+  // ✅ RETURN AFTER ALL HOOKS
   if (!certificates || certificates.length === 0) {
-    return (
-      <div className="text-center py-20 text-gray-500 font-poppins">
-        Loading Certificates...
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="relative w-full py-6 px-6 md:px-12 flex flex-col items-center gap-12 ">
+    <div className="relative w-full py-6 px-6 md:px-12 flex flex-col items-center gap-12">
       <Heading title="Our Certificates" />
 
-      {/* Left Arrow */}
       <button
         onClick={() => instanceRef.current?.prev()}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-white/90 shadow-lg rounded-full p-2 hover:bg-gray-100 z-10"
+        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-white/90 shadow-lg rounded-full p-2 z-10"
       >
-        <ChevronLeft className="w-6 h-6 text-gray-700" />
+        <ChevronLeft />
       </button>
 
-      {/* Slider */}
       <div ref={sliderRef} className="keen-slider w-full max-w-7xl">
         {certificates.map((item) => (
-          <div
-            key={item.id}
-            className="keen-slider__slide flex justify-center items-center p-2"
-          >
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 250, damping: 15 }}
-              className="bg-white w-full h-full rounded-2xl shadow-md overflow-hidden flex flex-col items-center p-6 hover:shadow-xl transition-all duration-300 min-h-[200px]"
-            >
-              <div className="relative w-full flex justify-center items-center h-48">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  width={400}
-                  height={280}
-                  className="rounded-lg object-contain transition-transform duration-300"
-                />
-              </div>
-              {/* <h3 className="mt-4 text-lg font-semibold text-gray-800 text-center">
-                {item.title}
-              </h3> */}
-              {/* Optional description */}
-              {/* <p className="text-sm text-gray-500 text-center mt-2">{item.description}</p> */}
+          <div key={item.id} className="keen-slider__slide p-2">
+            <motion.div className="bg-white rounded-xl p-6 shadow">
+              <Image
+                src={item.image}
+                alt={item.title}
+                width={400}
+                height={280}
+              />
             </motion.div>
           </div>
         ))}
       </div>
 
-      {/* Right Arrow */}
       <button
         onClick={() => instanceRef.current?.next()}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-white/90 shadow-lg rounded-full p-2 hover:bg-gray-100 z-10"
+        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-white/90 shadow-lg rounded-full p-2 z-10"
       >
-        <ChevronRight className="w-6 h-6 text-gray-700" />
+        <ChevronRight />
       </button>
-
-      {/* Dots */}
-      <div className="flex justify-center mt-6 space-x-2">
-        {certificates.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => instanceRef.current?.moveToIdx(idx)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              currentSlide === idx ? "bg-green-600 scale-125" : "bg-gray-300"
-            }`}
-          ></button>
-        ))}
-      </div>
     </div>
   );
 };
