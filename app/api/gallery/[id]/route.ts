@@ -84,13 +84,20 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
 
     const {id} = await context.params
     const idNum = Number(id)
-    const gallery = await prisma.gallery.findUnique({ where: { id: idNum } })
+    // const gallery = await prisma.gallery.findUnique({ where: { id: idNum } })
+    const gallery = await prisma.gallery.findUnique({
+  where: { id: idNum },
+  include: { images: true },
+})
+
     if (!gallery) return NextResponse.json({ error: "Gallery not found" }, { status: 404 })
 
     const formData = await req.formData()
     const title = formData.get("title") as string
     const description = formData.get("description") as string
     const imageFiles = formData.getAll("images") as File[]
+const removedRaw = formData.get("removedImages") as string | null
+const removedImages: string[] = removedRaw ? JSON.parse(removedRaw) : []
 
     const uploadedUrls: string[] = []
 
@@ -101,6 +108,23 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         uploadedUrls.push(url)
       }
     }
+
+    const imagesToDelete = gallery.images.filter((img) => {
+  const fileName = img.url.split("/").pop()
+  return fileName && removedImages.includes(fileName)
+})
+
+for (const img of imagesToDelete) {
+  const publicId = getCloudinaryPublicId(img.url)
+  if (publicId) {
+    await cloudinary.uploader.destroy(`gallery/${publicId}`)
+  }
+
+  await prisma.galleryImage.delete({
+    where: { id: img.id },
+  })
+}
+
 
     // Update gallery info
     const updatedGallery = await prisma.gallery.update({

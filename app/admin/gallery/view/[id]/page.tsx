@@ -36,42 +36,59 @@ export default function ViewGalleryPage() {
     return <div className="p-5 text-red-500">Gallery not found!</div>;
 
   return (
-    <div className="p-6 w-full bg-green-100 rounded shadow-lg">
-      <h1 className="text-2xl font-bold mb-4">Gallery Details</h1>
-
-      <p>
-        <strong>Title:</strong> {gallery.title}
-      </p>
-      <p>
-        <strong>Description:</strong> {gallery.description}
-      </p>
-
-      <div className="mt-4">
-        <strong>Images:</strong>
-        {gallery.images?.length ? (
-          <div className="grid grid-cols-3 gap-4 mt-2">
-            {gallery.images.map((img) => (
-              <div key={img.id} className="border p-2 rounded bg-white">
-                <img
-                  src={img.url}
-                  alt={img.title}
-                  className="w-full h-32 object-cover rounded"
-                />
-                <p className="mt-1 text-sm text-gray-700">{img.title}</p>
-              </div>
-            ))}
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-6 md:p-8">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800">
+              {gallery.title}
+            </h1>
+            <p className="text-gray-600 mt-1">{gallery.description}</p>
           </div>
-        ) : (
-          <p>No images</p>
-        )}
-      </div>
 
-      <button
-        className="mt-4 bg-yellow-400 px-4 py-2 rounded cursor-pointer"
-        onClick={() => router.back()}
-      >
-        Go Back
-      </button>
+          <button
+            onClick={() => router.back()}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm"
+          >
+            ← Back
+          </button>
+        </div>
+
+        {/* Images */}
+        <div>
+          <h2 className="text-lg font-medium text-gray-700 mb-4">
+            Gallery Images
+          </h2>
+
+          {gallery.images?.length ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+              {gallery.images.map((img) => (
+                <div
+                  key={img.id}
+                  className="group rounded-lg overflow-hidden border bg-gray-50"
+                >
+                  <div className="relative aspect-square overflow-hidden">
+                    <img
+                      src={img.url}
+                      alt={img.title || "Gallery image"}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {img.title && (
+                    <div className="p-2 text-sm text-gray-700 truncate">
+                      {img.title}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-sm">No images in this gallery.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
