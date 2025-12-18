@@ -34,7 +34,7 @@ const CertificateSliderPage = () => {
     fetchCertificates();
   }, []);
 
-  // ✅ Hook ALWAYS called
+
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
     {
       loop: true,
@@ -50,7 +50,7 @@ const CertificateSliderPage = () => {
     certificates && certificates.length > 0 ? [AutoplayPlugin(3000)] : []
   );
 
-  // ✅ RETURN AFTER ALL HOOKS
+
   if (!certificates || certificates.length === 0) {
     return null;
   }
@@ -61,7 +61,7 @@ const CertificateSliderPage = () => {
 
       <button
         onClick={() => instanceRef.current?.prev()}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-white/90 shadow-lg rounded-full p-2 z-10"
+        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-white/90 text-black shadow-lg rounded-full p-2 z-10"
       >
         <ChevronLeft />
       </button>
@@ -83,7 +83,7 @@ const CertificateSliderPage = () => {
 
       <button
         onClick={() => instanceRef.current?.next()}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-white/90 shadow-lg rounded-full p-2 z-10"
+        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-white/90 text-black shadow-lg rounded-full p-2 z-10"
       >
         <ChevronRight />
       </button>
