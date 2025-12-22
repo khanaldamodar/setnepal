@@ -7,7 +7,7 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: env("DATABASE_URL") || "mysql://root:root@localhost:3306/set_nepal",
+    url: env("DATABASE_URL") || "mysql://shaktate_deepak:Deepak121%40@s9943.sgp1.stableserver.net:3306/shaktate_setnepal"
   },
   
 });

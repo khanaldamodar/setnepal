@@ -1,5 +1,6 @@
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { deleteLocalFile } from "@/lib/local-uploader";
 
 import prisma from "@/lib/prisma";
 
@@ -17,6 +18,14 @@ export async function DELETE(
         { message: "Invalid Certificate ID" },
         { status: 400 }
       );
+    }
+
+    const cert = await prisma.certificates.findUnique({
+      where: { id: numericId },
+    });
+
+    if (cert && cert.image) {
+      await deleteLocalFile(cert.image);
     }
 
     const deletedcerts = await prisma.certificates.delete({

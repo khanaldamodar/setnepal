@@ -68,7 +68,7 @@ export default function EsewaSuccessPage() {
           throw new Error(data.message || "Payment save failed");
         }
 
-        console.log("Payment posted successfully ✔");
+        // console.log("Payment posted successfully ✔");
       } catch (err: any) {
         console.error(err);
         setError(err.message);

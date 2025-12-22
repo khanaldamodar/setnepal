@@ -2,36 +2,30 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  typescript:{
-    ignoreBuildErrors:true
+  typescript: {
+    ignoreBuildErrors: true,
   },
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "res.cloudinary.com", 
+        hostname: "th.bing.com",
       },
       {
         protocol: "https",
-        hostname: "th.bing.com", 
+        hostname: "example.com",
       },
       {
         protocol: "https",
-        hostname: "example.com", 
-      },
-      {
-        protocol: "https",
-        hostname: "via.placeholder.com", 
+        hostname: "via.placeholder.com",
       },
 
-         {
+      {
         protocol: "https",
-        hostname: "th.bing.com", 
+        hostname: "th.bing.com",
       },
-
     ],
   },
-  
 };
 
 export default nextConfig;

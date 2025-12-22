@@ -2,83 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 
-/**
- * @swagger
- * tags:
- *   - name: Brands
- *
- * /api/brands:
- *   get:
- *     summary: Get all brands
- *     tags: [Brands]
- *     responses:
- *       200:
- *         description: List of all brands
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   name:
- *                     type: string
- *                     example: "Apple"
- *                   products:
- *                     type: array
- *                     items:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 12
- *                         name:
- *                           type: string
- *                           example: "iPhone 15"
- *
- *   post:
- *     summary: Create a new brand
- *     description: Only admins can create a brand.
- *     security:
- *       - BearerAuth: []
- *     tags: [Brands]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [name]
- *             properties:
- *               name:
- *                 type: string
- *                 example: "Samsung"
- *     responses:
- *       201:
- *         description: Brand created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 2
- *                 name:
- *                   type: string
- *                   example: "Samsung"
- *       400:
- *         description: Invalid input (missing name)
- *       401:
- *         description: Unauthorized (token missing or invalid)
- *       403:
- *         description: Forbidden (not an admin)
- */
 
-// ✅ GET /api/brands
+
 export async function GET(req: NextRequest) {
   try {
     const brands = await prisma.brand.findMany({

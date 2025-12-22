@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth";
-import cloudinary from "@/lib/cloudinary";
+import { uploadFileToLocal, deleteLocalFile } from "@/lib/local-uploader";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/prisma";
@@ -15,6 +15,14 @@ export async function DELETE(
 
     if (isNaN(numericId)) {
       return NextResponse.json({ message: "Invalid Bank ID" }, { status: 400 });
+    }
+
+    const bank = await prisma.banks.findUnique({
+      where: { id: numericId },
+    });
+
+    if (bank && bank.qr) {
+      await deleteLocalFile(bank.qr);
     }
 
     const deletedbanks = await prisma.banks.delete({
@@ -42,7 +50,7 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params;
-     
+
     if (!id) {
       return NextResponse.json(
         { message: "Bank ID is required" },
@@ -54,10 +62,7 @@ export async function GET(
     });
 
     if (!bank) {
-      return NextResponse.json(
-        { message: "Bank not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Bank not found" }, { status: 404 });
     }
 
     return NextResponse.json(bank, { status: 200 });
@@ -100,7 +105,10 @@ export async function PUT(
 
     // If new file uploaded → upload to Cloudinary
     if (file && typeof file === "object") {
-      photoUrl = await uploadFileToCloudinary(file, "banks");
+      if (existing.qr) {
+        await deleteLocalFile(existing.qr);
+      }
+      photoUrl = await uploadFileToLocal(file, "banks");
     }
 
     // Update the member
@@ -127,23 +135,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-}
-
-async function uploadFileToCloudinary(
-  file: File,
-  folder: string
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: "auto" },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result!.secure_url);
-      }
-    );
-    file
-      .arrayBuffer()
-      .then((buffer) => uploadStream.end(Buffer.from(buffer)))
-      .catch(reject);
-  });
 }

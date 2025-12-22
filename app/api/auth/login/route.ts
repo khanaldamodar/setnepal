@@ -5,32 +5,7 @@ import { signToken } from "@/lib/jwt";
 
 
 
-/**
- * @swagger
- * /api/auth/login:
- *   post:
- *     summary: Login
- *     tags:
- *       - Auth
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [email, password]
- *             properties:
- *               email:
- *                 type: string
- *                 example: "hari@example.com"
- *               password:
- *                 type: string
- *                 example: "password123"
- *   
- *     responses:
- *       201:
- *         description: User registered successfully
- */
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

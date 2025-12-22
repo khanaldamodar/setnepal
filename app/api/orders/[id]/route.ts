@@ -2,37 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 
-/**
- * @swagger
- * /api/orders/{id}:
- *   get:
- *     summary: Get order details by ID
- *     description: Fetch a single order by its unique identifier, including user information, order items (with product details), and payment records. Requires ADMIN role.
- *     operationId: getOrderById
- *     tags:
- *       - Orders
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: Numeric ID of the order to fetch.
- *         schema:
- *           type: integer
- *           example: 12
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       '200':
- *         description: Order fetched successfully
- *       '401':
- *         description: Unauthorized - user not logged in
- *       '403':
- *         description: Forbidden - user lacks required role
- *       '404':
- *         description: Order not found
- *       '500':
- *         description: Server error
- */
 
 export async function GET(
   req: NextRequest,

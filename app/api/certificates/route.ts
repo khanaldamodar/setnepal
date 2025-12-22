@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import cloudinary from "@/lib/cloudinary"
+import { uploadFileToLocal } from "@/lib/local-uploader";
 
 export async function GET() {
   try {
@@ -12,7 +12,7 @@ export async function GET() {
       });
     }
     return NextResponse.json(
-      { message: "Certificates Fetched Success!", "certificates": certificates },
+      { message: "Certificates Fetched Success!", certificates: certificates },
       { status: 200 }
     );
   } catch (err) {
@@ -22,7 +22,6 @@ export async function GET() {
     );
   }
 }
-
 
 export async function POST(req: Request) {
   try {
@@ -38,7 +37,7 @@ export async function POST(req: Request) {
     }
 
     // Upload to Cloudinary
-    const imageUrl = await uploadFileToCloudinary(image, "certificates");
+    const imageUrl = await uploadFileToLocal(image, "certificates");
 
     // Save to DB
     const cert = await prisma.certificates.create({
@@ -52,7 +51,6 @@ export async function POST(req: Request) {
       { message: "Created Successfully", certificate: cert },
       { status: 201 }
     );
-
   } catch (err) {
     console.error("Certificate upload error:", err);
     return NextResponse.json(
@@ -60,18 +58,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
-
-
-async function uploadFileToCloudinary(file: File, folder: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: "auto" },
-      (error, result) => {
-        if (error) reject(error)
-        else resolve(result!.secure_url)
-      }
-    )
-    file.arrayBuffer().then((buffer) => uploadStream.end(Buffer.from(buffer))).catch(reject)
-  })
 }

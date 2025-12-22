@@ -36,7 +36,7 @@ export default function ViewMemberPage() {
       setLoading(true);
       const numericId = Number(id);
       const res = await axios.get(`/api/members/${numericId}`);
-      console.log("Member response:", res.data);
+      // console.log("Member response:", res.data);
       setMember(res.data); // <-- no .member
     } catch (error) {
       console.error("Failed to fetch member:", error);

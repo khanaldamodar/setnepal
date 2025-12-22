@@ -1,6 +1,6 @@
 datasource db {
   provider = "mysql"
-  url   =   "mysql://root:root@localhost:3306/set_nepal"
+  url   =   "mysql://shaktate_deepak:Deepak121@@s9943.sgp1.stableserver.net:3306/shaktate_setnepal"
 }
 
 generator client {
@@ -119,9 +119,9 @@ model Order {
 model OrderItem {
   id         Int      @id @default(autoincrement())
   orderId    Int
-  order      Order    @relation(fields: [orderId], references: [id])
+  order      Order    @relation(fields: [orderId], references: [id] ,onDelete: Cascade)
   productId  Int
-  product    Product  @relation(fields: [productId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity   Int      @default(1)
   price      Float
 }
@@ -236,7 +236,7 @@ model QuotationItem {
   quotation    Quotation  @relation(fields: [quotationId], references: [id], onDelete: Cascade)
 
   productId    Int
-  product      Product    @relation(fields: [productId], references: [id])
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   quantity     Int        @default(1)
   price        Float
