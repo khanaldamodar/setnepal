@@ -6,12 +6,12 @@ import { ProductPagination } from "@/components/Productpage-components/product-p
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
-const ITEMS_PER_PAGE = 6;
+// const ITEMS_PER_PAGE = 6;
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
 
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<{
     categories: string[];
@@ -30,8 +30,37 @@ export default function ProductsPage() {
   useEffect(() => {
     const search = searchParams.get("search") || "";
     setSearchQuery(search); // pre-fill input
-    setCurrentPage(1); // reset pagination
+    // setCurrentPage(1); // reset pagination
   }, [searchParams]);
+
+  // const filteredProducts = useMemo(() => {
+  //   return products.filter((product: any) => {
+  //     const categoryMatch =
+  //       filters.categories.length === 0 ||
+  //       filters.categories.includes(product.categoryName);
+
+  //     const brandMatch =
+  //       filters.brands.length === 0 ||
+  //       filters.brands.includes(product.brandName);
+
+  //     const priceMatch =
+  //       product.price >= filters.priceRange[0] &&
+  //       product.price <= filters.priceRange[1];
+
+  //     const ratingMatch = product.rating >= filters.minRating;
+
+  //     const searchMatch =
+  //       searchQuery === "" ||
+  //       product.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+  //     return (
+  //       categoryMatch && brandMatch && priceMatch && ratingMatch && searchMatch
+  //     );
+  //   });
+  // }, [filters, products, searchQuery]);
+
+  // ❌ no pagination state
+  // ❌ no ITEMS_PER_PAGE
 
   const filteredProducts = useMemo(() => {
     return products.filter((product: any) => {
@@ -112,16 +141,16 @@ export default function ProductsPage() {
   // }, [filters, products]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  // const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredProducts, currentPage]);
+  // const paginatedProducts = useMemo(() => {
+  //   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  //   return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  // }, [filteredProducts, currentPage]);
 
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
-    setCurrentPage(1);
+    // setCurrentPage(1);
   };
 
   return (
@@ -145,7 +174,7 @@ export default function ProductsPage() {
           />
 
           <button
-            onClick={() => setCurrentPage(1)} // Reset page on search
+            // onClick={() => setCurrentPage(1)} // Reset page on search
             className="rounded bg-primary px-4 py-2 text-[] hover:bg-primary/90 bg-white"
           >
             Search
@@ -172,7 +201,7 @@ export default function ProductsPage() {
 
           {/* Products Section */}
           <div className="flex-1">
-            {paginatedProducts.length > 0 ? (
+            {/* {paginatedProducts.length > 0 ? (
               <>
                 <ProductGrid products={paginatedProducts} />
                 <div className="mt-8">
@@ -183,6 +212,9 @@ export default function ProductsPage() {
                   />
                 </div>
               </>
+            ) : ( */}
+            {filteredProducts.length > 0 ? (
+              <ProductGrid products={filteredProducts} />
             ) : (
               <div className="flex h-96 items-center justify-center rounded-lg border border-border bg-card">
                 <div className="text-center">
