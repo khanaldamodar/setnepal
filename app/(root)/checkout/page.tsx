@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,20 @@ export default function CheckoutPage() {
     municipality: "",
     ward: "",
   });
+
+  const [locations, setLocations] = useState<any>({});
+  const [districts, setDistricts] = useState<string[]>([]);
+  const [municipalities, setMunicipalities] = useState<string[]>([]);
+  const [wards, setWards] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch(
+      "https://raw.githubusercontent.com/rukh-debug/location-np/main/english.json"
+    )
+      .then((res) => res.json())
+      .then((data) => setLocations(data))
+      .catch((err) => console.error(err));
+  }, []);
 
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [billingData, setBillingData] = useState(formData);
@@ -59,6 +73,43 @@ export default function CheckoutPage() {
       </main>
     );
   }
+
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const province = e.target.value;
+    setFormData({
+      ...formData,
+      province,
+      district: "",
+      municipality: "",
+      ward: "",
+    });
+    setDistricts(Object.keys(locations[province] || {}));
+    setMunicipalities([]);
+    setWards([]);
+  };
+
+  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const district = e.target.value;
+    setFormData({ ...formData, district, municipality: "", ward: "" });
+    setMunicipalities(
+      Object.keys(locations[formData.province][district] || {})
+    );
+    setWards([]);
+  };
+
+  const handleMunicipalityChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const municipality = e.target.value;
+    setFormData({ ...formData, municipality, ward: "" });
+    setWards(
+      locations[formData.province][formData.district][municipality] || []
+    );
+  };
+
+  const handleWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData({ ...formData, ward: e.target.value });
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -168,73 +219,71 @@ export default function CheckoutPage() {
                 <div>
                   <Label htmlFor="province">Province *</Label>
                   <select
-                    id="province"
                     name="province"
                     value={formData.province}
-                    onChange={handleInputChange}
+                    onChange={handleProvinceChange}
                     className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
                     <option value="">Select Province</option>
-                    <option>Province 1</option>
-                    <option>Bagmati</option>
-                    <option>Madhesh</option>
-                    <option>Gandaki</option>
-                    <option>Karnali</option>
-                    <option>Lumbini</option>
-                    <option>Sudur Paschim</option>
+                    {Object.keys(locations).map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
                   <Label htmlFor="district">District *</Label>
                   <select
-                    id="district"
                     name="district"
                     value={formData.district}
-                    onChange={handleInputChange}
+                    onChange={handleDistrictChange}
                     className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    disabled={!formData.province}
                   >
                     <option value="">Select District</option>
-                    <option>Kathmandu</option>
-                    <option>Lalitpur</option>
-                    <option>Bhaktapur</option>
-                    <option>Chitwan</option>
-                    <option>Pokhara</option>
+                    {districts.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
                   <Label htmlFor="municipality">Municipality *</Label>
                   <select
-                    id="municipality"
                     name="municipality"
                     value={formData.municipality}
-                    onChange={handleInputChange}
+                    onChange={handleMunicipalityChange}
                     className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    disabled={!formData.district}
                   >
                     <option value="">Select Municipality</option>
-                    <option>Rural Municipality</option>
-                    <option>Municipality</option>
-                    <option>Sub-Metropolitan City</option>
-                    <option>Metropolitan City</option>
+                    {municipalities.map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
                   <Label htmlFor="ward">Ward *</Label>
                   <select
-                    id="ward"
                     name="ward"
                     value={formData.ward}
-                    onChange={handleInputChange}
+                    onChange={handleWardChange}
                     className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    disabled={!formData.municipality}
                   >
                     <option value="">Select Ward</option>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
+                    {wards.map((w) => (
+                      <option key={w} value={w}>
+                        {w}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
