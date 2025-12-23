@@ -150,15 +150,17 @@ export default function CartPage() {
                       Rs. {subtotal.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  {/* <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tax (13%)</span>
                     <span className="font-medium text-foreground">
                       Rs. {tax.toFixed(2)}
                     </span>
-                  </div>
+                  </div> */}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span className="font-medium text-foreground">Free</span>
+                    <span className="font-medium text-foreground">
+                      Free inside valley
+                    </span>
                   </div>
                 </div>
 
