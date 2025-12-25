@@ -149,7 +149,7 @@ export default function PackagesPage() {
     return filteredPackages.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [filteredPackages, currentPage]);
 
-  // Reset to page 1 when filters change
+  
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
     setCurrentPage(1);
@@ -158,7 +158,7 @@ export default function PackagesPage() {
   return (
     <main className="min-h-screen font-poppins">
       <div className="mx-auto max-w-7xl px-4 py-30 sm:px-6 lg:px-8">
-        {/* Header */}
+        
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Packages</h1>
           <p className="mt-2 text-muted-foreground">

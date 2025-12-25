@@ -439,15 +439,20 @@ export default function PackageDetailPage() {
               {pkg.products.map((product) => (
                 <Card key={product.id} className="p-4">
                   {/* Product Image */}
-                  {product.imageUrl && (
-                    <div className="w-full h-40 mb-3 overflow-hidden rounded-lg bg-muted">
+                  <div className="w-full h-50 mb-3 overflow-hidden rounded-lg bg-muted">
+                    {product.imageUrl ? (
                       <img
                         src={product.imageUrl}
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <img
+                        src="/logo.jpeg"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
 
                   <h4 className="font-semibold text-foreground">
                     {product.name}
