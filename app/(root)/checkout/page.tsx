@@ -434,7 +434,7 @@ export default function CheckoutPage() {
             </Card>
 
             {/* Shipping Method */}
-            <Card className="p-6">
+            {/* <Card className="p-6">
               <h2 className="mb-4 text-xl font-bold text-foreground">
                 Shipping Method
               </h2>
@@ -499,7 +499,7 @@ export default function CheckoutPage() {
                   </span>
                 </label>
               </div>
-            </Card>
+            </Card> */}
           </div>
 
           {/* Order Summary */}
