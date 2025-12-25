@@ -100,6 +100,7 @@ model Package {
   benefits    Json?      // List of bullet points
 
   packageProducts PackageProduct[] // explicit many-to-many with quantity
+  orderItems      OrderItem[]
 }
 
 model Order {
@@ -122,8 +123,10 @@ model OrderItem {
   id         Int      @id @default(autoincrement())
   orderId    Int
   order      Order    @relation(fields: [orderId], references: [id] ,onDelete: Cascade)
-  productId  Int
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  Int?
+  product    Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  packageId  Int?
+  package    Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
   quantity   Int      @default(1)
   price      Float
 }

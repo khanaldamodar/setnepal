@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 
-
 export async function GET(req: NextRequest) {
   try {
     const user = requireAuth(req); // Admin or user
@@ -11,7 +10,16 @@ export async function GET(req: NextRequest) {
     if (user.role === "ADMIN") {
       // Admin can see all payments
       payments = await prisma.payment.findMany({
-        include: { order: true, user: true },
+        include: {
+          order: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
       });
     } else {
       // Regular user sees only their payments
@@ -36,11 +44,15 @@ export async function POST(req: NextRequest) {
     const { orderId, amount, method, transactionId, paymentData } = body;
 
     if (!orderId || !amount || !method) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     const order = await prisma.order.findUnique({ where: { id: orderId } });
-    if (!order) return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    if (!order)
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
 
     // Optional: Only allow user to pay for their own order unless ADMIN
     // if (1) {
@@ -56,7 +68,16 @@ export async function POST(req: NextRequest) {
         transactionId,
         paymentData,
       },
-      include: { order: true, user: true },
+      include: {
+        order: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
     });
 
     // Update order payment status if successful
@@ -70,7 +91,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(payment, { status: 201 });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ message: "Failed to create payment" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to create payment" },
+      { status: 500 }
+    );
   }
 }
 

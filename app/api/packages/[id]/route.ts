@@ -26,7 +26,13 @@ export async function GET(
             product: true,
           },
         },
-        createdBy: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -193,7 +199,13 @@ export async function PUT(
             product: true,
           },
         },
-        createdBy: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 

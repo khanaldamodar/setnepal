@@ -12,7 +12,13 @@ export async function GET(req: NextRequest) {
             product: true,
           },
         },
-        createdBy: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         category: true,
       },
     });
