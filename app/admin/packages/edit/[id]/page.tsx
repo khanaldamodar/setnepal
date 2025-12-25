@@ -11,9 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Cookies from "js-cookie";
-import "react-toastify/dist/ReactToastify.css";
-import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+type SelectedProduct = {
+  id: number;
+  name: string;
+  price: number;
+  qty: number;
+};
 
 export default function EditPackagePage() {
   const router = useRouter();
@@ -22,7 +28,7 @@ export default function EditPackagePage() {
 
   const { register, handleSubmit, setValue } = useForm();
   const [products, setProducts] = useState<any[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -30,6 +36,20 @@ export default function EditPackagePage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const [benefits, setBenefits] = useState<string[]>([]);
+  const [newBenefit, setNewBenefit] = useState("");
+
+  const handleAddBenefit = () => {
+    if (newBenefit.trim()) {
+      setBenefits([...benefits, newBenefit.trim()]);
+      setNewBenefit("");
+    }
+  };
+
+  const handleRemoveBenefit = (index: number) => {
+    setBenefits(benefits.filter((_, i) => i !== index));
+  };
 
   // Fetch all products
   useEffect(() => {
@@ -52,6 +72,7 @@ export default function EditPackagePage() {
 
   // Fetch package details
   useEffect(() => {
+    if (!packageId) return;
     axios
       .get(`/api/packages/${packageId}`)
       .then((res) => {
@@ -63,9 +84,33 @@ export default function EditPackagePage() {
         setValue("description", pkg.description);
         setValue("isFeatured", pkg.isFeatured);
         setValue("isActive", pkg.isActive);
-        setSelectedProducts(pkg.products || []);
+
+        // Map packageProducts to selectedProducts with quantity
+        if (pkg.packageProducts && Array.isArray(pkg.packageProducts)) {
+          const mappedProducts = pkg.packageProducts.map((pp: any) => ({
+            id: pp.product.id,
+            name: pp.product.name,
+            price: pp.product.price,
+            qty: pp.quantity
+          }));
+          setSelectedProducts(mappedProducts);
+        } else if (pkg.products && Array.isArray(pkg.products)) {
+          // Fallback if data is old structure
+          const mappedProducts = pkg.products.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            qty: 1
+          }));
+          setSelectedProducts(mappedProducts);
+        }
+
         if (pkg.imageUrl) setImagePreview(pkg.imageUrl);
         setSelectedCategory(pkg.categoryId || null);
+
+        if (pkg.benefits && Array.isArray(pkg.benefits)) {
+          setBenefits(pkg.benefits);
+        }
       })
       .catch((err) => console.error("Error fetching package:", err));
   }, [packageId, setValue]);
@@ -80,12 +125,18 @@ export default function EditPackagePage() {
 
   const handleAddProduct = (product: any) => {
     if (!selectedProducts.find((p) => p.id === product.id)) {
-      setSelectedProducts([...selectedProducts, product]);
+      setSelectedProducts([...selectedProducts, { ...product, qty: 1 }]);
     }
   };
 
   const handleRemoveProduct = (id: number) => {
     setSelectedProducts(selectedProducts.filter((p) => p.id !== id));
+  };
+
+  const handleQtyChange = (id: number, qty: number) => {
+    setSelectedProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, qty: qty < 1 ? 1 : qty } : p))
+    );
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,6 +173,15 @@ export default function EditPackagePage() {
         formData.append("image", selectedImage);
       }
 
+      // Serialize products with quantities
+      const productsData = selectedProducts.map(p => ({
+        id: p.id,
+        qty: p.qty
+      }));
+      formData.append("productsJson", JSON.stringify(productsData));
+      formData.append("benefits", JSON.stringify(benefits));
+
+      // Fallback
       selectedProducts.forEach((p) => {
         formData.append("productIds[]", p.id.toString());
       });
@@ -147,6 +207,7 @@ export default function EditPackagePage() {
 
   return (
     <div className="max-w-5xl mx-auto py-8">
+      <ToastContainer position="top-right" autoClose={3000} />
       <Card className="shadow-md border rounded-2xl">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold">Edit Package</CardTitle>
@@ -306,15 +367,71 @@ export default function EditPackagePage() {
                         key={product.id}
                         className="flex items-center justify-between bg-gray-50 border rounded-md p-2"
                       >
-                        <span>{product.name}</span>
-                        <Trash2
-                          className="w-5 h-5 text-red-500 cursor-pointer"
-                          onClick={() => handleRemoveProduct(product.id)}
-                        />
+                        <div>
+                          <p className="font-medium">{product.name}</p>
+                          <p className="text-sm text-gray-500">
+                            RS.{product.price}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm font-medium">Qty</label>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={product.qty}
+                            onChange={(e) => handleQtyChange(product.id, Number(e.target.value))}
+                            className="w-20 h-8"
+                          />
+                          <Trash2
+                            className="w-5 h-5 text-red-500 cursor-pointer ml-2"
+                            onClick={() => handleRemoveProduct(product.id)}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
+              )}
+            </div>
+
+            {/* Benefits Section */}
+            <div className="mt-6">
+              <label className="block mb-2 font-medium">Package Benefits (Bullet Points)</label>
+              <div className="flex gap-2 mb-2">
+                <Input
+                  value={newBenefit}
+                  onChange={(e) => setNewBenefit(e.target.value)}
+                  placeholder="Enter a benefit"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddBenefit();
+                    }
+                  }}
+                />
+                <Button type="button" onClick={handleAddBenefit} variant="outline">
+                  Add
+                </Button>
+              </div>
+
+              {benefits.length > 0 && (
+                <ul className="space-y-2 mt-2 border rounded p-3">
+                  {benefits.map((benefit, index) => (
+                    <li key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                      <span className="text-sm">• {benefit}</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-500 h-6 px-2"
+                        onClick={() => handleRemoveBenefit(index)}
+                        type="button"
+                      >
+                        ✕
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
 

@@ -29,8 +29,8 @@ export default function ProductsPage() {
 
   useEffect(() => {
     const search = searchParams.get("search") || "";
-    setSearchQuery(search); // pre-fill input
-    setCurrentPage(1); // reset pagination
+    setSearchQuery(search);
+    setCurrentPage(1);
   }, [searchParams]);
 
   const filteredProducts = useMemo(() => {
@@ -91,32 +91,12 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  // const filteredProducts = useMemo(() => {
-  //   return products.filter((product: any) => {
-  //     const categoryMatch =
-  //       filters.categories.length === 0 ||
-  //       filters.categories.includes(product.categoryName);
-
-  //     const brandMatch =
-  //       filters.brands.length === 0 ||
-  //       filters.brands.includes(product.brandName);
-
-  //     const priceMatch =
-  //       product.price >= filters.priceRange[0] &&
-  //       product.price <= filters.priceRange[1];
-
-  //     const ratingMatch = product.rating >= filters.minRating;
-
-  //     return categoryMatch && brandMatch && priceMatch && ratingMatch;
-  //   });
-  // }, [filters, products]);
-
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
   const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const endIndex = currentPage * ITEMS_PER_PAGE;
+    return filteredProducts.slice(0, endIndex);
   }, [filteredProducts, currentPage]);
 
   const handleFilterChange = (newFilters: typeof filters) => {
@@ -128,14 +108,7 @@ export default function ProductsPage() {
     <main className="min-h-screen font-poppins py-30 md:py-30">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-4 flex items-center gap-2">
-          {/* <input
-            type="text"
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 rounded border border-border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary bg-white"
-          /> */}
-
+          {/* Search Input */}
           <input
             type="text"
             placeholder="Search products..."
@@ -146,7 +119,7 @@ export default function ProductsPage() {
 
           <button
             onClick={() => setCurrentPage(1)} // Reset page on search
-            className="rounded bg-primary px-4 py-2 text-[] hover:bg-primary/90 bg-white"
+            className="rounded bg-primary px-4 py-2 hover:bg-primary/90 bg-white"
           >
             Search
           </button>

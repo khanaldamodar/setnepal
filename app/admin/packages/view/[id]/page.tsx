@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
-import { ArrowLeft, Package, User, Tag, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Package, User, Tag, ShoppingCart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,11 @@ interface Product {
   imageUrl?: string | null;
   isFeatured: boolean;
   isActive: boolean;
+}
+
+interface PackageProduct {
+  quantity: number;
+  product: Product;
 }
 
 interface Category {
@@ -48,8 +53,10 @@ interface PackageData {
   createdAt: string;
   updatedAt: string;
   createdBy: CreatedBy;
-  products: Product[];
+  packageProducts: PackageProduct[];
+  products?: Product[]; // Old support
   categoryId?: number; // from API
+  benefits?: string[] | null;
 }
 
 export default function ViewPackagePage() {
@@ -98,6 +105,10 @@ export default function ViewPackagePage() {
         <Button onClick={() => router.back()}>Go Back</Button>
       </div>
     );
+
+  // Helper to get products (supporting new and old structure fallback)
+  const displayProducts = pkg.packageProducts ||
+    (pkg.products ? pkg.products.map(p => ({ product: p, quantity: 1 })) : []);
 
   return (
     <div className="p-6 space-y-6">
@@ -173,12 +184,12 @@ export default function ViewPackagePage() {
         <CardContent>
           <div className="space-y-2">
             <p>
-              <strong>Name:</strong> {pkg.createdBy.name}
+              <strong>Name:</strong> {pkg.createdBy?.name || "N/A"}
             </p>
             <p>
-              <strong>Email:</strong> {pkg.createdBy.email}
+              <strong>Email:</strong> {pkg.createdBy?.email || "N/A"}
             </p>
-            <Badge>{pkg.createdBy.role}</Badge>
+            <Badge>{pkg.createdBy?.role || "N/A"}</Badge>
           </div>
         </CardContent>
       </Card>
@@ -191,32 +202,34 @@ export default function ViewPackagePage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {pkg.products.length > 0 ? (
+          {displayProducts.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full border border-gray-200 text-sm">
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="px-4 py-2 text-left">ID</th>
                     <th className="px-4 py-2 text-left">Name</th>
-                    <th className="px-4 py-2 text-left">Price</th>
-                    <th className="px-4 py-2 text-left">Stock</th>
+                    <th className="px-4 py-2 text-left">Price (Unit)</th>
+                    <th className="px-4 py-2 text-left">Qty in Package</th>
+                    <th className="px-4 py-2 text-left">Total Value</th>
                     <th className="px-4 py-2 text-left">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {pkg.products.map((product) => (
-                    <tr key={product.id} className="border-t hover:bg-gray-50">
-                      <td className="px-4 py-2">{product.id}</td>
-                      <td className="px-4 py-2">{product.name}</td>
-                      <td className="px-4 py-2">Rs. {product.price}</td>
-                      <td className="px-4 py-2">{product.stock}</td>
+                  {displayProducts.map((pp) => (
+                    <tr key={pp.product.id} className="border-t hover:bg-gray-50">
+                      <td className="px-4 py-2">{pp.product.id}</td>
+                      <td className="px-4 py-2">{pp.product.name}</td>
+                      <td className="px-4 py-2">Rs. {pp.product.price}</td>
+                      <td className="px-4 py-2 font-bold">{pp.quantity}</td>
+                      <td className="px-4 py-2">Rs. {pp.product.price * pp.quantity}</td>
                       <td className="px-4 py-2">
                         <Badge
                           className={
-                            product.isActive ? "bg-green-500" : "bg-red-500"
+                            pp.product.isActive ? "bg-green-500" : "bg-red-500"
                           }
                         >
-                          {product.isActive ? "Active" : "Inactive"}
+                          {pp.product.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </td>
                     </tr>
@@ -249,6 +262,26 @@ export default function ViewPackagePage() {
           )}
         </CardContent>
       </Card>
+      {/* Package Benefits */}
+      <Card className="shadow-sm rounded-2xl border">
+        <CardHeader>
+          <CardTitle className="text-xl flex items-center gap-2">
+            <Star className="w-5 h-5" /> Package Benefits
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {pkg.benefits && Array.isArray(pkg.benefits) && pkg.benefits.length > 0 ? (
+            <ul className="list-disc pl-5 space-y-1">
+              {pkg.benefits.map((benefit, i) => (
+                <li key={i} className="text-md">{String(benefit)}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 italic">No benefits listed</p>
+          )}
+        </CardContent>
+      </Card>
+
     </div>
   );
 }

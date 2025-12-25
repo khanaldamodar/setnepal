@@ -21,7 +21,11 @@ export async function GET(
     const pkg = await prisma.package.findUnique({
       where: { id: numericId },
       include: {
-        products: true,
+        packageProducts: {
+          include: {
+            product: true,
+          },
+        },
         createdBy: true,
       },
     });
@@ -86,9 +90,8 @@ export async function PUT(
 
     const imageFile = formData.get("image") as File | null;
 
+    const productsJson = formData.get("productsJson") as string | null;
     const productIdsRaw = formData.getAll("productIds[]");
-    const productIds =
-      productIdsRaw.length > 0 ? productIdsRaw.map((id) => Number(id)) : null;
 
     // Ensure package exists
     const existingPackage = await prisma.package.findUnique({
@@ -116,23 +119,36 @@ export async function PUT(
       }
     }
 
-    // Validate products
-    let connectProducts: any = undefined;
-    if (productIds) {
-      const existingProducts = await prisma.product.findMany({
-        where: { id: { in: productIds } },
-      });
+    // Validate products and prepare update
+    let updatePackageProducts: any = undefined;
 
-      if (existingProducts.length !== productIds.length) {
-        return NextResponse.json(
-          { message: "One or more productIds are invalid" },
-          { status: 400 }
-        );
+    if (productsJson) {
+      try {
+        const parsedProducts = JSON.parse(productsJson) as {
+          id: number;
+          qty: number;
+        }[];
+        if (parsedProducts.length > 0) {
+          updatePackageProducts = {
+            deleteMany: {}, // Remove all old relations
+            create: parsedProducts.map((p) => ({
+              product: { connect: { id: p.id } },
+              quantity: p.qty,
+            })),
+          };
+        }
+      } catch (e) {
+        console.error("Failed to parse productsJson", e);
       }
-
-      connectProducts = {
-        set: [], // clear old
-        connect: existingProducts.map((p) => ({ id: p.id })),
+    } else if (productIdsRaw.length > 0) {
+      // Fallback
+      const productIds = productIdsRaw.map((id) => Number(id));
+      updatePackageProducts = {
+        deleteMany: {},
+        create: productIds.map((id) => ({
+          product: { connect: { id } },
+          quantity: 1,
+        })),
       };
     }
 
@@ -143,6 +159,16 @@ export async function PUT(
         await deleteLocalFile(existingPackage.imageUrl);
       }
       imageUrl = await uploadFileToLocal(imageFile, "packages");
+    }
+
+    const benefitsJson = formData.get("benefits") as string | null;
+    let benefits: any = undefined;
+    if (benefitsJson !== null) {
+      try {
+        benefits = JSON.parse(benefitsJson);
+      } catch (e) {
+        console.error("Failed to parse benefits", e);
+      }
     }
 
     // Update package
@@ -158,10 +184,15 @@ export async function PUT(
         isActive: isActive ?? undefined,
         categoryId,
         imageUrl,
-        products: connectProducts,
+        benefits: benefits,
+        packageProducts: updatePackageProducts,
       },
       include: {
-        products: true,
+        packageProducts: {
+          include: {
+            product: true,
+          },
+        },
         createdBy: true,
       },
     });

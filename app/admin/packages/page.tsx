@@ -107,7 +107,7 @@ export default function PackagesPage() {
           <span className="text-gray-400">None</span>
         ),
     },
-    { key: "stock" as keyof Package, label: "Stock" },
+
     {
       key: "isFeatured" as keyof Package,
       label: "Featured",

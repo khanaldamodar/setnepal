@@ -90,9 +90,12 @@ export async function PUT(
     const formData = await req.formData();
 
     const name = formData.get("name") as string | null;
+    const accountNumber = formData.get("accountNumber") as string | null;
+    const businessName = formData.get("businessName") as string | null;
+    const branch = formData.get("branch") as string | null;
     const file = formData.get("qr") as File | null;
 
-    // Fetch existing member
+    // Fetch existing bank
     const existing = await prisma.banks.findUnique({
       where: { id: Number(id) },
     });
@@ -103,7 +106,7 @@ export async function PUT(
 
     let photoUrl = existing.qr; // keep existing by default
 
-    // If new file uploaded → upload to Cloudinary
+    // If new file uploaded → upload to local storage
     if (file && typeof file === "object") {
       if (existing.qr) {
         await deleteLocalFile(existing.qr);
@@ -111,11 +114,14 @@ export async function PUT(
       photoUrl = await uploadFileToLocal(file, "banks");
     }
 
-    // Update the member
+    // Update the bank
     const updatedBank = await prisma.banks.update({
       where: { id: Number(id) },
       data: {
         name: name ?? existing.name,
+        accountNumber: accountNumber ?? existing.accountNumber,
+        businessName: businessName ?? existing.businessName,
+        branch: branch ?? existing.branch,
         qr: photoUrl,
       },
     });
@@ -123,7 +129,7 @@ export async function PUT(
     return NextResponse.json(
       {
         message: "Bank updated successfully!",
-        member: updatedBank,
+        bank: updatedBank,
       },
       { status: 200 }
     );

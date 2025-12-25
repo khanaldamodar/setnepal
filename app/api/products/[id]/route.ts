@@ -5,7 +5,6 @@ import fs from "fs";
 import path from "path";
 import { deleteLocalFile } from "@/lib/local-uploader";
 
-
 export async function GET(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -26,7 +25,11 @@ export async function GET(
       include: {
         category: true,
         brand: true,
-        packages: true,
+        packageProducts: {
+          include: {
+            package: true,
+          },
+        },
       },
     });
 
@@ -50,75 +53,13 @@ export async function GET(
   }
 }
 
-// ✅ UPDATE PRODUCT (PUT)
-// export async function PUT(
-//   req: NextRequest,
-//   context: { params: Promise<{ id: string }> }
-// ) {
-//   try {
-//     const { id } = await context.params;
-//     const numericId = parseInt(id, 10);
-
-//     if (isNaN(numericId)) {
-//       return NextResponse.json({ message: "Invalid product ID" }, { status: 400 });
-//     }
-
-//     const body = await req.json();
-
-//     const {
-//       name,
-//       description,
-//       price,
-//       stock,
-//       sku,
-//       weight,
-//       categoryId,
-//       brandId,
-//       isFeatured,
-//       isActive,
-//       imageUrl,
-//       gallery,
-//     } = body;
-
-//     const existing = await prisma.product.findUnique({ where: { id: numericId } });
-//     if (!existing) {
-//       return NextResponse.json({ message: "Product not found" }, { status: 404 });
-//     }
-
-//     const updated = await prisma.product.update({
-//       where: { id: numericId },
-//       data: {
-//         name,
-//         description,
-//         price,
-//         stock,
-//         sku,
-//         weight,
-//         categoryId,
-//         brandId,
-//         isFeatured,
-//         isActive,
-//         imageUrl,
-//         gallery: Array.isArray(gallery) ? JSON.stringify(gallery) : gallery,
-//       },
-//     });
-
-//     return NextResponse.json(
-//       { message: "Product updated successfully", product: updated },
-//       { status: 200 }
-//     );
-//   } catch (err) {
-//     console.error("Error updating product:", err);
-//     return NextResponse.json({ message: "Failed to update product" }, { status: 500 });
-//   }
-// }
 
 export async function PUT(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> } // Updated type to Promise
 ) {
   try {
-    const { id } = await context.params; // ✅
+    const { id } = await context.params;
 
     const numericId = parseInt(id, 10);
 
@@ -283,16 +224,7 @@ export async function DELETE(
       where: { productId: numericId },
     });
 
-    const packages = await prisma.package.findMany({
-      where: { products: { some: { id: numericId } } },
-    });
-
-    for (const pkg of packages) {
-      await prisma.package.update({
-        where: { id: pkg.id },
-        data: { products: { disconnect: { id: numericId } } },
-      });
-    }
+    // Note: Package associations are automatically handled by Cascade delete in schema
 
     // 4️⃣ Clear category + brand FK
     await prisma.product.update({
