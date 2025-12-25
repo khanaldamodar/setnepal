@@ -319,9 +319,9 @@ export default function PackageDetailPage() {
               </div>
             </Card>
 
-            <p className="text-sm text-muted-foreground mb-2">
+            {/* <p className="text-sm text-muted-foreground mb-2">
               Stock: {pkg.stock ?? "N/A"} items
-            </p>
+            </p> */}
             {pkg.createdBy && (
               <p className="text-sm text-muted-foreground mb-4">
                 Created By:{" "}
@@ -413,7 +413,7 @@ export default function PackageDetailPage() {
           </Card>
         )}
 
-        {sampleData?.specifications && (
+        {/* {sampleData?.specifications && (
           <Card className="p-4 mb-12">
             <h3 className="font-semibold text-foreground mb-3">
               Specifications
@@ -427,7 +427,7 @@ export default function PackageDetailPage() {
               ))}
             </div>
           </Card>
-        )}
+        )} */}
 
         {pkg.products && (
           <div className="mt-12">
