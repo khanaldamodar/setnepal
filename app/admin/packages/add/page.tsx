@@ -284,7 +284,9 @@ export default function AddPackagePage() {
                   >
                     <div>
                       <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-gray-500">₹{product.price}</p>
+                      <p className="text-sm text-gray-500">
+                        RS.{product.price}
+                      </p>
                     </div>
 
                     <Button
@@ -314,7 +316,7 @@ export default function AddPackagePage() {
                       <div>
                         <p className="font-medium">{product.name}</p>
                         <p className="text-sm text-gray-500">
-                          ₹{product.price}
+                          RS.{product.price}
                         </p>
                       </div>
 
