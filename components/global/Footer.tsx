@@ -140,8 +140,9 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
         <div>
           <h3 className="text-xl font-semibold text-white mb-4">Contact Us</h3>
           <ul className="space-y-3 text-black">
-            <h4 className="text-3xl font-bold text-white ml-7">
-              {settings.companyName || "Set Nepal"}
+            <h4 className="text-xl font-bold text-white ml-7">
+              {/* {settings.companyName || "Set Nepal"} */}
+              Scientific Equipments Traders Pvt. Ltd.
             </h4>
 
             {settings.phone1 && (

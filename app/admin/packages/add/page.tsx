@@ -41,6 +41,20 @@ export default function AddPackagePage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [benefits, setBenefits] = useState<string[]>([]);
+  const [newBenefit, setNewBenefit] = useState("");
+
+  const handleAddBenefit = () => {
+    if (newBenefit.trim()) {
+      setBenefits([...benefits, newBenefit.trim()]);
+      setNewBenefit("");
+    }
+  };
+
+  const handleRemoveBenefit = (index: number) => {
+    setBenefits(benefits.filter((_, i) => i !== index));
+  };
+
   /* ---------------- Fetch Products ---------------- */
   useEffect(() => {
     axios.get("/api/products").then((res) => {
@@ -129,9 +143,17 @@ export default function AddPackagePage() {
 
       if (selectedImage) formData.append("image", selectedImage);
 
+      // Serialize products with quantities
+      const productsData = selectedProducts.map(p => ({
+        id: p.id,
+        qty: p.qty
+      }));
+      formData.append("productsJson", JSON.stringify(productsData));
+      formData.append("benefits", JSON.stringify(benefits));
+
+      // Append standard productIds[] for fallback or direct indexing if needed
       selectedProducts.forEach((p) => {
         formData.append("productIds[]", p.id.toString());
-        // qty is UI only for now
       });
 
       formData.append("categoryId", selectedCategories[0].id.toString());
@@ -344,6 +366,46 @@ export default function AddPackagePage() {
                   ))}
                 </div>
               )}
+              {/* Benefits Section */}
+              <div>
+                <label className="block mb-2 font-medium">Package Benefits (Bullet Points)</label>
+                <div className="flex gap-2 mb-2">
+                  <Input
+                    value={newBenefit}
+                    onChange={(e) => setNewBenefit(e.target.value)}
+                    placeholder="Enter a benefit (e.g. Free Shipping)"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddBenefit();
+                      }
+                    }}
+                  />
+                  <Button type="button" onClick={handleAddBenefit} variant="outline">
+                    Add
+                  </Button>
+                </div>
+
+                {benefits.length > 0 && (
+                  <ul className="space-y-2 mt-2 border rounded p-3">
+                    {benefits.map((benefit, index) => (
+                      <li key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                        <span className="text-sm">• {benefit}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-500 h-6 px-2"
+                          onClick={() => handleRemoveBenefit(index)}
+                          type="button"
+                        >
+                          ✕
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>

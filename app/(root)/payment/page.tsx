@@ -53,15 +53,20 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
   const orderItems = [
     ...cart.map((item) => ({
       productId: item.id,
+      id: item.id,
       quantity: item.quantity,
       price: item.price,
       name: item.name,
+      category: item.category || (item.id.toString().startsWith("pkg-") ? "Package" : "Product"),
+    products: undefined as any,
     })),
     ...(packages?.map((pkg) => ({
       productId: pkg.id,
+      id: pkg.id,
       quantity: 1,
       price: pkg.price,
       name: pkg.name,
+      category: "Package",
       products: pkg.products?.map((p: any) => ({
         id: p.id,
         name: p.name,
@@ -122,21 +127,17 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     setIsProcessing(true);
 
     try {
-      const shippingAddress = `${checkoutData.billingAddress.fullName}, ${
-        checkoutData.billingAddress.province
-      }, ${checkoutData.billingAddress.district}, ${
-        checkoutData.billingAddress.municipality
-      }, Ward ${checkoutData.billingAddress.ward}${
-        checkoutData.billingAddress.zipCode
+      const shippingAddress = `${checkoutData.billingAddress.fullName}, ${checkoutData.billingAddress.province
+        }, ${checkoutData.billingAddress.district}, ${checkoutData.billingAddress.municipality
+        }, Ward ${checkoutData.billingAddress.ward}${checkoutData.billingAddress.zipCode
           ? `, ${checkoutData.billingAddress.zipCode}`
           : ""
-      }`;
+        }`;
 
       const payload = {
         items: orderItems.map((item) => ({
-          productId: Number(
-            (item.productId ?? item.id).toString().replace(/(pkg-|prod-)/, "")
-          ),
+          productId: item.category === "Package" ? undefined : Number((item.productId ?? item.id).toString().replace(/(pkg-|prod-)/, "")),
+          packageId: item.category === "Package" ? Number((item.productId ?? item.id).toString().replace(/(pkg-|prod-)/, "")) : undefined,
           quantity: item.quantity,
           price: item.price,
           name: item.name,
@@ -309,24 +310,63 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
                         </div>
 
                         {/* QR */}
-                        <div className="flex items-center justify-center">
-                          <div className="w-56 p-4 border rounded-xl shadow-md bg-white flex flex-col items-center space-y-3">
-                            <p className="text-sm font-semibold text-gray-700">
-                              Scan to Pay
-                            </p>
-
-                            <div className="w-40 h-40 border rounded-lg shadow-sm overflow-hidden bg-white flex items-center justify-center p-2">
-                              <img
-                                src={selectedBank.qr}
-                                alt="Bank QR Code"
-                                className="w-full h-full object-contain"
-                              />
+                        {/* QR & Bank Details */}
+                        <div className="mt-4 p-4 border rounded-xl bg-card shadow-sm">
+                          <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                            {/* Left: QR Code (Larger) */}
+                            <div className="flex-shrink-0">
+                              <div className="w-64 h-64 border rounded-lg overflow-hidden bg-white p-2 shadow-sm">
+                                <img
+                                  src={selectedBank.qr}
+                                  alt="Scan to Pay"
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+                              <p className="mt-2 text-center text-sm font-medium text-muted-foreground">
+                                Scan to Pay
+                              </p>
                             </div>
 
-                            <p className="text-xs text-gray-500 text-center px-2">
-                              Please scan to pay through your bank. Don’t forget
-                              to include your Transaction ID.
-                            </p>
+                            {/* Right: Bank Details */}
+                            <div className="flex-grow space-y-4 pt-2">
+                              <h3 className="font-semibold text-lg text-foreground border-b border-border pb-2">
+                                Bank Details
+                              </h3>
+
+                              <div className="space-y-3 text-sm">
+                                <div className="grid grid-cols-1 gap-1">
+                                  <span className="text-muted-foreground">Bank Name</span>
+                                  <span className="font-medium text-foreground">{selectedBank.name}</span>
+                                </div>
+
+                                {selectedBank.businessName && (
+                                  <div className="grid grid-cols-1 gap-1">
+                                    <span className="text-muted-foreground">Account Name</span>
+                                    <span className="font-medium text-foreground">{selectedBank.businessName}</span>
+                                  </div>
+                                )}
+
+                                {selectedBank.accountNumber && (
+                                  <div className="grid grid-cols-1 gap-1">
+                                    <span className="text-muted-foreground">Account Number</span>
+                                    <span className="font-medium text-foreground text-base tracking-wide">{selectedBank.accountNumber}</span>
+                                  </div>
+                                )}
+
+                                {selectedBank.branch && (
+                                  <div className="grid grid-cols-1 gap-1">
+                                    <span className="text-muted-foreground">Branch</span>
+                                    <span className="font-medium text-foreground">{selectedBank.branch}</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                                <p className="text-xs text-blue-600 dark:text-blue-400">
+                                  Please include the <strong>Transaction ID</strong> below after making the payment.
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </>
@@ -393,27 +433,27 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
 
               <div className="space-y-3 border-b border-border pb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-muted-foreground">Total</span>
                   <span className="font-medium text-foreground">
                     Rs. {subtotal.toFixed(2)}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm">
+                {/* <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax (10%)</span>
                   <span className="font-medium text-foreground">
                     Rs. {tax.toFixed(2)}
                   </span>
-                </div>
+                </div> */}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span className="font-medium text-foreground">Free</span>
+                  <span className="font-medium text-foreground">Free Inside Valley</span>
                 </div>
               </div>
 
               <div className="mt-4 flex justify-between">
                 <span className="font-bold text-foreground">Total</span>
                 <span className="text-2xl font-bold text-primary">
-                  Rs. {total.toFixed(2)}
+                  Rs. {subtotal.toFixed(2)}
                 </span>
               </div>
 

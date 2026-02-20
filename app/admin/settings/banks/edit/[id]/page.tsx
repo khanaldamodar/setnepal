@@ -8,7 +8,10 @@ import "react-toastify/dist/ReactToastify.css";
 interface BankType {
   id: number;
   name: string;
-  qrUrl?: string;
+  accountNumber?: string;
+  businessName?: string;
+  branch?: string;
+  qr?: string;
 }
 
 export default function EditBankPage() {
@@ -17,6 +20,9 @@ export default function EditBankPage() {
   const bankId = Number(params?.id);
 
   const [name, setName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [branch, setBranch] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,7 +48,10 @@ export default function EditBankPage() {
         }
 
         setName(bank.name);
-        setQrUrl(bank.qrUrl || null);
+        setAccountNumber(bank.accountNumber || "");
+        setBusinessName(bank.businessName || "");
+        setBranch(bank.branch || "");
+        setQrUrl(bank.qr || null);
       } catch (err) {
         console.error(err);
         toast.error("Failed to load bank data");
@@ -63,6 +72,9 @@ export default function EditBankPage() {
 
     const formData = new FormData();
     formData.append("name", trimmed);
+    if (accountNumber.trim()) formData.append("accountNumber", accountNumber.trim());
+    if (businessName.trim()) formData.append("businessName", businessName.trim());
+    if (branch.trim()) formData.append("branch", branch.trim());
     if (file) formData.append("qr", file);
 
     try {
@@ -102,25 +114,73 @@ export default function EditBankPage() {
 
           <div className="flex flex-col gap-4">
             {/* Bank Name */}
-            <label className="text-sm font-medium text-gray-700">
-              Bank Name
-            </label>
-            <input
-              type="text"
-              placeholder="Enter Bank Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#aec958] transition"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Bank Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Bank Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#aec958] transition"
+              />
+            </div>
+
+            {/* Account Number */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Account Number
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Account Number"
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#aec958] transition"
+              />
+            </div>
+
+            {/* Business Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Business Name
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Business Name"
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#aec958] transition"
+              />
+            </div>
+
+            {/* Branch */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Branch
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Branch"
+                value={branch}
+                onChange={(e) => setBranch(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#aec958] transition"
+              />
+            </div>
 
             {/* QR Upload */}
-            <label className="text-sm font-medium text-gray-700">
-              Upload QR
-            </label>
-            <input
-              type="file"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Upload QR Code
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#aec958] transition"
+              />
+            </div>
 
             {/* Show selected file */}
             {file && (
@@ -129,16 +189,14 @@ export default function EditBankPage() {
 
             {/* Existing QR Preview */}
             {!file && qrUrl && (
-              <p className="text-sm text-gray-600">
-                Current QR:{" "}
-                <a
-                  href={qrUrl}
-                  target="_blank"
-                  className="underline text-blue-600"
-                >
-                  View
-                </a>
-              </p>
+              <div className="border rounded-md p-3">
+                <p className="text-sm text-gray-700 mb-2">Current QR Code:</p>
+                <img
+                  src={qrUrl}
+                  alt="QR Code"
+                  className="w-32 h-32 object-contain"
+                />
+              </div>
             )}
 
             <button
@@ -153,7 +211,7 @@ export default function EditBankPage() {
             <button
               type="button"
               onClick={() => router.push("/admin/settings/banks")}
-              className="mt-2 text-sm text-[#aec958] font-semibold hover:underline cursor-pointer"
+              className="text-sm text-[#aec958] font-semibold hover:underline cursor-pointer"
             >
               ← Back to Bank List
             </button>

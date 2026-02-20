@@ -7,6 +7,9 @@ import CRUDTable from "@/components/admin-components/CRUDTable";
 interface BankType {
   id: number;
   name: string;
+  accountNumber?: string;
+  businessName?: string;
+  branch?: string;
   qr: string; // URL or path to QR image
 }
 
@@ -61,7 +64,7 @@ const BanksPage = () => {
           <CRUDTable
             endpoint="settings/banks" // frontend route
             apiEndpoint="banks" // backend API route
-            columns={["name", "qr"]}
+            columns={["name", "accountNumber", "businessName", "branch", "qr"]}
             data={banks}
             actions={["edit", "delete"]}
             setData={setBanks}
@@ -76,6 +79,15 @@ const BanksPage = () => {
                 ) : (
                   <span className="text-gray-400">No QR</span>
                 );
+              }
+              if (column === "accountNumber") {
+                return row.accountNumber || <span className="text-gray-400">-</span>;
+              }
+              if (column === "businessName") {
+                return row.businessName || <span className="text-gray-400">-</span>;
+              }
+              if (column === "branch") {
+                return row.branch || <span className="text-gray-400">-</span>;
               }
               return row[column];
             }}

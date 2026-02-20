@@ -27,12 +27,14 @@ export async function POST(req: Request) {
     const formData = await req.formData();
 
     const name = formData.get("name") as string;
-
+    const accountNumber = formData.get("accountNumber") as string | null;
+    const businessName = formData.get("businessName") as string | null;
+    const branch = formData.get("branch") as string | null;
     const file = formData.get("qr") as File | null;
 
-    if (!name || !file) {
+    if (!name) {
       return NextResponse.json(
-        { error: "Name and QR are required" },
+        { error: "Bank name is required" },
         { status: 400 }
       );
     }
@@ -44,10 +46,13 @@ export async function POST(req: Request) {
       photoUrl = await uploadFileToLocal(file, "banks");
     }
 
-    // Create Bank QR in Prisma
+    // Create Bank in Prisma
     const bank = await prisma.banks.create({
       data: {
         name,
+        accountNumber: accountNumber || undefined,
+        businessName: businessName || undefined,
+        branch: branch || undefined,
         qr: photoUrl || undefined,
       },
     });

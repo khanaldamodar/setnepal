@@ -7,8 +7,18 @@ export async function GET(req: NextRequest) {
   try {
     const packages = await prisma.package.findMany({
       include: {
-        products: true,
-        createdBy: true,
+        packageProducts: {
+          include: {
+            product: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         category: true,
       },
     });
@@ -36,9 +46,12 @@ export async function POST(req: NextRequest) {
     const isFeatured = formData.get("isFeatured") === "true";
     const isActive = formData.get("isActive") !== "false";
     const imageFile = formData.get("image") as File | null;
-    const productIds = formData.getAll("productIds[]").map((id) => Number(id));
     const categoryIdRaw = formData.get("categoryId");
     const categoryId = categoryIdRaw ? Number(categoryIdRaw) : null;
+
+    // Expecting a JSON string for products with quantities: [{ id: 1, qty: 2 }, ...]
+    const productsJson = formData.get("productsJson") as string | null;
+    const productIds = formData.getAll("productIds[]").map((id) => Number(id)); // Fallback
 
     if (!name || !price) {
       return NextResponse.json(
@@ -51,22 +64,44 @@ export async function POST(req: NextRequest) {
     if (imageFile && imageFile.size > 0) {
       imageUrl = await uploadFileToLocal(imageFile, "packages");
     }
-    let connectProducts = undefined;
-    if (productIds && productIds.length > 0) {
-      const existingProducts = await prisma.product.findMany({
-        where: { id: { in: productIds } },
-      });
 
-      if (existingProducts.length !== productIds.length) {
-        return NextResponse.json(
-          { message: "One or more products do not exist" },
-          { status: 400 }
-        );
+    let createPackageProducts = undefined;
+
+    if (productsJson) {
+      try {
+        const parsedProducts = JSON.parse(productsJson) as {
+          id: number;
+          qty: number;
+        }[];
+        if (parsedProducts.length > 0) {
+          createPackageProducts = {
+            create: parsedProducts.map((p) => ({
+              product: { connect: { id: p.id } },
+              quantity: p.qty,
+            })),
+          };
+        }
+      } catch (e) {
+        console.error("Failed to parse productsJson", e);
       }
-
-      connectProducts = {
-        connect: existingProducts.map((p) => ({ id: p.id })),
+    } else if (productIds && productIds.length > 0) {
+      // Fallback for backward compatibility or simple selection
+      createPackageProducts = {
+        create: productIds.map((id) => ({
+          product: { connect: { id } },
+          quantity: 1, // Default quantity
+        })),
       };
+    }
+
+    const benefitsJson = formData.get("benefits") as string | null;
+    let benefits: any = null;
+    if (benefitsJson) {
+      try {
+        benefits = JSON.parse(benefitsJson);
+      } catch (e) {
+        console.error("Failed to parse benefits", e);
+      }
     }
 
     const pkg = await prisma.package.create({
@@ -81,9 +116,16 @@ export async function POST(req: NextRequest) {
         isActive,
         categoryId: categoryId,
         createdById: user.userId,
-        products: connectProducts,
+        benefits,
+        packageProducts: createPackageProducts,
       },
-      include: { products: true },
+      include: {
+        packageProducts: {
+          include: {
+            product: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(pkg, { status: 201 });

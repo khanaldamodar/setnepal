@@ -16,7 +16,11 @@ export async function GET(req: NextRequest) {
       include: {
         category: true,
         brand: true,
-        packages: true,
+        packageProducts: {
+          include: {
+            package: true,
+          },
+        },
       },
     });
     return NextResponse.json(products);
@@ -151,7 +155,6 @@ async function handleFormDataUpload(req: NextRequest, user: any) {
         formEntries[key] = value;
       }
     }
-    
 
     // Extract fields
     const name = formData.get("name") as string;
@@ -175,8 +178,6 @@ async function handleFormDataUpload(req: NextRequest, user: any) {
     let imageUrl = null;
 
     if (imageFile && imageFile.size > 0) {
-      
-
       try {
         imageUrl = await uploadFileToLocal(imageFile, "products");
       } catch (uploadError) {
@@ -255,7 +256,6 @@ async function handleFormDataUpload(req: NextRequest, user: any) {
       isActive: formData.get("isActive") !== "false",
       createdById: user.userId,
     };
-
 
     const product = await prisma.product.create({
       data: productData,
