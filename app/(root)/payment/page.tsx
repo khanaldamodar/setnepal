@@ -57,8 +57,10 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
       quantity: item.quantity,
       price: item.price,
       name: item.name,
-      category: item.category || (item.id.toString().startsWith("pkg-") ? "Package" : "Product"),
-    products: undefined as any,
+      category:
+        item.category ||
+        (item.id.toString().startsWith("pkg-") ? "Package" : "Product"),
+      products: undefined as any,
     })),
     ...(packages?.map((pkg) => ({
       productId: pkg.id,
@@ -76,7 +78,7 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
 
   const calculatedTotal = orderItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
-    0
+    0,
   );
 
   if (!isLoaded || !checkoutData) {
@@ -112,7 +114,6 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
   const handlePlaceOrder = async () => {
     setError(null);
 
-    // BANK validation
     if (paymentMethod === "BANK") {
       if (!selectedBank) {
         toast.error("Please select a bank");
@@ -127,17 +128,34 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
     setIsProcessing(true);
 
     try {
-      const shippingAddress = `${checkoutData.billingAddress.fullName}, ${checkoutData.billingAddress.province
-        }, ${checkoutData.billingAddress.district}, ${checkoutData.billingAddress.municipality
-        }, Ward ${checkoutData.billingAddress.ward}${checkoutData.billingAddress.zipCode
-          ? `, ${checkoutData.billingAddress.zipCode}`
-          : ""
-        }`;
+      const billing = checkoutData.billingAddress;
+
+      const shippingAddress = `${billing.fullName}, ${billing.province}, ${billing.district}, ${billing.municipality}, Ward ${billing.ward}${billing.zipCode ? `, ${billing.zipCode}` : ""}`;
 
       const payload = {
+        // 👇 Include user info for auto-creation
+        user: {
+          name: billing.fullName,
+          email: billing.email,
+          phone: billing.phone,
+        },
         items: orderItems.map((item) => ({
-          productId: item.category === "Package" ? undefined : Number((item.productId ?? item.id).toString().replace(/(pkg-|prod-)/, "")),
-          packageId: item.category === "Package" ? Number((item.productId ?? item.id).toString().replace(/(pkg-|prod-)/, "")) : undefined,
+          productId:
+            item.category === "Package"
+              ? undefined
+              : Number(
+                  (item.productId ?? item.id)
+                    .toString()
+                    .replace(/(pkg-|prod-)/, ""),
+                ),
+          packageId:
+            item.category === "Package"
+              ? Number(
+                  (item.productId ?? item.id)
+                    .toString()
+                    .replace(/(pkg-|prod-)/, ""),
+                )
+              : undefined,
           quantity: item.quantity,
           price: item.price,
           name: item.name,
@@ -153,12 +171,11 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
 
       const token = localStorage.getItem("token");
 
-      // Create Order
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token || ""}`,
         },
         body: JSON.stringify(payload),
       });
@@ -170,11 +187,10 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
         throw new Error(data?.message || "Failed to create order");
       }
 
-      // Save Payment
+      // ✅ Optional: Save payment for BANK
       if (paymentMethod === "BANK") {
         const paymentPayload = {
           orderId: Number(orderId),
-          userId: 1,
           amount: calculatedTotal,
           method: "ONLINE",
           status: "SUCCESS",
@@ -199,15 +215,11 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
         }
       }
 
-      // SUCCESS
       clearCart();
       sessionStorage.removeItem("checkoutData");
 
       toast.success("Order placed successfully!");
-
-      setTimeout(() => {
-        router.push("/");
-      }, 1200);
+      setTimeout(() => router.push("/"), 1200);
     } catch (err: any) {
       const message =
         err?.message || "Something went wrong while placing your order";
@@ -277,7 +289,7 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
                         className="w-full rounded border border-border p-2"
                         onChange={(e) => {
                           const bank = banks.find(
-                            (b) => b.id == e.target.value
+                            (b) => b.id == e.target.value,
                           );
                           setSelectedBank(bank);
                         }}
@@ -335,35 +347,53 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
 
                               <div className="space-y-3 text-sm">
                                 <div className="grid grid-cols-1 gap-1">
-                                  <span className="text-muted-foreground">Bank Name</span>
-                                  <span className="font-medium text-foreground">{selectedBank.name}</span>
+                                  <span className="text-muted-foreground">
+                                    Bank Name
+                                  </span>
+                                  <span className="font-medium text-foreground">
+                                    {selectedBank.name}
+                                  </span>
                                 </div>
 
                                 {selectedBank.businessName && (
                                   <div className="grid grid-cols-1 gap-1">
-                                    <span className="text-muted-foreground">Account Name</span>
-                                    <span className="font-medium text-foreground">{selectedBank.businessName}</span>
+                                    <span className="text-muted-foreground">
+                                      Account Name
+                                    </span>
+                                    <span className="font-medium text-foreground">
+                                      {selectedBank.businessName}
+                                    </span>
                                   </div>
                                 )}
 
                                 {selectedBank.accountNumber && (
                                   <div className="grid grid-cols-1 gap-1">
-                                    <span className="text-muted-foreground">Account Number</span>
-                                    <span className="font-medium text-foreground text-base tracking-wide">{selectedBank.accountNumber}</span>
+                                    <span className="text-muted-foreground">
+                                      Account Number
+                                    </span>
+                                    <span className="font-medium text-foreground text-base tracking-wide">
+                                      {selectedBank.accountNumber}
+                                    </span>
                                   </div>
                                 )}
 
                                 {selectedBank.branch && (
                                   <div className="grid grid-cols-1 gap-1">
-                                    <span className="text-muted-foreground">Branch</span>
-                                    <span className="font-medium text-foreground">{selectedBank.branch}</span>
+                                    <span className="text-muted-foreground">
+                                      Branch
+                                    </span>
+                                    <span className="font-medium text-foreground">
+                                      {selectedBank.branch}
+                                    </span>
                                   </div>
                                 )}
                               </div>
 
                               <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-900/50">
                                 <p className="text-xs text-blue-600 dark:text-blue-400">
-                                  Please include the <strong>Transaction ID</strong> below after making the payment.
+                                  Please include the{" "}
+                                  <strong>Transaction ID</strong> below after
+                                  making the payment.
                                 </p>
                               </div>
                             </div>
@@ -446,7 +476,9 @@ export default function PaymentPage({ packages }: { packages?: any[] }) {
                 </div> */}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span className="font-medium text-foreground">Free Inside Valley</span>
+                  <span className="font-medium text-foreground">
+                    Free Inside Valley
+                  </span>
                 </div>
               </div>
 

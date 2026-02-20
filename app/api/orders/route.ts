@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
+import bcrypt from "bcryptjs";
 
 export async function GET(req: NextRequest) {
   try {
@@ -91,11 +92,13 @@ export async function GET(req: NextRequest) {
 //   }
 // }
 
+
+
+
 export async function POST(req: NextRequest) {
   try {
-    // const user = requireAuth(req); // uncomment if using auth
     const body = await req.json();
-    const { items, shippingAddress, paymentMethod } = body;
+    const { items, shippingAddress, paymentMethod, user: userData } = body;
 
     if (!items || !items.length) {
       return NextResponse.json(
@@ -104,6 +107,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!userData || !userData.email || !userData.name || !userData.phone) {
+      return NextResponse.json(
+        { message: "User information is required" },
+        { status: 400 }
+      );
+    }
+
+
+    let user = await prisma.user.findUnique({ where: { email: userData.email } });
+
+    if (!user) {
+      
+      const randomPassword = Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      user = await prisma.user.create({
+        data: {
+          name: userData.name,
+          email: userData.email,
+          phone: userData.phone,
+          password: hashedPassword,
+          role: "USER",
+        },
+      });
+    }
+
+    const userId = user.id;
+
+    
     let total = 0;
     const orderItemsData = [];
 
@@ -111,20 +143,16 @@ export async function POST(req: NextRequest) {
       total += item.price * item.quantity;
 
       if (item.productId) {
-        // Check if item exists as a real product
         const product = await prisma.product.findUnique({
           where: { id: item.productId },
         });
 
         if (!product) {
-          // Fallback: Check if it's actually a package (handling legacy/ambiguous IDs)
           const fallbackPkg = await prisma.package.findUnique({
             where: { id: item.productId },
           });
 
           if (fallbackPkg) {
-            // Treat as Package
-            // Reduce stock
             await prisma.package.update({
               where: { id: fallbackPkg.id },
               data: { stock: fallbackPkg.stock - item.quantity },
@@ -135,7 +163,7 @@ export async function POST(req: NextRequest) {
               quantity: item.quantity,
               price: item.price,
             });
-            continue; // Skip the rest of this iteration
+            continue;
           }
 
           return NextResponse.json(
@@ -144,26 +172,17 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // It's a real product, check stock
-        // if (product.stock < item.quantity)
-        //   return NextResponse.json(
-        //     { message: `Insufficient stock for ${product.name}` },
-        //     { status: 400 }
-        //   );
-
-        // Reduce stock for real products only
         await prisma.product.update({
           where: { id: product.id },
           data: { stock: product.stock - item.quantity },
         });
 
         orderItemsData.push({
-          productId: item.productId,
+          productId: product.id,
           quantity: item.quantity,
           price: item.price,
         });
       } else if (item.packageId) {
-        // Check if item exists as a package
         const pkg = await prisma.package.findUnique({
           where: { id: item.packageId },
         });
@@ -175,30 +194,23 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // Check stock
-        // if (pkg.stock < item.quantity)
-        //   return NextResponse.json(
-        //     { message: `Insufficient stock for package ${pkg.name}` },
-        //     { status: 400 }
-        //   );
-
-        // Reduce stock
         await prisma.package.update({
           where: { id: pkg.id },
           data: { stock: pkg.stock - item.quantity },
         });
 
         orderItemsData.push({
-          packageId: item.packageId,
+          packageId: pkg.id,
           quantity: item.quantity,
           price: item.price,
         });
       }
     }
 
+    
     const order = await prisma.order.create({
       data: {
-        userId: 1,
+        userId,
         total,
         shippingAddress,
         paymentMethod,
@@ -209,6 +221,24 @@ export async function POST(req: NextRequest) {
         payments: true,
       },
     });
+
+    
+if (paymentMethod === "BANK" && body.bankId && body.transactionId) {
+  const paymentPayload = {
+    orderId: order.id,
+    userId: userId,
+    amount: total,
+    method: "ONLINE" as const,
+    status: "SUCCESS" as const,
+    paymentData: {
+      bankName: body.bankName,
+      qr: body.qr,
+      transactionId: body.transactionId,
+    },
+  };
+
+  await prisma.payment.create({ data: paymentPayload });
+}
 
     return NextResponse.json(order, { status: 201 });
   } catch (err) {
