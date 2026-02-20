@@ -7,6 +7,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
+type jsPDFWithAutoTable = jsPDF & {
+  lastAutoTable?: { finalY: number };
+};
+
 interface Category {
   id: number;
   name: string;
@@ -30,10 +34,22 @@ interface Selection {
   products: SelectedProduct[];
 }
 
+interface Package {
+  id: number;
+  name: string;
+  price: number;
+  categoryId: number;
+}
+
 export default function Quotation() {
   const [step, setStep] = useState<number>(1);
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [activeTab, setActiveTab] = useState<"products" | "packages">(
+    "products",
+  );
+  const [packages, setPackages] = useState<Package[]>([]);
+  const [packagePages, setPackagePages] = useState<number[]>([1]);
   const [formData, setFormData] = useState({
     organization: "",
     name: "",
@@ -53,10 +69,11 @@ export default function Quotation() {
   useEffect(() => {
     axios.get("/api/categories").then((res) => setCategories(res.data));
     axios.get("/api/products").then((res) => setProducts(res.data));
+    axios.get("/api/packages").then((res) => setPackages(res.data));
   }, []);
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => setFormData({ ...formData, [e.target.id]: e.target.value });
 
   const handleNextStep1 = () => {
@@ -93,7 +110,7 @@ export default function Quotation() {
     if (existing) {
       // Remove product
       newSelections[index].products = productsArr.filter(
-        (p) => p.productId !== productId
+        (p) => p.productId !== productId,
       );
     } else {
       // Add product with default quantity 1
@@ -103,16 +120,38 @@ export default function Quotation() {
     setSelections(newSelections);
   };
 
+  const handlePackageToggle = (index: number, pkg: Package) => {
+    const newSelections = [...selections];
+    const productsArr = newSelections[index].products;
+
+    const existing = productsArr.find((p) => p.productId === pkg.id);
+
+    if (existing) {
+      newSelections[index].products = productsArr.filter(
+        (p) => p.productId !== pkg.id,
+      );
+    } else {
+      newSelections[index].products.push({
+        productId: pkg.id,
+        quantity: 1,
+      });
+    }
+
+    setSelections(newSelections);
+  };
+
   const addSelection = () => {
     setSelections([...selections, { category: null, products: [] }]);
     setSearchQueries([...searchQueries, ""]);
     setCurrentPages([...currentPages, 1]);
+    setPackagePages([...packagePages, 1]);
   };
 
   const undoSelection = () => {
     setSelections(selections.slice(0, -1));
     setSearchQueries(searchQueries.slice(0, -1));
     setCurrentPages(currentPages.slice(0, -1));
+    setPackagePages(packagePages.slice(0, -1));
   };
 
   const handleNextStep2 = () => {
@@ -385,7 +424,7 @@ export default function Quotation() {
             unitPrice: parseFloat(unitPriceWithoutTax.toFixed(2)),
             subtotal: parseFloat(subtotal.toFixed(2)),
           };
-        })
+        }),
       );
 
       if (items.length === 0) {
@@ -411,7 +450,7 @@ export default function Quotation() {
       const grandTotal = parseFloat((subtotalSum + taxAmount).toFixed(2));
 
       // PDF Generation
-      const doc = new jsPDF("p", "pt", "a4");
+      const doc = new jsPDF("p", "pt", "a4") as jsPDFWithAutoTable;
       const pageWidth = doc.internal.pageSize.getWidth();
       const leftX = 40;
       const rightX = pageWidth - 200;
@@ -438,7 +477,7 @@ export default function Quotation() {
         doc.text(
           "Contact Office : Bafal, Kathmandu Metropolitan-13,",
           leftX,
-          205
+          205,
         );
         doc.text("Contact Office : Kathmandu, Nepal", leftX, 220);
 
@@ -585,7 +624,7 @@ export default function Quotation() {
         },
       });
 
-      let lastY = doc.lastAutoTable.finalY + 10;
+      let lastY = (doc.lastAutoTable?.finalY ?? boxY + boxH + 30) + 10;
 
       // Notes — unchanged
       autoTable(doc, {
@@ -619,11 +658,11 @@ export default function Quotation() {
         },
       });
 
-      lastY = doc.lastAutoTable.finalY + 10;
+      lastY = (doc.lastAutoTable?.finalY ?? lastY) + 10;
 
       // Warranty — unchanged
       autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 10,
+        startY: (doc.lastAutoTable?.finalY ?? lastY) + 10,
         head: [["Warranty Terms and Conditions:"]],
         body: [
           [
@@ -653,7 +692,7 @@ export default function Quotation() {
         },
       });
 
-      lastY = doc.lastAutoTable.finalY + 15;
+      lastY = (doc.lastAutoTable?.finalY ?? lastY) + 15;
 
       // Closing text — unchanged
       doc.setFontSize(10);
@@ -670,7 +709,7 @@ export default function Quotation() {
       const paddingBottom = 5; // minimum padding required at bottom
 
       // Check if the box fits on current page
-      let sigY = doc.lastAutoTable.finalY + 40; // space below previous content
+      let sigY = (doc.lastAutoTable?.finalY ?? lastY) + 40; // space below previous content
       if (
         sigY + boxHeight + paddingBottom >
         doc.internal.pageSize.getHeight()
@@ -697,7 +736,7 @@ export default function Quotation() {
         leftX + boxWidth + 30,
         sigY + 10,
         stampWidth,
-        stampHeight
+        stampHeight,
       );
 
       // "For: ..." text below stamp
@@ -705,7 +744,7 @@ export default function Quotation() {
       doc.text(
         "For: Scientific Equipment Traders Pvt. Ltd.",
         leftX + boxWidth + 30,
-        sigY + 10 + stampHeight + 10
+        sigY + 10 + stampHeight + 10,
       );
 
       // Save
@@ -732,6 +771,9 @@ export default function Quotation() {
 
   const productsByCategory = (categoryId: number) =>
     products.filter((p) => p.categoryId === categoryId);
+
+  const packagesByCategory = (categoryId: number) =>
+    packages.filter((pkg) => pkg.categoryId === categoryId);
 
   return (
     <div className="min-h-screen flex items-center justify-center font-poppins py-12">
@@ -856,10 +898,18 @@ export default function Quotation() {
 
             {selections.map((sel, index) => {
               const rawProducts = productsByCategory(sel.category?.id || 0);
+              const rawPackages = packagesByCategory(sel.category?.id || 0);
+
               const filteredProducts = rawProducts.filter((p) =>
                 p.name
                   .toLowerCase()
-                  .includes(searchQueries[index].toLowerCase())
+                  .includes(searchQueries[index].toLowerCase()),
+              );
+
+              const filteredPackages = rawPackages.filter((pkg) =>
+                pkg.name
+                  .toLowerCase()
+                  .includes(searchQueries[index].toLowerCase()),
               );
 
               const PAGE_SIZE = 10;
@@ -867,23 +917,47 @@ export default function Quotation() {
               const start = (currentPages[index] - 1) * PAGE_SIZE;
               const paginatedProducts = filteredProducts.slice(
                 start,
-                start + PAGE_SIZE
+                start + PAGE_SIZE,
               );
 
+              const ITEMS_PER_PAGE = 5;
+
+              const categoryPackages = sel.category
+                ? packagesByCategory(sel.category.id)
+                : [];
+
+              const totalPackagePages = Math.ceil(
+                categoryPackages.length / ITEMS_PER_PAGE,
+              );
+
+              const packageStart = (packagePages[index] - 1) * ITEMS_PER_PAGE;
+
+              const paginatedPackages = categoryPackages.slice(
+                packageStart,
+                packageStart + ITEMS_PER_PAGE,
+              );
+
+              const handlePackagePageChange = (index: number, page: number) => {
+                const newPages = [...packagePages];
+                newPages[index] = page;
+                setPackagePages(newPages);
+              };
               return (
                 <div
                   key={index}
                   className="mb-6 border border-gray-200 rounded-lg p-4 bg-gray-50"
                 >
+                  {/* CATEGORY */}
                   <label className="block text-gray-700 font-medium mb-2">
                     Category
                   </label>
+
                   <select
                     value={sel.category?.id || ""}
                     onChange={(e) =>
                       handleCategoryChange(index, e.target.value)
                     }
-                    className="w-full p-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-[#9bb648] outline-none mb-2"
+                    className="w-full p-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-[#9bb648] outline-none mb-4"
                   >
                     <option value="">-- Select Category --</option>
                     {categories.map((c) => (
@@ -893,8 +967,10 @@ export default function Quotation() {
                     ))}
                   </select>
 
+                  {/* SHOW ONLY AFTER CATEGORY SELECTED */}
                   {sel.category && (
                     <>
+                      {/* SEARCH */}
                       <input
                         type="text"
                         placeholder="Search products..."
@@ -903,89 +979,204 @@ export default function Quotation() {
                           const updated = [...searchQueries];
                           updated[index] = e.target.value;
                           setSearchQueries(updated);
+
                           const updatedPages = [...currentPages];
                           updatedPages[index] = 1;
                           setCurrentPages(updatedPages);
                         }}
-                        className="w-full mb-2 p-2 border rounded-lg focus:ring-2 focus:ring-[#9bb648]"
+                        className="w-full mb-4 p-2 border rounded-lg focus:ring-2 focus:ring-[#9bb648]"
                       />
 
-                      <p className="text-gray-700 font-medium mb-2">Products</p>
-                      {paginatedProducts.length === 0 ? (
-                        <p className="text-gray-500">No products found.</p>
-                      ) : (
-                        <div className="flex flex-wrap gap-2">
-                          {paginatedProducts.map((product) => {
-                            const selectedProduct = sel.products.find(
-                              (p) => p.productId === product.id
-                            );
+                      {/* TABS */}
+                      <div className="flex gap-6 mb-4 border-b">
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("products")}
+                          className={`pb-2 font-medium ${
+                            activeTab === "products"
+                              ? "border-b-2 border-[#9bb648] text-[#9bb648]"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          Products
+                        </button>
 
-                            return (
-                              <div
-                                key={product.id}
-                                className={`px-3 py-1 rounded-full border flex items-center gap-1 ${
-                                  selectedProduct
-                                    ? "bg-[#9bb648] text-white border-[#9bb648]"
-                                    : "bg-white border-gray-300 text-gray-700"
-                                }`}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={!!selectedProduct}
-                                  onChange={() =>
-                                    handleProductToggle(index, product.id)
-                                  }
-                                />
-                                <span>
-                                  {product.name} — Rs. {product.price}
-                                </span>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("packages")}
+                          className={`pb-2 font-medium ${
+                            activeTab === "packages"
+                              ? "border-b-2 border-[#9bb648] text-[#9bb648]"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          Packages
+                        </button>
+                      </div>
 
-                                {selectedProduct && (
-                                  <input
-                                    type="number"
-                                    min={1}
-                                    value={selectedProduct.quantity}
-                                    onChange={(e) => {
-                                      const val = Number(e.target.value);
-                                      const newSelections = [...selections];
-                                      newSelections[index].products.find(
-                                        (p) => p.productId === product.id
-                                      )!.quantity = val;
-                                      setSelections(newSelections);
-                                    }}
-                                    className="w-16 border rounded px-2 py-1 text-sm ml-2"
-                                  />
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
+                      {/* PRODUCTS TAB */}
+                      {activeTab === "products" && (
+                        <>
+                          {paginatedProducts.length === 0 ? (
+                            <p className="text-gray-500">No products found.</p>
+                          ) : (
+                            <div className="flex flex-wrap gap-2">
+                              {paginatedProducts.map((product) => {
+                                const selectedProduct = sel.products.find(
+                                  (p) => p.productId === product.id,
+                                );
+
+                                return (
+                                  <div
+                                    key={product.id}
+                                    className={`px-3 py-1 rounded-full border flex items-center gap-2 ${
+                                      selectedProduct
+                                        ? "bg-[#9bb648] text-white border-[#9bb648]"
+                                        : "bg-white border-gray-300 text-gray-700"
+                                    }`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={!!selectedProduct}
+                                      onChange={() =>
+                                        handleProductToggle(index, product.id)
+                                      }
+                                    />
+
+                                    <span>
+                                      {product.name} — Rs. {product.price}
+                                    </span>
+
+                                    {selectedProduct && (
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        value={selectedProduct.quantity}
+                                        onChange={(e) => {
+                                          const val = Number(e.target.value);
+                                          const newSelections = [...selections];
+                                          newSelections[index].products.find(
+                                            (p) => p.productId === product.id,
+                                          )!.quantity = val;
+
+                                          setSelections(newSelections);
+                                        }}
+                                        className="w-16 border rounded px-2 py-1 text-sm"
+                                      />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* PAGINATION */}
+                          {totalPages > 1 && (
+                            <div className="flex gap-1 mt-4 flex-wrap">
+                              {Array.from(
+                                { length: totalPages },
+                                (_, i) => i + 1,
+                              ).map((page) => (
+                                <button
+                                  key={page}
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = [...currentPages];
+                                    updated[index] = page;
+                                    setCurrentPages(updated);
+                                  }}
+                                  className={`px-2 py-1 rounded-md border text-sm ${
+                                    currentPages[index] === page
+                                      ? "bg-[#9bb648] text-white border-[#9bb648]"
+                                      : "bg-white text-gray-700 border-gray-300"
+                                  }`}
+                                >
+                                  {page}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </>
                       )}
 
-                      {totalPages > 1 && (
-                        <div className="flex gap-1 mt-2 flex-wrap">
-                          {Array.from(
-                            { length: totalPages },
-                            (_, i) => i + 1
-                          ).map((page) => (
-                            <button
-                              key={page}
-                              type="button"
-                              onClick={() => {
-                                const updated = [...currentPages];
-                                updated[index] = page;
-                                setCurrentPages(updated);
-                              }}
-                              className={`px-2 py-1 rounded-md border text-sm ${
-                                currentPages[index] === page
-                                  ? "bg-[#9bb648] text-white border-[#9bb648]"
-                                  : "bg-white text-gray-700 border-gray-300"
-                              }`}
-                            >
-                              {page}
-                            </button>
-                          ))}
-                        </div>
+                      {activeTab === "packages" && (
+                        <>
+                          {rawPackages.length === 0 ? (
+                            <p className="text-gray-500">No packages found.</p>
+                          ) : (
+                            <div className="flex flex-wrap gap-2">
+                              {paginatedPackages.map((pkg) => {
+                                const selectedPackage = sel.products.find(
+                                  (p) => p.productId === pkg.id,
+                                );
+
+                                return (
+                                  <div
+                                    key={pkg.id}
+                                    onClick={() =>
+                                      handlePackageToggle(index, pkg)
+                                    }
+                                    className={`px-3 py-1 rounded-full border flex items-center gap-2 cursor-pointer ${
+                                      selectedPackage
+                                        ? "bg-[#9bb648] text-white border-[#9bb648]"
+                                        : "bg-white border-gray-300 text-gray-700"
+                                    }`}
+                                  >
+                                    <span>
+                                      {pkg.name} — Rs. {pkg.price}
+                                    </span>
+
+                                    {selectedPackage && (
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        value={selectedPackage.quantity}
+                                        onClick={(e) => e.stopPropagation()}
+                                        onChange={(e) => {
+                                          const val = Number(e.target.value);
+                                          const newSelections = [...selections];
+                                          newSelections[index].products.find(
+                                            (p) => p.productId === pkg.id,
+                                          )!.quantity = val;
+
+                                          setSelections(newSelections);
+                                        }}
+                                        className="w-16 border rounded px-2 py-1 text-sm text-black"
+                                      />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* PACKAGE PAGINATION */}
+                          {totalPackagePages > 1 && (
+                            <div className="flex gap-1 mt-4 flex-wrap">
+                              {Array.from(
+                                { length: totalPackagePages },
+                                (_, i) => i + 1,
+                              ).map((page) => (
+                                <button
+                                  key={page}
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = [...packagePages];
+                                    updated[index] = page;
+                                    setPackagePages(updated);
+                                  }}
+                                  className={`px-2 py-1 rounded-md border text-sm ${
+                                    packagePages[index] === page
+                                      ? "bg-[#9bb648] text-white border-[#9bb648]"
+                                      : "bg-white text-gray-700 border-gray-300"
+                                  }`}
+                                >
+                                  {page}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </>
                       )}
                     </>
                   )}
@@ -993,17 +1184,19 @@ export default function Quotation() {
               );
             })}
 
+            {/* ADD / REMOVE CATEGORY */}
             <div className="flex items-center mb-4">
               {selections.at(-1)?.category &&
                 selections.at(-1)?.products.length! > 0 && (
                   <button
                     type="button"
                     onClick={addSelection}
-                    className="bg-[#9bb648] text-white py-1 px-3 rounded-lg font-semibold hover:opacity-90"
+                    className="bg-[#9bb648] text-white py-1 px-3 rounded-lg font-semibold"
                   >
                     + Add Category
                   </button>
                 )}
+
               {selections.length > 1 && (
                 <button
                   type="button"
@@ -1015,6 +1208,7 @@ export default function Quotation() {
               )}
             </div>
 
+            {/* NAVIGATION */}
             <div className="flex justify-between">
               <button
                 type="button"
@@ -1023,10 +1217,11 @@ export default function Quotation() {
               >
                 ← Back
               </button>
+
               <button
                 type="button"
                 onClick={handleNextStep2}
-                className="bg-[#9bb648] text-white py-2 px-6 rounded-lg font-semibold hover:opacity-90"
+                className="bg-[#9bb648] text-white py-2 px-6 rounded-lg font-semibold"
               >
                 Next →
               </button>
@@ -1056,16 +1251,23 @@ export default function Quotation() {
                 <p className="font-semibold text-gray-700">
                   Category: {sel.category?.name}
                 </p>
+
                 <ul className="list-disc list-inside">
-                  {sel.products.map((p) => {
+                  {sel.products.map((p: SelectedProduct) => {
                     const prod = products.find(
-                      (prod) => prod.id === p.productId
+                      (prod) => prod.id === p.productId,
                     );
-                    return prod ? (
+
+                    const pkg = packages.find((pkg) => pkg.id === p.productId);
+
+                    const item = prod ?? pkg;
+                    if (!item) return null;
+
+                    return (
                       <li key={p.productId}>
-                        {prod.name} — Rs. {prod.price} × {p.quantity}
+                        {item.name} — Rs. {item.price} × {p.quantity}
                       </li>
-                    ) : null;
+                    );
                   })}
                 </ul>
               </div>
@@ -1187,8 +1389,8 @@ const Stepper = ({ current }: { current: number }) => (
           current === step
             ? "bg-[#9bb648] text-white"
             : current > step
-            ? "bg-green-200 text-white"
-            : "bg-gray-200 text-gray-500"
+              ? "bg-green-200 text-white"
+              : "bg-gray-200 text-gray-500"
         }`}
       >
         {step}
