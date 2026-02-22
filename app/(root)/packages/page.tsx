@@ -3,144 +3,72 @@
 import { PackageFilters } from "@/components/package-components/package-filter";
 import { PackageGrid } from "@/components/package-components/package-grid";
 import { ProductPagination } from "@/components/Productpage-components/product-pagination";
-import { useState, useMemo } from "react";
-
-// Sample package data
-const SAMPLE_PACKAGES = [
-  {
-    id: 1,
-    name: "Home Office Starter",
-    description: "Perfect for beginners setting up a home office",
-    price: 299.99,
-    originalPrice: 399.99,
-    category: "Office Setup",
-    rating: 4.6,
-    image: "/home-office-starter-bundle.jpg",
-    productCount: 5,
-    products: [
-      { id: 1, name: "Wireless Headphones", price: 129.99 },
-      { id: 3, name: "Laptop Stand", price: 49.99 },
-      { id: 5, name: "Mouse Pad", price: 24.99 },
-      { id: 7, name: "Desk Lamp", price: 39.99 },
-      { id: 9, name: "Phone Stand", price: 14.99 },
-    ],
-  },
-  {
-    id: 2,
-    name: "Professional Setup",
-    description: "Complete professional workstation package",
-    price: 599.99,
-    originalPrice: 799.99,
-    category: "Professional",
-    rating: 4.8,
-    image: "/professional-workstation-setup.jpg",
-    productCount: 7,
-    products: [
-      { id: 1, name: "Wireless Headphones", price: 129.99 },
-      { id: 4, name: "Mechanical Keyboard", price: 159.99 },
-      { id: 6, name: "Monitor Arm", price: 79.99 },
-      { id: 8, name: "Wireless Mouse", price: 34.99 },
-      { id: 11, name: "Webcam", price: 89.99 },
-      { id: 2, name: "USB-C Cable", price: 19.99 },
-      { id: 10, name: "USB Hub", price: 44.99 },
-    ],
-  },
-  {
-    id: 3,
-    name: "Desk Essentials",
-    description: "Must-have items for any desk",
-    price: 149.99,
-    originalPrice: 199.99,
-    category: "Accessories",
-    rating: 4.4,
-    image: "/desk-essentials-collection.jpg",
-    productCount: 4,
-    products: [
-      { id: 5, name: "Mouse Pad", price: 24.99 },
-      { id: 7, name: "Desk Lamp", price: 39.99 },
-      { id: 12, name: "Desk Organizer", price: 29.99 },
-      { id: 9, name: "Phone Stand", price: 14.99 },
-    ],
-  },
-  {
-    id: 4,
-    name: "Cable & Connectivity",
-    description: "All cables and connectivity solutions",
-    price: 99.99,
-    originalPrice: 149.99,
-    category: "Accessories",
-    rating: 4.5,
-    image: "/cables-connectivity-bundle.jpg",
-    productCount: 3,
-    products: [
-      { id: 2, name: "USB-C Cable", price: 19.99 },
-      { id: 10, name: "USB Hub", price: 44.99 },
-      { id: 9, name: "Phone Stand", price: 14.99 },
-    ],
-  },
-  {
-    id: 5,
-    name: "Gaming Setup",
-    description: "Everything you need for gaming",
-    price: 449.99,
-    originalPrice: 599.99,
-    category: "Gaming",
-    rating: 4.7,
-    image: "/gaming-setup-bundle.jpg",
-    productCount: 5,
-    products: [
-      { id: 1, name: "Wireless Headphones", price: 129.99 },
-      { id: 4, name: "Mechanical Keyboard", price: 159.99 },
-      { id: 8, name: "Wireless Mouse", price: 34.99 },
-      { id: 5, name: "Mouse Pad", price: 24.99 },
-      { id: 6, name: "Monitor Arm", price: 79.99 },
-    ],
-  },
-  {
-    id: 6,
-    name: "Streaming Bundle",
-    description: "Complete streaming setup for content creators",
-    price: 699.99,
-    originalPrice: 899.99,
-    category: "Professional",
-    rating: 4.9,
-    image: "/streaming-setup-bundle.jpg",
-    productCount: 6,
-    products: [
-      { id: 1, name: "Wireless Headphones", price: 129.99 },
-      { id: 11, name: "Webcam", price: 89.99 },
-      { id: 4, name: "Mechanical Keyboard", price: 159.99 },
-      { id: 8, name: "Wireless Mouse", price: 34.99 },
-      { id: 7, name: "Desk Lamp", price: 39.99 },
-      { id: 2, name: "USB-C Cable", price: 19.99 },
-    ],
-  },
-];
+import { useState, useEffect, useMemo } from "react";
 
 const ITEMS_PER_PAGE = 6;
 
+interface Package {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  discount?: number;
+  stock: number;
+  imageUrl: string | null;
+  category?: { id: number; name: string };
+}
+
 export default function PackagesPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState({
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<{
+    categories: string[];
+    priceRange: [number, number];
+    minRating: number;
+  }>({
     categories: [],
     priceRange: [0, 100000],
     minRating: 0,
   });
 
+  const [packages, setPackages] = useState<Package[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch packages from API
+  useEffect(() => {
+    async function fetchPackages() {
+      try {
+        const res = await fetch("/api/packages");
+        if (!res.ok) throw new Error("Failed to fetch packages");
+        const data: Package[] = await res.json();
+        setPackages(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPackages();
+  }, []);
+
   // Filter packages based on selected filters
   const filteredPackages = useMemo(() => {
-    return SAMPLE_PACKAGES.filter((pkg) => {
+    return packages.filter((pkg) => {
       const categoryMatch =
         filters.categories.length === 0 ||
-        filters.categories.includes(pkg.category);
+        filters.categories.includes(pkg.category?.name ?? "");
+
       const priceMatch =
         pkg.price >= filters.priceRange[0] &&
         pkg.price <= filters.priceRange[1];
-      const ratingMatch = pkg.rating >= filters.minRating;
 
-      return categoryMatch && priceMatch && ratingMatch;
+      const searchMatch =
+        searchQuery === "" ||
+        pkg.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return categoryMatch && priceMatch && searchMatch;
     });
-  }, [filters]);
+  }, [filters, packages, searchQuery]);
 
   // Paginate filtered packages
   const totalPages = Math.ceil(filteredPackages.length / ITEMS_PER_PAGE);
@@ -149,7 +77,6 @@ export default function PackagesPage() {
     return filteredPackages.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [filteredPackages, currentPage]);
 
-  
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
     setCurrentPage(1);
@@ -158,13 +85,28 @@ export default function PackagesPage() {
   return (
     <main className="min-h-screen font-poppins">
       <div className="mx-auto max-w-7xl px-4 py-30 sm:px-6 lg:px-8">
-        
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Packages</h1>
           <p className="mt-2 text-muted-foreground">
             Curated bundles of {filteredPackages.length} packages to save you
             money
           </p>
+        </div>
+
+        <div className="mb-4 flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search packages..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 rounded border border-border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+          />
+          <button
+            onClick={() => setCurrentPage(1)}
+            className="rounded bg-primary px-4 py-2 hover:bg-primary/90 text-white"
+          >
+            Search
+          </button>
         </div>
 
         {/* Main Content */}
@@ -179,7 +121,11 @@ export default function PackagesPage() {
 
           {/* Packages Section */}
           <div className="flex-1">
-            {paginatedPackages.length > 0 ? (
+            {loading ? (
+              <div className="text-center py-10 text-muted-foreground">
+                Loading packages...
+              </div>
+            ) : paginatedPackages.length > 0 ? (
               <>
                 <PackageGrid packages={paginatedPackages} />
                 <div className="mt-8">

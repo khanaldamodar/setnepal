@@ -35,11 +35,11 @@ export default function Navbar({ settings }: NavbarProps) {
 
   const handleSearch = () => {
     const input = document.querySelector<HTMLInputElement>(
-      'input[placeholder="Search products..."]'
+      'input[placeholder="Search products..."]',
     );
-    if (input?.value.trim() !== "") {
+    if (input && input.value.trim() !== "") {
       window.location.href = `/products?search=${encodeURIComponent(
-        input.value
+        input.value,
       )}`;
     }
   };

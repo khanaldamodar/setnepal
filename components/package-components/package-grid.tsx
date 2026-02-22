@@ -1,10 +1,9 @@
 "use client";
 
-import type React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCartContext } from "@/context/CartContext";
 
 interface Package {
@@ -12,49 +11,30 @@ interface Package {
   name: string;
   description: string;
   price: number;
-  originalPrice: number;
-  category: string;
-  imageUrl: string;
+  discount?: number;
   stock: number;
+  imageUrl: string | null;
+  category?: { id: number; name: string };
 }
 
-export function PackageGrid() {
+interface PackageGridProps {
+  packages: Package[];
+}
+
+export function PackageGrid({ packages }: PackageGridProps) {
   const { addToCart } = useCartContext();
-  const [packages, setPackages] = useState<Package[]>([]);
   const [addedItems, setAddedItems] = useState<Set<number>>(new Set());
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchPackages() {
-      try {
-        const res = await fetch("/api/packages");
-        if (!res.ok) throw new Error("Failed to fetch packages");
-        const data: Package[] = await res.json();
-        setPackages(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchPackages();
-  }, []);
-
-  const handleAddToCart = (e: React.MouseEvent, pkg: Package) => {
-    e.preventDefault();
+  const handleAddToCart = (pkg: Package) => {
     addToCart(
       {
         id: pkg.id,
         name: pkg.name,
         price: pkg.price,
-        image: pkg.imageUrl,
-        category:
-          typeof pkg.category === "string"
-            ? pkg.category
-            : pkg.category?.name ?? "",
-        type: "package",
+        image: pkg.imageUrl || "/placeholder.svg",
+        category: pkg.category?.name ?? "",
       },
-      1
+      1,
     );
 
     setAddedItems((prev) => new Set(prev).add(pkg.id));
@@ -67,14 +47,6 @@ export function PackageGrid() {
     }, 2000);
   };
 
-  if (loading) {
-    return (
-      <div className="text-center py-10 text-muted-foreground">
-        Loading packages...
-      </div>
-    );
-  }
-
   if (!packages.length) {
     return (
       <div className="text-center py-10 text-muted-foreground">
@@ -86,9 +58,7 @@ export function PackageGrid() {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {packages.map((pkg) => {
-        const discount = Math.round(
-          ((pkg.originalPrice - pkg.price) / pkg.originalPrice) * 100
-        );
+        const discount = pkg.discount ?? 0;
 
         return (
           <Link key={pkg.id} href={`/packages/${pkg.id}`}>
@@ -100,11 +70,11 @@ export function PackageGrid() {
                   alt={pkg.name}
                   className="h-full w-full object-cover transition-transform hover:scale-105"
                 />
-                {discount > 0 && (
+                {/* {discount > 0 && (
                   <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-sm font-bold">
                     -{discount}%
                   </div>
-                )}
+                )} */}
               </div>
 
               {/* Package Info */}
@@ -118,7 +88,7 @@ export function PackageGrid() {
                   </p>
                 </div>
 
-                {/* Product Count */}
+                {/* Stock */}
                 <div className="mb-3 text-xs text-muted-foreground">
                   <span className="font-medium">{pkg.stock} items</span>{" "}
                   included
@@ -136,16 +106,16 @@ export function PackageGrid() {
                     <span className="text-lg font-bold text-foreground">
                       Rs. {pkg.price.toFixed(2)}
                     </span>
-                    {pkg.originalPrice > pkg.price && (
+                    {discount > 0 && (
                       <span className="text-xs text-muted-foreground line-through">
-                        Rs. {pkg.originalPrice.toFixed(2)}
+                        Rs. {(pkg.price + discount).toFixed(2)}
                       </span>
                     )}
                   </div>
                   <Button
                     size="sm"
                     variant={addedItems.has(pkg.id) ? "default" : "default"}
-                    onClick={(e) => handleAddToCart(e, pkg)}
+                    onClick={() => handleAddToCart(pkg)}
                     className={
                       addedItems.has(pkg.id)
                         ? "bg-green-600 hover:bg-green-700"
