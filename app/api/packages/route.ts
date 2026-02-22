@@ -4,24 +4,19 @@ import { requireAuth } from "@/lib/auth";
 import { uploadFileToLocal } from "@/lib/local-uploader";
 
 export async function GET(req: NextRequest) {
+  const { search } = Object.fromEntries(req.nextUrl.searchParams);
+
   try {
     const packages = await prisma.package.findMany({
+      where: search
+        ? { name: { contains: String(search)} }
+        : {},
       include: {
-        packageProducts: {
-          include: {
-            product: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        packageProducts: { include: { product: true } },
         category: true,
       },
     });
+
     return NextResponse.json(packages);
   } catch (err) {
     console.error(err);

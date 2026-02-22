@@ -4,6 +4,7 @@ import { PackageFilters } from "@/components/package-components/package-filter";
 import { PackageGrid } from "@/components/package-components/package-grid";
 import { ProductPagination } from "@/components/Productpage-components/product-pagination";
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -21,6 +22,13 @@ interface Package {
 export default function PackagesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const search = searchParams.get("search") || "";
+    setSearchQuery(search);
+    setCurrentPage(1);
+  }, [searchParams]);
   const [filters, setFilters] = useState<{
     categories: string[];
     priceRange: [number, number];

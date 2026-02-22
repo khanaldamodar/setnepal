@@ -11,18 +11,20 @@ import { uploadFileToLocal } from "@/lib/local-uploader";
 // GET: Get all products (public)
 
 export async function GET(req: NextRequest) {
+  const { search } = Object.fromEntries(req.nextUrl.searchParams);
+
   try {
     const products = await prisma.product.findMany({
+      where: search
+        ? { name: { contains: String(search)} }
+        : {},
       include: {
         category: true,
         brand: true,
-        packageProducts: {
-          include: {
-            package: true,
-          },
-        },
+        packageProducts: { include: { package: true } },
       },
     });
+
     return NextResponse.json(products);
   } catch (err) {
     console.error(err);
