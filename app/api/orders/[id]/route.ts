@@ -23,7 +23,12 @@ export async function GET(
       where: { id: numericId },
       include: {
         user: true,
-        items: { include: { product: true } },
+        items: {
+          include: {
+            product: true,
+            package: true, 
+          },
+        },
         payments: true,
       },
     });

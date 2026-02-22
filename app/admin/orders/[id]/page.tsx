@@ -11,14 +11,18 @@ import Cookies from "js-cookie";
 
 interface OrderItem {
   id: number;
-  productId: number;
-  packageId: number;
+  productId: number | null;
+  packageId: number | null;
   price: number;
   quantity: number;
   product?: {
     id: number;
     name: string;
-  };
+  } | null;
+  package?: {
+    id: number;
+    name: string;
+  } | null;
 }
 
 interface OrderData {
@@ -88,7 +92,7 @@ export default function ViewOrderPage() {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       toast.success("Order updated successfully!");
@@ -230,7 +234,9 @@ export default function ViewOrderPage() {
                     <tr key={item.id} className="border-t hover:bg-gray-50">
                       <td className="px-4 py-2">{item.id}</td>
                       <td className="px-4 py-2">
-                        {item.product?.name || "Unknown Product"}
+                        {item.product?.name ||
+                          item.package?.name ||
+                          "Unknown Item"}
                       </td>
                       <td className="px-4 py-2">Rs. {item.price}</td>
                       <td className="px-4 py-2">{item.quantity}</td>
