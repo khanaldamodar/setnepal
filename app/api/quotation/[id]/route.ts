@@ -21,12 +21,13 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     const quotation = await prisma.quotation.findUnique({
       where: {id: numericId},
       include: {
-        items: {
-          include: {
-            product: true,
-          },
-        },
-      },
+  items: {
+    include: {
+      product: true,
+      package: true,
+    },
+  },
+},
     });
 
     if (!quotation) {

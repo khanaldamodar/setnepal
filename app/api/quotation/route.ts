@@ -9,6 +9,7 @@ export async function GET(req: Request) {
         items: {
           include: {
             product: true,
+            package: true,
           },
         },
       },
@@ -66,26 +67,49 @@ export async function POST(req: Request) {
     let total = 0;
 
     // Fetch product prices to avoid frontend manipulation
-    const productIds = items.map((i: any) => i.productId);
-    const products = await prisma.product.findMany({
-      where: { id: { in: productIds } },
-    });
+    
 
-    const quotationItems = items.map((item: any) => {
-      const product: any = products.find((p) => p.id === item.productId);
-      if (!product) throw new Error(`Product ID ${item.productId} not found`);
+const productIds = items
+  .filter((i: any) => i.productId != null) 
+  .map((i: any) => i.productId);
 
-      const price = product.price;
-      const subtotal = price * item.quantity;
-      total += subtotal;
+const packageIds = items
+  .filter((i: any) => i.packageId != null)
+  .map((i: any) => i.packageId);
 
-      return {
-        productId: item.productId,
-        quantity: item.quantity,
-        price,
-        subtotal,
-      };
-    });
+const products = await prisma.product.findMany({
+  where: { id: { in: productIds } },
+});
+const packages = await prisma.package.findMany({
+  where: { id: { in: packageIds } },
+});
+
+const quotationItems = items.map((item: any) => {
+  let price = 0;
+
+  if (item.productId) {
+    const product = products.find((p) => p.id === item.productId);
+    if (!product) throw new Error(`Product ID ${item.productId} not found`);
+    price = product.price;
+  } else if (item.packageId) {
+    const packageItem = packages.find((p) => p.id === item.packageId);
+    if (!packageItem) throw new Error(`Package ID ${item.packageId} not found`);
+    price = packageItem.price;
+  } else {
+    throw new Error("Item must have productId or packageId");
+  }
+
+  const subtotal = price * item.quantity;
+  total += subtotal;
+
+  return {
+    productId: item.productId ?? undefined,
+    packageId: item.packageId ?? undefined,
+    quantity: item.quantity,
+    price,
+    subtotal,
+  };
+});
 
     // Save quotation
     const quotation = await prisma.quotation.create({
@@ -105,6 +129,7 @@ export async function POST(req: Request) {
         items: {
           include: {
             product: true,
+            package: true,
           },
         },
       },

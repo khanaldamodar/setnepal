@@ -98,6 +98,7 @@ model Package {
 
   packageProducts PackageProduct[] // explicit many-to-many with quantity
   orderItems      OrderItem[]
+  quotationItems  QuotationItem[]
 }
 
 model Order {
@@ -236,8 +237,11 @@ model QuotationItem {
   quotationId Int
   quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
 
-  productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  packageId Int?
+  package   Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
 
   quantity Int   @default(1)
   price    Float

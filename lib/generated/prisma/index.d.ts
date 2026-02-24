@@ -2599,11 +2599,13 @@ export namespace Prisma {
   export type PackageCountOutputType = {
     packageProducts: number
     orderItems: number
+    quotationItems: number
   }
 
   export type PackageCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     packageProducts?: boolean | PackageCountOutputTypeCountPackageProductsArgs
     orderItems?: boolean | PackageCountOutputTypeCountOrderItemsArgs
+    quotationItems?: boolean | PackageCountOutputTypeCountQuotationItemsArgs
   }
 
   // Custom InputTypes
@@ -2629,6 +2631,13 @@ export namespace Prisma {
    */
   export type PackageCountOutputTypeCountOrderItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OrderItemWhereInput
+  }
+
+  /**
+   * PackageCountOutputType without action
+   */
+  export type PackageCountOutputTypeCountQuotationItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: QuotationItemWhereInput
   }
 
 
@@ -7362,6 +7371,7 @@ export namespace Prisma {
     createdBy?: boolean | Package$createdByArgs<ExtArgs>
     packageProducts?: boolean | Package$packageProductsArgs<ExtArgs>
     orderItems?: boolean | Package$orderItemsArgs<ExtArgs>
+    quotationItems?: boolean | Package$quotationItemsArgs<ExtArgs>
     _count?: boolean | PackageCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["package"]>
 
@@ -7390,6 +7400,7 @@ export namespace Prisma {
     createdBy?: boolean | Package$createdByArgs<ExtArgs>
     packageProducts?: boolean | Package$packageProductsArgs<ExtArgs>
     orderItems?: boolean | Package$orderItemsArgs<ExtArgs>
+    quotationItems?: boolean | Package$quotationItemsArgs<ExtArgs>
     _count?: boolean | PackageCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -7400,6 +7411,7 @@ export namespace Prisma {
       createdBy: Prisma.$UserPayload<ExtArgs> | null
       packageProducts: Prisma.$PackageProductPayload<ExtArgs>[]
       orderItems: Prisma.$OrderItemPayload<ExtArgs>[]
+      quotationItems: Prisma.$QuotationItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -7760,6 +7772,7 @@ export namespace Prisma {
     createdBy<T extends Package$createdByArgs<ExtArgs> = {}>(args?: Subset<T, Package$createdByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     packageProducts<T extends Package$packageProductsArgs<ExtArgs> = {}>(args?: Subset<T, Package$packageProductsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackageProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     orderItems<T extends Package$orderItemsArgs<ExtArgs> = {}>(args?: Subset<T, Package$orderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    quotationItems<T extends Package$quotationItemsArgs<ExtArgs> = {}>(args?: Subset<T, Package$quotationItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuotationItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8229,6 +8242,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: OrderItemScalarFieldEnum | OrderItemScalarFieldEnum[]
+  }
+
+  /**
+   * Package.quotationItems
+   */
+  export type Package$quotationItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuotationItem
+     */
+    select?: QuotationItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuotationItem
+     */
+    omit?: QuotationItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuotationItemInclude<ExtArgs> | null
+    where?: QuotationItemWhereInput
+    orderBy?: QuotationItemOrderByWithRelationInput | QuotationItemOrderByWithRelationInput[]
+    cursor?: QuotationItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: QuotationItemScalarFieldEnum | QuotationItemScalarFieldEnum[]
   }
 
   /**
@@ -17326,6 +17363,7 @@ export namespace Prisma {
     id: number | null
     quotationId: number | null
     productId: number | null
+    packageId: number | null
     quantity: number | null
     price: number | null
     subtotal: number | null
@@ -17335,6 +17373,7 @@ export namespace Prisma {
     id: number | null
     quotationId: number | null
     productId: number | null
+    packageId: number | null
     quantity: number | null
     price: number | null
     subtotal: number | null
@@ -17344,6 +17383,7 @@ export namespace Prisma {
     id: number | null
     quotationId: number | null
     productId: number | null
+    packageId: number | null
     quantity: number | null
     price: number | null
     subtotal: number | null
@@ -17353,6 +17393,7 @@ export namespace Prisma {
     id: number | null
     quotationId: number | null
     productId: number | null
+    packageId: number | null
     quantity: number | null
     price: number | null
     subtotal: number | null
@@ -17362,6 +17403,7 @@ export namespace Prisma {
     id: number
     quotationId: number
     productId: number
+    packageId: number
     quantity: number
     price: number
     subtotal: number
@@ -17373,6 +17415,7 @@ export namespace Prisma {
     id?: true
     quotationId?: true
     productId?: true
+    packageId?: true
     quantity?: true
     price?: true
     subtotal?: true
@@ -17382,6 +17425,7 @@ export namespace Prisma {
     id?: true
     quotationId?: true
     productId?: true
+    packageId?: true
     quantity?: true
     price?: true
     subtotal?: true
@@ -17391,6 +17435,7 @@ export namespace Prisma {
     id?: true
     quotationId?: true
     productId?: true
+    packageId?: true
     quantity?: true
     price?: true
     subtotal?: true
@@ -17400,6 +17445,7 @@ export namespace Prisma {
     id?: true
     quotationId?: true
     productId?: true
+    packageId?: true
     quantity?: true
     price?: true
     subtotal?: true
@@ -17409,6 +17455,7 @@ export namespace Prisma {
     id?: true
     quotationId?: true
     productId?: true
+    packageId?: true
     quantity?: true
     price?: true
     subtotal?: true
@@ -17504,7 +17551,8 @@ export namespace Prisma {
   export type QuotationItemGroupByOutputType = {
     id: number
     quotationId: number
-    productId: number
+    productId: number | null
+    packageId: number | null
     quantity: number
     price: number
     subtotal: number
@@ -17533,11 +17581,13 @@ export namespace Prisma {
     id?: boolean
     quotationId?: boolean
     productId?: boolean
+    packageId?: boolean
     quantity?: boolean
     price?: boolean
     subtotal?: boolean
     quotation?: boolean | QuotationDefaultArgs<ExtArgs>
-    product?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | QuotationItem$productArgs<ExtArgs>
+    package?: boolean | QuotationItem$packageArgs<ExtArgs>
   }, ExtArgs["result"]["quotationItem"]>
 
 
@@ -17546,27 +17596,31 @@ export namespace Prisma {
     id?: boolean
     quotationId?: boolean
     productId?: boolean
+    packageId?: boolean
     quantity?: boolean
     price?: boolean
     subtotal?: boolean
   }
 
-  export type QuotationItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "quotationId" | "productId" | "quantity" | "price" | "subtotal", ExtArgs["result"]["quotationItem"]>
+  export type QuotationItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "quotationId" | "productId" | "packageId" | "quantity" | "price" | "subtotal", ExtArgs["result"]["quotationItem"]>
   export type QuotationItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     quotation?: boolean | QuotationDefaultArgs<ExtArgs>
-    product?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | QuotationItem$productArgs<ExtArgs>
+    package?: boolean | QuotationItem$packageArgs<ExtArgs>
   }
 
   export type $QuotationItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "QuotationItem"
     objects: {
       quotation: Prisma.$QuotationPayload<ExtArgs>
-      product: Prisma.$ProductPayload<ExtArgs>
+      product: Prisma.$ProductPayload<ExtArgs> | null
+      package: Prisma.$PackagePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       quotationId: number
-      productId: number
+      productId: number | null
+      packageId: number | null
       quantity: number
       price: number
       subtotal: number
@@ -17911,7 +17965,8 @@ export namespace Prisma {
   export interface Prisma__QuotationItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     quotation<T extends QuotationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, QuotationDefaultArgs<ExtArgs>>): Prisma__QuotationClient<$Result.GetResult<Prisma.$QuotationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    product<T extends QuotationItem$productArgs<ExtArgs> = {}>(args?: Subset<T, QuotationItem$productArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    package<T extends QuotationItem$packageArgs<ExtArgs> = {}>(args?: Subset<T, QuotationItem$packageArgs<ExtArgs>>): Prisma__PackageClient<$Result.GetResult<Prisma.$PackagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17944,6 +17999,7 @@ export namespace Prisma {
     readonly id: FieldRef<"QuotationItem", 'Int'>
     readonly quotationId: FieldRef<"QuotationItem", 'Int'>
     readonly productId: FieldRef<"QuotationItem", 'Int'>
+    readonly packageId: FieldRef<"QuotationItem", 'Int'>
     readonly quantity: FieldRef<"QuotationItem", 'Int'>
     readonly price: FieldRef<"QuotationItem", 'Float'>
     readonly subtotal: FieldRef<"QuotationItem", 'Float'>
@@ -18287,6 +18343,44 @@ export namespace Prisma {
      * Limit how many QuotationItems to delete.
      */
     limit?: number
+  }
+
+  /**
+   * QuotationItem.product
+   */
+  export type QuotationItem$productArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Product
+     */
+    select?: ProductSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Product
+     */
+    omit?: ProductOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductInclude<ExtArgs> | null
+    where?: ProductWhereInput
+  }
+
+  /**
+   * QuotationItem.package
+   */
+  export type QuotationItem$packageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Package
+     */
+    select?: PackageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Package
+     */
+    omit?: PackageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageInclude<ExtArgs> | null
+    where?: PackageWhereInput
   }
 
   /**
@@ -22290,6 +22384,7 @@ export namespace Prisma {
     id: 'id',
     quotationId: 'quotationId',
     productId: 'productId',
+    packageId: 'packageId',
     quantity: 'quantity',
     price: 'price',
     subtotal: 'subtotal'
@@ -22978,6 +23073,7 @@ export namespace Prisma {
     createdBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     packageProducts?: PackageProductListRelationFilter
     orderItems?: OrderItemListRelationFilter
+    quotationItems?: QuotationItemListRelationFilter
   }
 
   export type PackageOrderByWithRelationInput = {
@@ -22999,6 +23095,7 @@ export namespace Prisma {
     createdBy?: UserOrderByWithRelationInput
     packageProducts?: PackageProductOrderByRelationAggregateInput
     orderItems?: OrderItemOrderByRelationAggregateInput
+    quotationItems?: QuotationItemOrderByRelationAggregateInput
     _relevance?: PackageOrderByRelevanceInput
   }
 
@@ -23024,6 +23121,7 @@ export namespace Prisma {
     createdBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     packageProducts?: PackageProductListRelationFilter
     orderItems?: OrderItemListRelationFilter
+    quotationItems?: QuotationItemListRelationFilter
   }, "id">
 
   export type PackageOrderByWithAggregationInput = {
@@ -23751,23 +23849,27 @@ export namespace Prisma {
     NOT?: QuotationItemWhereInput | QuotationItemWhereInput[]
     id?: IntFilter<"QuotationItem"> | number
     quotationId?: IntFilter<"QuotationItem"> | number
-    productId?: IntFilter<"QuotationItem"> | number
+    productId?: IntNullableFilter<"QuotationItem"> | number | null
+    packageId?: IntNullableFilter<"QuotationItem"> | number | null
     quantity?: IntFilter<"QuotationItem"> | number
     price?: FloatFilter<"QuotationItem"> | number
     subtotal?: FloatFilter<"QuotationItem"> | number
     quotation?: XOR<QuotationScalarRelationFilter, QuotationWhereInput>
-    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    product?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
+    package?: XOR<PackageNullableScalarRelationFilter, PackageWhereInput> | null
   }
 
   export type QuotationItemOrderByWithRelationInput = {
     id?: SortOrder
     quotationId?: SortOrder
-    productId?: SortOrder
+    productId?: SortOrderInput | SortOrder
+    packageId?: SortOrderInput | SortOrder
     quantity?: SortOrder
     price?: SortOrder
     subtotal?: SortOrder
     quotation?: QuotationOrderByWithRelationInput
     product?: ProductOrderByWithRelationInput
+    package?: PackageOrderByWithRelationInput
   }
 
   export type QuotationItemWhereUniqueInput = Prisma.AtLeast<{
@@ -23776,18 +23878,21 @@ export namespace Prisma {
     OR?: QuotationItemWhereInput[]
     NOT?: QuotationItemWhereInput | QuotationItemWhereInput[]
     quotationId?: IntFilter<"QuotationItem"> | number
-    productId?: IntFilter<"QuotationItem"> | number
+    productId?: IntNullableFilter<"QuotationItem"> | number | null
+    packageId?: IntNullableFilter<"QuotationItem"> | number | null
     quantity?: IntFilter<"QuotationItem"> | number
     price?: FloatFilter<"QuotationItem"> | number
     subtotal?: FloatFilter<"QuotationItem"> | number
     quotation?: XOR<QuotationScalarRelationFilter, QuotationWhereInput>
-    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    product?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
+    package?: XOR<PackageNullableScalarRelationFilter, PackageWhereInput> | null
   }, "id">
 
   export type QuotationItemOrderByWithAggregationInput = {
     id?: SortOrder
     quotationId?: SortOrder
-    productId?: SortOrder
+    productId?: SortOrderInput | SortOrder
+    packageId?: SortOrderInput | SortOrder
     quantity?: SortOrder
     price?: SortOrder
     subtotal?: SortOrder
@@ -23804,7 +23909,8 @@ export namespace Prisma {
     NOT?: QuotationItemScalarWhereWithAggregatesInput | QuotationItemScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"QuotationItem"> | number
     quotationId?: IntWithAggregatesFilter<"QuotationItem"> | number
-    productId?: IntWithAggregatesFilter<"QuotationItem"> | number
+    productId?: IntNullableWithAggregatesFilter<"QuotationItem"> | number | null
+    packageId?: IntNullableWithAggregatesFilter<"QuotationItem"> | number | null
     quantity?: IntWithAggregatesFilter<"QuotationItem"> | number
     price?: FloatWithAggregatesFilter<"QuotationItem"> | number
     subtotal?: FloatWithAggregatesFilter<"QuotationItem"> | number
@@ -24393,6 +24499,7 @@ export namespace Prisma {
     createdBy?: UserCreateNestedOneWithoutPackagesCreatedInput
     packageProducts?: PackageProductCreateNestedManyWithoutPackageInput
     orderItems?: OrderItemCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUncheckedCreateInput = {
@@ -24412,6 +24519,7 @@ export namespace Prisma {
     benefits?: NullableJsonNullValueInput | InputJsonValue
     packageProducts?: PackageProductUncheckedCreateNestedManyWithoutPackageInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemUncheckedCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUpdateInput = {
@@ -24430,6 +24538,7 @@ export namespace Prisma {
     createdBy?: UserUpdateOneWithoutPackagesCreatedNestedInput
     packageProducts?: PackageProductUpdateManyWithoutPackageNestedInput
     orderItems?: OrderItemUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateInput = {
@@ -24449,6 +24558,7 @@ export namespace Prisma {
     benefits?: NullableJsonNullValueInput | InputJsonValue
     packageProducts?: PackageProductUncheckedUpdateManyWithoutPackageNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUncheckedUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageCreateManyInput = {
@@ -25200,13 +25310,15 @@ export namespace Prisma {
     price: number
     subtotal: number
     quotation: QuotationCreateNestedOneWithoutItemsInput
-    product: ProductCreateNestedOneWithoutQuotationItemsInput
+    product?: ProductCreateNestedOneWithoutQuotationItemsInput
+    package?: PackageCreateNestedOneWithoutQuotationItemsInput
   }
 
   export type QuotationItemUncheckedCreateInput = {
     id?: number
     quotationId: number
-    productId: number
+    productId?: number | null
+    packageId?: number | null
     quantity?: number
     price: number
     subtotal: number
@@ -25217,13 +25329,15 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number
     quotation?: QuotationUpdateOneRequiredWithoutItemsNestedInput
-    product?: ProductUpdateOneRequiredWithoutQuotationItemsNestedInput
+    product?: ProductUpdateOneWithoutQuotationItemsNestedInput
+    package?: PackageUpdateOneWithoutQuotationItemsNestedInput
   }
 
   export type QuotationItemUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     quotationId?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    packageId?: NullableIntFieldUpdateOperationsInput | number | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number
@@ -25232,7 +25346,8 @@ export namespace Prisma {
   export type QuotationItemCreateManyInput = {
     id?: number
     quotationId: number
-    productId: number
+    productId?: number | null
+    packageId?: number | null
     quantity?: number
     price: number
     subtotal: number
@@ -25247,7 +25362,8 @@ export namespace Prisma {
   export type QuotationItemUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     quotationId?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    packageId?: NullableIntFieldUpdateOperationsInput | number | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number
@@ -26676,15 +26792,11 @@ export namespace Prisma {
     isNot?: QuotationWhereInput
   }
 
-  export type ProductScalarRelationFilter = {
-    is?: ProductWhereInput
-    isNot?: ProductWhereInput
-  }
-
   export type QuotationItemCountOrderByAggregateInput = {
     id?: SortOrder
     quotationId?: SortOrder
     productId?: SortOrder
+    packageId?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
     subtotal?: SortOrder
@@ -26694,6 +26806,7 @@ export namespace Prisma {
     id?: SortOrder
     quotationId?: SortOrder
     productId?: SortOrder
+    packageId?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
     subtotal?: SortOrder
@@ -26703,6 +26816,7 @@ export namespace Prisma {
     id?: SortOrder
     quotationId?: SortOrder
     productId?: SortOrder
+    packageId?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
     subtotal?: SortOrder
@@ -26712,6 +26826,7 @@ export namespace Prisma {
     id?: SortOrder
     quotationId?: SortOrder
     productId?: SortOrder
+    packageId?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
     subtotal?: SortOrder
@@ -26721,6 +26836,7 @@ export namespace Prisma {
     id?: SortOrder
     quotationId?: SortOrder
     productId?: SortOrder
+    packageId?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
     subtotal?: SortOrder
@@ -26855,6 +26971,11 @@ export namespace Prisma {
   export type PackageScalarRelationFilter = {
     is?: PackageWhereInput
     isNot?: PackageWhereInput
+  }
+
+  export type ProductScalarRelationFilter = {
+    is?: ProductWhereInput
+    isNot?: ProductWhereInput
   }
 
   export type PackageProductPackageIdProductIdCompoundUniqueInput = {
@@ -27443,6 +27564,13 @@ export namespace Prisma {
     connect?: OrderItemWhereUniqueInput | OrderItemWhereUniqueInput[]
   }
 
+  export type QuotationItemCreateNestedManyWithoutPackageInput = {
+    create?: XOR<QuotationItemCreateWithoutPackageInput, QuotationItemUncheckedCreateWithoutPackageInput> | QuotationItemCreateWithoutPackageInput[] | QuotationItemUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: QuotationItemCreateOrConnectWithoutPackageInput | QuotationItemCreateOrConnectWithoutPackageInput[]
+    createMany?: QuotationItemCreateManyPackageInputEnvelope
+    connect?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
+  }
+
   export type PackageProductUncheckedCreateNestedManyWithoutPackageInput = {
     create?: XOR<PackageProductCreateWithoutPackageInput, PackageProductUncheckedCreateWithoutPackageInput> | PackageProductCreateWithoutPackageInput[] | PackageProductUncheckedCreateWithoutPackageInput[]
     connectOrCreate?: PackageProductCreateOrConnectWithoutPackageInput | PackageProductCreateOrConnectWithoutPackageInput[]
@@ -27455,6 +27583,13 @@ export namespace Prisma {
     connectOrCreate?: OrderItemCreateOrConnectWithoutPackageInput | OrderItemCreateOrConnectWithoutPackageInput[]
     createMany?: OrderItemCreateManyPackageInputEnvelope
     connect?: OrderItemWhereUniqueInput | OrderItemWhereUniqueInput[]
+  }
+
+  export type QuotationItemUncheckedCreateNestedManyWithoutPackageInput = {
+    create?: XOR<QuotationItemCreateWithoutPackageInput, QuotationItemUncheckedCreateWithoutPackageInput> | QuotationItemCreateWithoutPackageInput[] | QuotationItemUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: QuotationItemCreateOrConnectWithoutPackageInput | QuotationItemCreateOrConnectWithoutPackageInput[]
+    createMany?: QuotationItemCreateManyPackageInputEnvelope
+    connect?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
   }
 
   export type CategoryUpdateOneWithoutPackagesNestedInput = {
@@ -27505,6 +27640,20 @@ export namespace Prisma {
     deleteMany?: OrderItemScalarWhereInput | OrderItemScalarWhereInput[]
   }
 
+  export type QuotationItemUpdateManyWithoutPackageNestedInput = {
+    create?: XOR<QuotationItemCreateWithoutPackageInput, QuotationItemUncheckedCreateWithoutPackageInput> | QuotationItemCreateWithoutPackageInput[] | QuotationItemUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: QuotationItemCreateOrConnectWithoutPackageInput | QuotationItemCreateOrConnectWithoutPackageInput[]
+    upsert?: QuotationItemUpsertWithWhereUniqueWithoutPackageInput | QuotationItemUpsertWithWhereUniqueWithoutPackageInput[]
+    createMany?: QuotationItemCreateManyPackageInputEnvelope
+    set?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
+    disconnect?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
+    delete?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
+    connect?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
+    update?: QuotationItemUpdateWithWhereUniqueWithoutPackageInput | QuotationItemUpdateWithWhereUniqueWithoutPackageInput[]
+    updateMany?: QuotationItemUpdateManyWithWhereWithoutPackageInput | QuotationItemUpdateManyWithWhereWithoutPackageInput[]
+    deleteMany?: QuotationItemScalarWhereInput | QuotationItemScalarWhereInput[]
+  }
+
   export type PackageProductUncheckedUpdateManyWithoutPackageNestedInput = {
     create?: XOR<PackageProductCreateWithoutPackageInput, PackageProductUncheckedCreateWithoutPackageInput> | PackageProductCreateWithoutPackageInput[] | PackageProductUncheckedCreateWithoutPackageInput[]
     connectOrCreate?: PackageProductCreateOrConnectWithoutPackageInput | PackageProductCreateOrConnectWithoutPackageInput[]
@@ -27531,6 +27680,20 @@ export namespace Prisma {
     update?: OrderItemUpdateWithWhereUniqueWithoutPackageInput | OrderItemUpdateWithWhereUniqueWithoutPackageInput[]
     updateMany?: OrderItemUpdateManyWithWhereWithoutPackageInput | OrderItemUpdateManyWithWhereWithoutPackageInput[]
     deleteMany?: OrderItemScalarWhereInput | OrderItemScalarWhereInput[]
+  }
+
+  export type QuotationItemUncheckedUpdateManyWithoutPackageNestedInput = {
+    create?: XOR<QuotationItemCreateWithoutPackageInput, QuotationItemUncheckedCreateWithoutPackageInput> | QuotationItemCreateWithoutPackageInput[] | QuotationItemUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: QuotationItemCreateOrConnectWithoutPackageInput | QuotationItemCreateOrConnectWithoutPackageInput[]
+    upsert?: QuotationItemUpsertWithWhereUniqueWithoutPackageInput | QuotationItemUpsertWithWhereUniqueWithoutPackageInput[]
+    createMany?: QuotationItemCreateManyPackageInputEnvelope
+    set?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
+    disconnect?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
+    delete?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
+    connect?: QuotationItemWhereUniqueInput | QuotationItemWhereUniqueInput[]
+    update?: QuotationItemUpdateWithWhereUniqueWithoutPackageInput | QuotationItemUpdateWithWhereUniqueWithoutPackageInput[]
+    updateMany?: QuotationItemUpdateManyWithWhereWithoutPackageInput | QuotationItemUpdateManyWithWhereWithoutPackageInput[]
+    deleteMany?: QuotationItemScalarWhereInput | QuotationItemScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutOrdersInput = {
@@ -27831,6 +27994,12 @@ export namespace Prisma {
     connect?: ProductWhereUniqueInput
   }
 
+  export type PackageCreateNestedOneWithoutQuotationItemsInput = {
+    create?: XOR<PackageCreateWithoutQuotationItemsInput, PackageUncheckedCreateWithoutQuotationItemsInput>
+    connectOrCreate?: PackageCreateOrConnectWithoutQuotationItemsInput
+    connect?: PackageWhereUniqueInput
+  }
+
   export type QuotationUpdateOneRequiredWithoutItemsNestedInput = {
     create?: XOR<QuotationCreateWithoutItemsInput, QuotationUncheckedCreateWithoutItemsInput>
     connectOrCreate?: QuotationCreateOrConnectWithoutItemsInput
@@ -27839,12 +28008,24 @@ export namespace Prisma {
     update?: XOR<XOR<QuotationUpdateToOneWithWhereWithoutItemsInput, QuotationUpdateWithoutItemsInput>, QuotationUncheckedUpdateWithoutItemsInput>
   }
 
-  export type ProductUpdateOneRequiredWithoutQuotationItemsNestedInput = {
+  export type ProductUpdateOneWithoutQuotationItemsNestedInput = {
     create?: XOR<ProductCreateWithoutQuotationItemsInput, ProductUncheckedCreateWithoutQuotationItemsInput>
     connectOrCreate?: ProductCreateOrConnectWithoutQuotationItemsInput
     upsert?: ProductUpsertWithoutQuotationItemsInput
+    disconnect?: ProductWhereInput | boolean
+    delete?: ProductWhereInput | boolean
     connect?: ProductWhereUniqueInput
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutQuotationItemsInput, ProductUpdateWithoutQuotationItemsInput>, ProductUncheckedUpdateWithoutQuotationItemsInput>
+  }
+
+  export type PackageUpdateOneWithoutQuotationItemsNestedInput = {
+    create?: XOR<PackageCreateWithoutQuotationItemsInput, PackageUncheckedCreateWithoutQuotationItemsInput>
+    connectOrCreate?: PackageCreateOrConnectWithoutQuotationItemsInput
+    upsert?: PackageUpsertWithoutQuotationItemsInput
+    disconnect?: PackageWhereInput | boolean
+    delete?: PackageWhereInput | boolean
+    connect?: PackageWhereUniqueInput
+    update?: XOR<XOR<PackageUpdateToOneWithWhereWithoutQuotationItemsInput, PackageUpdateWithoutQuotationItemsInput>, PackageUncheckedUpdateWithoutQuotationItemsInput>
   }
 
   export type PackageCreateNestedOneWithoutPackageProductsInput = {
@@ -28261,6 +28442,7 @@ export namespace Prisma {
     category?: CategoryCreateNestedOneWithoutPackagesInput
     packageProducts?: PackageProductCreateNestedManyWithoutPackageInput
     orderItems?: OrderItemCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUncheckedCreateWithoutCreatedByInput = {
@@ -28279,6 +28461,7 @@ export namespace Prisma {
     benefits?: NullableJsonNullValueInput | InputJsonValue
     packageProducts?: PackageProductUncheckedCreateNestedManyWithoutPackageInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemUncheckedCreateNestedManyWithoutPackageInput
   }
 
   export type PackageCreateOrConnectWithoutCreatedByInput = {
@@ -28562,6 +28745,7 @@ export namespace Prisma {
     createdBy?: UserCreateNestedOneWithoutPackagesCreatedInput
     packageProducts?: PackageProductCreateNestedManyWithoutPackageInput
     orderItems?: OrderItemCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUncheckedCreateWithoutCategoryInput = {
@@ -28580,6 +28764,7 @@ export namespace Prisma {
     benefits?: NullableJsonNullValueInput | InputJsonValue
     packageProducts?: PackageProductUncheckedCreateNestedManyWithoutPackageInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemUncheckedCreateNestedManyWithoutPackageInput
   }
 
   export type PackageCreateOrConnectWithoutCategoryInput = {
@@ -28810,11 +28995,13 @@ export namespace Prisma {
     price: number
     subtotal: number
     quotation: QuotationCreateNestedOneWithoutItemsInput
+    package?: PackageCreateNestedOneWithoutQuotationItemsInput
   }
 
   export type QuotationItemUncheckedCreateWithoutProductInput = {
     id?: number
     quotationId: number
+    packageId?: number | null
     quantity?: number
     price: number
     subtotal: number
@@ -28992,7 +29179,8 @@ export namespace Prisma {
     NOT?: QuotationItemScalarWhereInput | QuotationItemScalarWhereInput[]
     id?: IntFilter<"QuotationItem"> | number
     quotationId?: IntFilter<"QuotationItem"> | number
-    productId?: IntFilter<"QuotationItem"> | number
+    productId?: IntNullableFilter<"QuotationItem"> | number | null
+    packageId?: IntNullableFilter<"QuotationItem"> | number | null
     quantity?: IntFilter<"QuotationItem"> | number
     price?: FloatFilter<"QuotationItem"> | number
     subtotal?: FloatFilter<"QuotationItem"> | number
@@ -29098,6 +29286,33 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type QuotationItemCreateWithoutPackageInput = {
+    quantity?: number
+    price: number
+    subtotal: number
+    quotation: QuotationCreateNestedOneWithoutItemsInput
+    product?: ProductCreateNestedOneWithoutQuotationItemsInput
+  }
+
+  export type QuotationItemUncheckedCreateWithoutPackageInput = {
+    id?: number
+    quotationId: number
+    productId?: number | null
+    quantity?: number
+    price: number
+    subtotal: number
+  }
+
+  export type QuotationItemCreateOrConnectWithoutPackageInput = {
+    where: QuotationItemWhereUniqueInput
+    create: XOR<QuotationItemCreateWithoutPackageInput, QuotationItemUncheckedCreateWithoutPackageInput>
+  }
+
+  export type QuotationItemCreateManyPackageInputEnvelope = {
+    data: QuotationItemCreateManyPackageInput | QuotationItemCreateManyPackageInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CategoryUpsertWithoutPackagesInput = {
     update: XOR<CategoryUpdateWithoutPackagesInput, CategoryUncheckedUpdateWithoutPackagesInput>
     create: XOR<CategoryCreateWithoutPackagesInput, CategoryUncheckedCreateWithoutPackagesInput>
@@ -29194,6 +29409,22 @@ export namespace Prisma {
   export type OrderItemUpdateManyWithWhereWithoutPackageInput = {
     where: OrderItemScalarWhereInput
     data: XOR<OrderItemUpdateManyMutationInput, OrderItemUncheckedUpdateManyWithoutPackageInput>
+  }
+
+  export type QuotationItemUpsertWithWhereUniqueWithoutPackageInput = {
+    where: QuotationItemWhereUniqueInput
+    update: XOR<QuotationItemUpdateWithoutPackageInput, QuotationItemUncheckedUpdateWithoutPackageInput>
+    create: XOR<QuotationItemCreateWithoutPackageInput, QuotationItemUncheckedCreateWithoutPackageInput>
+  }
+
+  export type QuotationItemUpdateWithWhereUniqueWithoutPackageInput = {
+    where: QuotationItemWhereUniqueInput
+    data: XOR<QuotationItemUpdateWithoutPackageInput, QuotationItemUncheckedUpdateWithoutPackageInput>
+  }
+
+  export type QuotationItemUpdateManyWithWhereWithoutPackageInput = {
+    where: QuotationItemScalarWhereInput
+    data: XOR<QuotationItemUpdateManyMutationInput, QuotationItemUncheckedUpdateManyWithoutPackageInput>
   }
 
   export type UserCreateWithoutOrdersInput = {
@@ -29459,6 +29690,7 @@ export namespace Prisma {
     category?: CategoryCreateNestedOneWithoutPackagesInput
     createdBy?: UserCreateNestedOneWithoutPackagesCreatedInput
     packageProducts?: PackageProductCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUncheckedCreateWithoutOrderItemsInput = {
@@ -29477,6 +29709,7 @@ export namespace Prisma {
     createdById?: number | null
     benefits?: NullableJsonNullValueInput | InputJsonValue
     packageProducts?: PackageProductUncheckedCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemUncheckedCreateNestedManyWithoutPackageInput
   }
 
   export type PackageCreateOrConnectWithoutOrderItemsInput = {
@@ -29598,6 +29831,7 @@ export namespace Prisma {
     category?: CategoryUpdateOneWithoutPackagesNestedInput
     createdBy?: UserUpdateOneWithoutPackagesCreatedNestedInput
     packageProducts?: PackageProductUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateWithoutOrderItemsInput = {
@@ -29616,6 +29850,7 @@ export namespace Prisma {
     createdById?: NullableIntFieldUpdateOperationsInput | number | null
     benefits?: NullableJsonNullValueInput | InputJsonValue
     packageProducts?: PackageProductUncheckedUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUncheckedUpdateManyWithoutPackageNestedInput
   }
 
   export type OrderCreateWithoutPaymentsInput = {
@@ -29860,12 +30095,14 @@ export namespace Prisma {
     quantity?: number
     price: number
     subtotal: number
-    product: ProductCreateNestedOneWithoutQuotationItemsInput
+    product?: ProductCreateNestedOneWithoutQuotationItemsInput
+    package?: PackageCreateNestedOneWithoutQuotationItemsInput
   }
 
   export type QuotationItemUncheckedCreateWithoutQuotationInput = {
     id?: number
-    productId: number
+    productId?: number | null
+    packageId?: number | null
     quantity?: number
     price: number
     subtotal: number
@@ -29975,6 +30212,48 @@ export namespace Prisma {
     create: XOR<ProductCreateWithoutQuotationItemsInput, ProductUncheckedCreateWithoutQuotationItemsInput>
   }
 
+  export type PackageCreateWithoutQuotationItemsInput = {
+    name: string
+    description?: string | null
+    price: number
+    discount?: number | null
+    stock?: number
+    imageUrl?: string | null
+    isFeatured?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    benefits?: NullableJsonNullValueInput | InputJsonValue
+    category?: CategoryCreateNestedOneWithoutPackagesInput
+    createdBy?: UserCreateNestedOneWithoutPackagesCreatedInput
+    packageProducts?: PackageProductCreateNestedManyWithoutPackageInput
+    orderItems?: OrderItemCreateNestedManyWithoutPackageInput
+  }
+
+  export type PackageUncheckedCreateWithoutQuotationItemsInput = {
+    id?: number
+    name: string
+    description?: string | null
+    price: number
+    discount?: number | null
+    stock?: number
+    imageUrl?: string | null
+    isFeatured?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    categoryId?: number | null
+    createdById?: number | null
+    benefits?: NullableJsonNullValueInput | InputJsonValue
+    packageProducts?: PackageProductUncheckedCreateNestedManyWithoutPackageInput
+    orderItems?: OrderItemUncheckedCreateNestedManyWithoutPackageInput
+  }
+
+  export type PackageCreateOrConnectWithoutQuotationItemsInput = {
+    where: PackageWhereUniqueInput
+    create: XOR<PackageCreateWithoutQuotationItemsInput, PackageUncheckedCreateWithoutQuotationItemsInput>
+  }
+
   export type QuotationUpsertWithoutItemsInput = {
     update: XOR<QuotationUpdateWithoutItemsInput, QuotationUncheckedUpdateWithoutItemsInput>
     create: XOR<QuotationCreateWithoutItemsInput, QuotationUncheckedCreateWithoutItemsInput>
@@ -30065,6 +30344,54 @@ export namespace Prisma {
     orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
   }
 
+  export type PackageUpsertWithoutQuotationItemsInput = {
+    update: XOR<PackageUpdateWithoutQuotationItemsInput, PackageUncheckedUpdateWithoutQuotationItemsInput>
+    create: XOR<PackageCreateWithoutQuotationItemsInput, PackageUncheckedCreateWithoutQuotationItemsInput>
+    where?: PackageWhereInput
+  }
+
+  export type PackageUpdateToOneWithWhereWithoutQuotationItemsInput = {
+    where?: PackageWhereInput
+    data: XOR<PackageUpdateWithoutQuotationItemsInput, PackageUncheckedUpdateWithoutQuotationItemsInput>
+  }
+
+  export type PackageUpdateWithoutQuotationItemsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    discount?: NullableFloatFieldUpdateOperationsInput | number | null
+    stock?: IntFieldUpdateOperationsInput | number
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    benefits?: NullableJsonNullValueInput | InputJsonValue
+    category?: CategoryUpdateOneWithoutPackagesNestedInput
+    createdBy?: UserUpdateOneWithoutPackagesCreatedNestedInput
+    packageProducts?: PackageProductUpdateManyWithoutPackageNestedInput
+    orderItems?: OrderItemUpdateManyWithoutPackageNestedInput
+  }
+
+  export type PackageUncheckedUpdateWithoutQuotationItemsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    discount?: NullableFloatFieldUpdateOperationsInput | number | null
+    stock?: IntFieldUpdateOperationsInput | number
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFeatured?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    categoryId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdById?: NullableIntFieldUpdateOperationsInput | number | null
+    benefits?: NullableJsonNullValueInput | InputJsonValue
+    packageProducts?: PackageProductUncheckedUpdateManyWithoutPackageNestedInput
+    orderItems?: OrderItemUncheckedUpdateManyWithoutPackageNestedInput
+  }
+
   export type PackageCreateWithoutPackageProductsInput = {
     name: string
     description?: string | null
@@ -30080,6 +30407,7 @@ export namespace Prisma {
     category?: CategoryCreateNestedOneWithoutPackagesInput
     createdBy?: UserCreateNestedOneWithoutPackagesCreatedInput
     orderItems?: OrderItemCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUncheckedCreateWithoutPackageProductsInput = {
@@ -30098,6 +30426,7 @@ export namespace Prisma {
     createdById?: number | null
     benefits?: NullableJsonNullValueInput | InputJsonValue
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutPackageInput
+    quotationItems?: QuotationItemUncheckedCreateNestedManyWithoutPackageInput
   }
 
   export type PackageCreateOrConnectWithoutPackageProductsInput = {
@@ -30177,6 +30506,7 @@ export namespace Prisma {
     category?: CategoryUpdateOneWithoutPackagesNestedInput
     createdBy?: UserUpdateOneWithoutPackagesCreatedNestedInput
     orderItems?: OrderItemUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateWithoutPackageProductsInput = {
@@ -30195,6 +30525,7 @@ export namespace Prisma {
     createdById?: NullableIntFieldUpdateOperationsInput | number | null
     benefits?: NullableJsonNullValueInput | InputJsonValue
     orderItems?: OrderItemUncheckedUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUncheckedUpdateManyWithoutPackageNestedInput
   }
 
   export type ProductUpsertWithoutPackageProductsInput = {
@@ -30380,6 +30711,7 @@ export namespace Prisma {
     category?: CategoryUpdateOneWithoutPackagesNestedInput
     packageProducts?: PackageProductUpdateManyWithoutPackageNestedInput
     orderItems?: OrderItemUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateWithoutCreatedByInput = {
@@ -30398,6 +30730,7 @@ export namespace Prisma {
     benefits?: NullableJsonNullValueInput | InputJsonValue
     packageProducts?: PackageProductUncheckedUpdateManyWithoutPackageNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUncheckedUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateManyWithoutCreatedByInput = {
@@ -30595,6 +30928,7 @@ export namespace Prisma {
     createdBy?: UserUpdateOneWithoutPackagesCreatedNestedInput
     packageProducts?: PackageProductUpdateManyWithoutPackageNestedInput
     orderItems?: OrderItemUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateWithoutCategoryInput = {
@@ -30613,6 +30947,7 @@ export namespace Prisma {
     benefits?: NullableJsonNullValueInput | InputJsonValue
     packageProducts?: PackageProductUncheckedUpdateManyWithoutPackageNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutPackageNestedInput
+    quotationItems?: QuotationItemUncheckedUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateManyWithoutCategoryInput = {
@@ -30725,6 +31060,7 @@ export namespace Prisma {
   export type QuotationItemCreateManyProductInput = {
     id?: number
     quotationId: number
+    packageId?: number | null
     quantity?: number
     price: number
     subtotal: number
@@ -30775,11 +31111,13 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number
     quotation?: QuotationUpdateOneRequiredWithoutItemsNestedInput
+    package?: PackageUpdateOneWithoutQuotationItemsNestedInput
   }
 
   export type QuotationItemUncheckedUpdateWithoutProductInput = {
     id?: IntFieldUpdateOperationsInput | number
     quotationId?: IntFieldUpdateOperationsInput | number
+    packageId?: NullableIntFieldUpdateOperationsInput | number | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number
@@ -30788,6 +31126,7 @@ export namespace Prisma {
   export type QuotationItemUncheckedUpdateManyWithoutProductInput = {
     id?: IntFieldUpdateOperationsInput | number
     quotationId?: IntFieldUpdateOperationsInput | number
+    packageId?: NullableIntFieldUpdateOperationsInput | number | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number
@@ -30805,6 +31144,15 @@ export namespace Prisma {
     productId?: number | null
     quantity?: number
     price: number
+  }
+
+  export type QuotationItemCreateManyPackageInput = {
+    id?: number
+    quotationId: number
+    productId?: number | null
+    quantity?: number
+    price: number
+    subtotal: number
   }
 
   export type PackageProductUpdateWithoutPackageInput = {
@@ -30845,6 +31193,32 @@ export namespace Prisma {
     productId?: NullableIntFieldUpdateOperationsInput | number | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type QuotationItemUpdateWithoutPackageInput = {
+    quantity?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    quotation?: QuotationUpdateOneRequiredWithoutItemsNestedInput
+    product?: ProductUpdateOneWithoutQuotationItemsNestedInput
+  }
+
+  export type QuotationItemUncheckedUpdateWithoutPackageInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    quotationId?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type QuotationItemUncheckedUpdateManyWithoutPackageInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    quotationId?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
   }
 
   export type OrderItemCreateManyOrderInput = {
@@ -30946,7 +31320,8 @@ export namespace Prisma {
 
   export type QuotationItemCreateManyQuotationInput = {
     id?: number
-    productId: number
+    productId?: number | null
+    packageId?: number | null
     quantity?: number
     price: number
     subtotal: number
@@ -30956,12 +31331,14 @@ export namespace Prisma {
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number
-    product?: ProductUpdateOneRequiredWithoutQuotationItemsNestedInput
+    product?: ProductUpdateOneWithoutQuotationItemsNestedInput
+    package?: PackageUpdateOneWithoutQuotationItemsNestedInput
   }
 
   export type QuotationItemUncheckedUpdateWithoutQuotationInput = {
     id?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    packageId?: NullableIntFieldUpdateOperationsInput | number | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number
@@ -30969,7 +31346,8 @@ export namespace Prisma {
 
   export type QuotationItemUncheckedUpdateManyWithoutQuotationInput = {
     id?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    packageId?: NullableIntFieldUpdateOperationsInput | number | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
     subtotal?: FloatFieldUpdateOperationsInput | number

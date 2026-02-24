@@ -24,14 +24,15 @@ interface Product {
   brand?: { id: number; name: string } | "N/A";
 }
 
-interface SelectedProduct {
-  productId: number;
+interface SelectedItem {
+  id: number;
+  type: "product" | "package";
   quantity: number;
 }
 
 interface Selection {
   category: Category | null;
-  products: SelectedProduct[];
+  products: SelectedItem[];
 }
 
 interface Package {
@@ -103,18 +104,22 @@ export default function Quotation() {
 
   const handleProductToggle = (index: number, productId: number) => {
     const newSelections = [...selections];
-    const productsArr = newSelections[index].products;
+    const itemsArr = newSelections[index].products;
 
-    const existing = productsArr.find((p) => p.productId === productId);
+    const existing = itemsArr.find(
+      (p) => p.id === productId && p.type === "product",
+    );
 
     if (existing) {
-      // Remove product
-      newSelections[index].products = productsArr.filter(
-        (p) => p.productId !== productId,
+      newSelections[index].products = itemsArr.filter(
+        (p) => !(p.id === productId && p.type === "product"),
       );
     } else {
-      // Add product with default quantity 1
-      newSelections[index].products.push({ productId, quantity: 1 });
+      newSelections[index].products.push({
+        id: productId,
+        type: "product",
+        quantity: 1,
+      });
     }
 
     setSelections(newSelections);
@@ -122,17 +127,20 @@ export default function Quotation() {
 
   const handlePackageToggle = (index: number, pkg: Package) => {
     const newSelections = [...selections];
-    const productsArr = newSelections[index].products;
+    const itemsArr = newSelections[index].products;
 
-    const existing = productsArr.find((p) => p.productId === pkg.id);
+    const existing = itemsArr.find(
+      (p) => p.id === pkg.id && p.type === "package",
+    );
 
     if (existing) {
-      newSelections[index].products = productsArr.filter(
-        (p) => p.productId !== pkg.id,
+      newSelections[index].products = itemsArr.filter(
+        (p) => !(p.id === pkg.id && p.type === "package"),
       );
     } else {
       newSelections[index].products.push({
-        productId: pkg.id,
+        id: pkg.id,
+        type: "package",
         quantity: 1,
       });
     }
@@ -162,235 +170,6 @@ export default function Quotation() {
     setStep(3);
   };
 
-  // const handleSubmit = async (e: FormEvent) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const { name, email, phone, organization, address, message } = formData;
-  //     if (!name || !organization || !address) {
-  //       toast.error("Please fill all required fields.");
-  //       return;
-  //     }
-
-  //     // Prepare items
-  //     const items = selections.flatMap((sel) =>
-  //       sel.products.map((p) => {
-  //         const prod = products.find((prod) => prod.id === p.productId);
-  //         return {
-  //           category: sel.category?.name ?? "N/A",
-  //           productId: p.productId,
-  //           productName: prod?.name ?? "N/A",
-  //           brandName:
-  //             prod?.brand && typeof prod.brand === "object"
-  //               ? prod.brand.name
-  //               : "N/A",
-  //           quantity: p.quantity,
-  //           unitPrice: prod?.price ?? 0,
-  //           subtotal: (prod?.price ?? 0) * p.quantity,
-  //         };
-  //       })
-  //     );
-
-  //     if (items.length === 0) {
-  //       toast.error("Please select at least one product.");
-  //       return;
-  //     }
-
-  //     const res = await axios.post("/api/quotation", {
-  //       name,
-  //       email,
-  //       phone,
-  //       address,
-  //       companyName: organization,
-  //       message,
-  //       items,
-  //     });
-
-  //     toast.success(res.data.message || "Quotation submitted successfully!");
-
-  //     // PDF Generation
-  //     const doc = new jsPDF("p", "pt", "a4");
-  //     const pageWidth = doc.internal.pageSize.getWidth();
-  //     const leftX = 40;
-  //     const rightX = pageWidth - 200;
-
-  //     if (typeof window !== "undefined") {
-  //       const logo = new Image();
-  //       logo.src = "/logo.jpeg";
-  //       const quality = new Image();
-  //       quality.src = "/qualityAssured.png";
-
-  //       doc.addImage(logo, "JPEG", leftX, 20, 230, 150);
-  //       doc.addImage(quality, "PNG", rightX, 20, 140, 120);
-
-  //       doc.setFontSize(10);
-
-  //       // Set "Set Nepal" in green
-  //       doc.setTextColor(155, 182, 72);
-  //       doc.text("Set Nepal", leftX, 170);
-
-  //       // Reset to black
-  //       doc.setTextColor(0, 0, 0);
-  //       doc.text("Bafal Kathmandu", leftX, 185);
-  //       doc.text("01-5312298", leftX, 200);
-
-  //       doc.text("Contact No.: 015312298", rightX, 170);
-  //       doc.text("Whatsapp: 9851331773", rightX, 185);
-
-  //       // Make email clickable
-  //       const emailLink = "info.setnepal@gmail.com";
-  //       doc.textWithLink(`Email: ${emailLink}`, rightX, 200, {
-  //         url: `mailto:${emailLink}`,
-  //       });
-
-  //       doc.text(`Date: ${new Date().toLocaleDateString()}`, rightX, 215);
-  //     }
-
-  //     // Boxes
-  //     const boxY = 230;
-  //     const boxH = 60;
-  //     const boxW = (pageWidth - leftX * 2 - 20) / 2;
-
-  //     // Left box: Customer Info
-  //     doc.rect(leftX, boxY, boxW, boxH);
-  //     let infoY = boxY + 15;
-  //     doc.setFontSize(10);
-  //     doc.text("Customer Info:", leftX + 10, infoY);
-  //     infoY += 12;
-  //     doc.text(`Organization: ${organization}`, leftX + 10, infoY);
-  //     infoY += 12;
-  //     doc.text(`Name: ${name}`, leftX + 10, infoY);
-  //     infoY += 12;
-  //     doc.text(`Address: ${address}`, leftX + 10, infoY);
-
-  //     // Right box: Quotation title
-  //     doc.rect(leftX + boxW + 20, boxY, boxW, boxH);
-  //     const fontSize = 24;
-  //     doc.setFontSize(fontSize);
-  //     const titleY = boxY + boxH / 2 + fontSize / 2 - 4;
-  //     doc.text("Quotation", leftX + boxW + 20 + boxW / 2, titleY, {
-  //       align: "center",
-  //     });
-
-  //     // Items Table
-  //     const tableData = items.map((item, idx) => [
-  //       idx + 1,
-  //       item.productName,
-  //       item.brandName,
-  //       "pcs",
-  //       item.quantity,
-  //       item.unitPrice.toFixed(2),
-  //       item.subtotal.toFixed(2),
-  //     ]);
-
-  //     autoTable(doc, {
-  //       startY: boxY + boxH + 30,
-  //       head: [
-  //         ["SN", "Description", "Brand", "Unit", "Qty", "Unit Price", "Total"],
-  //       ],
-  //       body: tableData,
-  //       theme: "grid",
-  //       styles: { fontSize: 10, cellPadding: 3 },
-  //       headStyles: { fillColor: [200, 200, 200] },
-  //       columnStyles: {
-  //         0: { halign: "center" },
-  //         3: { halign: "center" },
-  //         4: { halign: "center" },
-  //         5: { halign: "right" },
-  //         6: { halign: "right" },
-  //       },
-  //     });
-
-  //     // @ts-ignore
-  //     let lastY = doc.lastAutoTable.finalY + 10;
-
-  //     // Notes Table
-  //     autoTable(doc, {
-  //       startY: lastY,
-  //       head: [["Notes & Special Comments:"]],
-  //       body: [
-  //         ["• The Quoted price is inclusive of all applicable taxes and VAT"],
-  //         ["• Payment: 100% within 7 days after delivery."],
-  //         ["• Delivery and Installation will be free of cost"],
-  //         ["• Delivery: Within 5–15 Days of PO acceptance"],
-  //         ["• Validity of Quotation: 30 Days"],
-  //       ],
-  //       theme: "grid",
-  //       styles: { fontSize: 10, cellPadding: 5 },
-  //       headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
-  //       columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
-  //     });
-
-  //     // @ts-ignore
-  //     lastY = doc.lastAutoTable.finalY + 10;
-
-  //     // Warranty Table
-  //     autoTable(doc, {
-  //       startY: lastY,
-  //       head: [["Warranty Terms and Conditions:"]],
-  //       body: [
-  //         ["• In case of payment failure, warranty isn't applicable."],
-  //         ["• NEA voltage fluctuation damage is not covered."],
-  //         ["• Physical damage or tampering voids warranty."],
-  //       ],
-  //       theme: "grid",
-  //       styles: { fontSize: 10, cellPadding: 5 },
-  //       headStyles: { fillColor: [200, 200, 200], fontStyle: "bold" },
-  //       columnStyles: { 0: { cellWidth: pageWidth - leftX * 2 } },
-  //     });
-
-  //     // Closing Text
-  //     // @ts-ignore
-  //     lastY = doc.lastAutoTable.finalY + 15;
-  //     doc.setFontSize(10);
-  //     const closingText =
-  //       "We will be happy to supply any further information you may need and trust that you call on us to fill your order, which will receive our attention promptly.";
-  //     const wrapped = doc.splitTextToSize(closingText, pageWidth - leftX * 2);
-  //     doc.text(wrapped, leftX, lastY);
-
-  //     // Signature & Stamp
-  //     lastY += wrapped.length * 12 + 20;
-  //     let sigY = lastY;
-  //     doc.setFontSize(10);
-  //     doc.text(
-  //       "To accept this quotation, please sign here and return:",
-  //       leftX,
-  //       sigY
-  //     );
-  //     sigY += 40;
-
-  //     const stamp = new Image();
-  //     stamp.src = "/setNepalStamp.png";
-  //     const stampWidth = 120;
-  //     const stampHeight = 80;
-  //     const rightXStamp = pageWidth - leftX - stampWidth;
-  //     doc.addImage(stamp, "PNG", rightXStamp, sigY, stampWidth, stampHeight);
-
-  //     doc.setFontSize(12);
-  //     doc.text("For: Set Nepal Pvt. Ltd", rightXStamp, sigY + stampHeight + 10);
-
-  //     // Save PDF
-  //     doc.save("quotation.pdf");
-
-  //     // Reset form
-  //     setFormData({
-  //       organization: "",
-  //       name: "",
-  //       email: "",
-  //       phone: "",
-  //       address: "",
-  //       message: "",
-  //     });
-  //     setSelections([{ category: null, products: [] }]);
-  //     setSearchQueries([""]);
-  //     setCurrentPages([1]);
-  //     setStep(1);
-  //   } catch (err: any) {
-  //     toast.error(err.response?.data?.error || "Submission failed");
-  //     console.error(err);
-  //   }
-  // };
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -404,22 +183,35 @@ export default function Quotation() {
       const TAX_RATE = 0.13; // 13%
 
       // Prepare items with tax deducted from unit price
+
       const items = selections.flatMap((sel) =>
         sel.products.map((p) => {
-          const prod = products.find((prod) => prod.id === p.productId);
-          const originalPrice = prod?.price ?? 0;
+          let itemData;
+          let brandName = "N/A";
 
+          if (p.type === "product") {
+            const prod = products.find((prod) => prod.id === p.id);
+            itemData = prod;
+            brandName =
+              prod?.brand && typeof prod.brand === "object"
+                ? prod.brand.name
+                : "N/A";
+          } else {
+            const pkg = packages.find((pkg) => pkg.id === p.id);
+            itemData = pkg;
+            brandName = "N/A";
+          }
+
+          const originalPrice = itemData?.price ?? 0;
           const unitPriceWithoutTax = originalPrice / (1 + TAX_RATE);
           const subtotal = unitPriceWithoutTax * p.quantity;
 
           return {
             category: sel.category?.name ?? "N/A",
-            productId: p.productId,
-            productName: prod?.name ?? "N/A",
-            brandName:
-              prod?.brand && typeof prod.brand === "object"
-                ? prod.brand.name
-                : "N/A",
+            productId: p.type === "product" ? p.id : undefined,
+            packageId: p.type === "package" ? p.id : undefined,
+            productName: itemData?.name ?? "N/A",
+            brandName,
             quantity: p.quantity,
             unitPrice: parseFloat(unitPriceWithoutTax.toFixed(2)),
             subtotal: parseFloat(subtotal.toFixed(2)),
@@ -900,54 +692,41 @@ export default function Quotation() {
               const rawProducts = productsByCategory(sel.category?.id || 0);
               const rawPackages = packagesByCategory(sel.category?.id || 0);
 
+              const query = searchQueries[index].toLowerCase();
               const filteredProducts = rawProducts.filter((p) =>
-                p.name
-                  .toLowerCase()
-                  .includes(searchQueries[index].toLowerCase()),
+                p.name.toLowerCase().includes(query),
               );
-
               const filteredPackages = rawPackages.filter((pkg) =>
-                pkg.name
-                  .toLowerCase()
-                  .includes(searchQueries[index].toLowerCase()),
+                pkg.name.toLowerCase().includes(query),
               );
 
               const PAGE_SIZE = 10;
-              const totalPages = Math.ceil(filteredProducts.length / PAGE_SIZE);
-              const start = (currentPages[index] - 1) * PAGE_SIZE;
+              const startProducts = (currentPages[index] - 1) * PAGE_SIZE;
               const paginatedProducts = filteredProducts.slice(
-                start,
-                start + PAGE_SIZE,
+                startProducts,
+                startProducts + PAGE_SIZE,
               );
 
-              const ITEMS_PER_PAGE = 5;
+              const PACKAGE_PAGE_SIZE = 5;
+              const startPackages =
+                (packagePages[index] - 1) * PACKAGE_PAGE_SIZE;
+              const paginatedPackages = filteredPackages.slice(
+                startPackages,
+                startPackages + PACKAGE_PAGE_SIZE,
+              );
 
-              const categoryPackages = sel.category
-                ? packagesByCategory(sel.category.id)
-                : [];
-
+              const totalProductPages = Math.ceil(
+                filteredProducts.length / PAGE_SIZE,
+              );
               const totalPackagePages = Math.ceil(
-                categoryPackages.length / ITEMS_PER_PAGE,
+                filteredPackages.length / PACKAGE_PAGE_SIZE,
               );
 
-              const packageStart = (packagePages[index] - 1) * ITEMS_PER_PAGE;
-
-              const paginatedPackages = categoryPackages.slice(
-                packageStart,
-                packageStart + ITEMS_PER_PAGE,
-              );
-
-              const handlePackagePageChange = (index: number, page: number) => {
-                const newPages = [...packagePages];
-                newPages[index] = page;
-                setPackagePages(newPages);
-              };
               return (
                 <div
                   key={index}
                   className="mb-6 border border-gray-200 rounded-lg p-4 bg-gray-50"
                 >
-                  {/* CATEGORY */}
                   <label className="block text-gray-700 font-medium mb-2">
                     Category
                   </label>
@@ -967,27 +746,28 @@ export default function Quotation() {
                     ))}
                   </select>
 
-                  {/* SHOW ONLY AFTER CATEGORY SELECTED */}
                   {sel.category && (
                     <>
-                      {/* SEARCH */}
                       <input
                         type="text"
-                        placeholder="Search products..."
+                        placeholder="Search products or packages..."
                         value={searchQueries[index]}
                         onChange={(e) => {
                           const updated = [...searchQueries];
                           updated[index] = e.target.value;
                           setSearchQueries(updated);
 
-                          const updatedPages = [...currentPages];
-                          updatedPages[index] = 1;
-                          setCurrentPages(updatedPages);
+                          const updatedProductPages = [...currentPages];
+                          updatedProductPages[index] = 1;
+                          setCurrentPages(updatedProductPages);
+
+                          const updatedPackagePages = [...packagePages];
+                          updatedPackagePages[index] = 1;
+                          setPackagePages(updatedPackagePages);
                         }}
                         className="w-full mb-4 p-2 border rounded-lg focus:ring-2 focus:ring-[#9bb648]"
                       />
 
-                      {/* TABS */}
                       <div className="flex gap-6 mb-4 border-b">
                         <button
                           type="button"
@@ -1023,7 +803,8 @@ export default function Quotation() {
                             <div className="flex flex-wrap gap-2">
                               {paginatedProducts.map((product) => {
                                 const selectedProduct = sel.products.find(
-                                  (p) => p.productId === product.id,
+                                  (p) =>
+                                    p.id === product.id && p.type === "product",
                                 );
 
                                 return (
@@ -1055,9 +836,16 @@ export default function Quotation() {
                                         onChange={(e) => {
                                           const val = Number(e.target.value);
                                           const newSelections = [...selections];
-                                          newSelections[index].products.find(
-                                            (p) => p.productId === product.id,
-                                          )!.quantity = val;
+
+                                          const item = newSelections[
+                                            index
+                                          ].products.find(
+                                            (p) =>
+                                              p.id === product.id &&
+                                              p.type === "product",
+                                          );
+
+                                          if (item) item.quantity = val;
 
                                           setSelections(newSelections);
                                         }}
@@ -1070,11 +858,10 @@ export default function Quotation() {
                             </div>
                           )}
 
-                          {/* PAGINATION */}
-                          {totalPages > 1 && (
+                          {totalProductPages > 1 && (
                             <div className="flex gap-1 mt-4 flex-wrap">
                               {Array.from(
-                                { length: totalPages },
+                                { length: totalProductPages },
                                 (_, i) => i + 1,
                               ).map((page) => (
                                 <button
@@ -1099,29 +886,40 @@ export default function Quotation() {
                         </>
                       )}
 
+                      {/* PACKAGES TAB */}
                       {activeTab === "packages" && (
                         <>
-                          {rawPackages.length === 0 ? (
+                          {paginatedPackages.length === 0 ? (
                             <p className="text-gray-500">No packages found.</p>
                           ) : (
                             <div className="flex flex-wrap gap-2">
                               {paginatedPackages.map((pkg) => {
                                 const selectedPackage = sel.products.find(
-                                  (p) => p.productId === pkg.id,
+                                  (p) =>
+                                    p.id === pkg.id && p.type === "package",
                                 );
 
                                 return (
                                   <div
                                     key={pkg.id}
-                                    onClick={() =>
-                                      handlePackageToggle(index, pkg)
-                                    }
                                     className={`px-3 py-1 rounded-full border flex items-center gap-2 cursor-pointer ${
                                       selectedPackage
                                         ? "bg-[#9bb648] text-white border-[#9bb648]"
                                         : "bg-white border-gray-300 text-gray-700"
                                     }`}
+                                    onClick={() =>
+                                      handlePackageToggle(index, pkg)
+                                    }
                                   >
+                                    <input
+                                      type="checkbox"
+                                      checked={!!selectedPackage}
+                                      onClick={(e) => e.stopPropagation()}
+                                      onChange={() =>
+                                        handlePackageToggle(index, pkg)
+                                      }
+                                    />
+
                                     <span>
                                       {pkg.name} — Rs. {pkg.price}
                                     </span>
@@ -1135,9 +933,16 @@ export default function Quotation() {
                                         onChange={(e) => {
                                           const val = Number(e.target.value);
                                           const newSelections = [...selections];
-                                          newSelections[index].products.find(
-                                            (p) => p.productId === pkg.id,
-                                          )!.quantity = val;
+
+                                          const item = newSelections[
+                                            index
+                                          ].products.find(
+                                            (p) =>
+                                              p.id === pkg.id &&
+                                              p.type === "package",
+                                          );
+
+                                          if (item) item.quantity = val;
 
                                           setSelections(newSelections);
                                         }}
@@ -1150,7 +955,6 @@ export default function Quotation() {
                             </div>
                           )}
 
-                          {/* PACKAGE PAGINATION */}
                           {totalPackagePages > 1 && (
                             <div className="flex gap-1 mt-4 flex-wrap">
                               {Array.from(
@@ -1184,7 +988,6 @@ export default function Quotation() {
               );
             })}
 
-            {/* ADD / REMOVE CATEGORY */}
             <div className="flex items-center mb-4">
               {selections.at(-1)?.category &&
                 selections.at(-1)?.products.length! > 0 && (
@@ -1208,7 +1011,6 @@ export default function Quotation() {
               )}
             </div>
 
-            {/* NAVIGATION */}
             <div className="flex justify-between">
               <button
                 type="button"
@@ -1229,7 +1031,6 @@ export default function Quotation() {
           </div>
         </div>
       )}
-
       {/* Step 3 */}
       {step === 3 && (
         <div className="flex justify-center px-4">
@@ -1253,18 +1054,19 @@ export default function Quotation() {
                 </p>
 
                 <ul className="list-disc list-inside">
-                  {sel.products.map((p: SelectedProduct) => {
-                    const prod = products.find(
-                      (prod) => prod.id === p.productId,
-                    );
+                  {sel.products.map((p) => {
+                    let item;
 
-                    const pkg = packages.find((pkg) => pkg.id === p.productId);
+                    if (p.type === "product") {
+                      item = products.find((prod) => prod.id === p.id);
+                    } else {
+                      item = packages.find((pkg) => pkg.id === p.id);
+                    }
 
-                    const item = prod ?? pkg;
                     if (!item) return null;
 
                     return (
-                      <li key={p.productId}>
+                      <li key={`${p.type}-${p.id}`}>
                         {item.name} — Rs. {item.price} × {p.quantity}
                       </li>
                     );

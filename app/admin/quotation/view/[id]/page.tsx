@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ProductItem {
   id: number;
-  product: { name: string };
+  product?: { name: string } | null;
+  package?: { name: string } | null;
   quantity: number;
   price: number;
 }
@@ -113,7 +114,7 @@ export default function QuotationViewPage() {
       }
 
       doc.text(String(index + 1), 20, y);
-      doc.text(item.product?.name || "N/A", 35, y);
+      doc.text(item.product?.name || item.package?.name || "N/A", 35, y);
       doc.text(String(item.quantity), 130, y);
       doc.text(`Rs. ${item.price.toFixed(2)}`, 150, y);
 
@@ -141,6 +142,11 @@ export default function QuotationViewPage() {
         <p className="text-red-500 mb-4">{error}</p>
         <Button onClick={() => router.back()}>Go Back</Button>
       </div>
+    );
+
+  if (!quotation)
+    return (
+      <p className="text-gray-500 p-6 text-center">Quotation not found.</p>
     );
 
   return (
@@ -230,7 +236,7 @@ export default function QuotationViewPage() {
                     <tr key={item.id} className="border-t hover:bg-gray-50">
                       <td className="px-4 py-2">{index + 1}</td>
                       <td className="px-4 py-2">
-                        {item.product?.name || "N/A"}
+                        {item.product?.name || item.package?.name || "N/A"}
                       </td>
                       <td className="px-4 py-2">{item.quantity}</td>
                       <td className="px-4 py-2">Rs. {item.price}</td>
@@ -249,7 +255,7 @@ export default function QuotationViewPage() {
                       {quotation.items
                         .reduce(
                           (sum, item) => sum + item.price * item.quantity,
-                          0
+                          0,
                         )
                         .toFixed(2)}
                     </td>
