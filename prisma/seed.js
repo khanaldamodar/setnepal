@@ -27,6 +27,6 @@ async function main() {
 }
 
 main()
-  .then(() => console.log("✅ Settings table seeded"))
+  .then(() => console.log(" Settings table seeded"))
   .catch((e) => console.error(e))
   .finally(() => prisma.$disconnect())
