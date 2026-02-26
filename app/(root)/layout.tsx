@@ -13,34 +13,18 @@ const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-export default async function RootLayout({
+export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const settings = await getSettings(); // fast, cached
   return (
-    <html lang="en">
-      <head>
-        <title>{settings?.companyName || "Set Nepal"}</title>
-        <link
-          rel="icon"
-          href={
-            settings?.favicon
-              ? settings.favicon.startsWith("http")
-                ? settings.favicon
-                : `/${settings.favicon.replace(/^\//, "")}`
-              : "/logo.jpeg"
-          }
-        />
-      </head>
-      <body className={`${poppins.variable} antialiased bg-[#AEC958]`}>
-        <CartProvider>
-          <Navbar settings={settings} />
-          {children}
-        </CartProvider>
-        <Footer settings={settings} />
-      </body>
-    </html>
+    <CartProvider>
+      <Navbar settings={settings} />
+      {children}
+      <Footer settings={settings} />
+    </CartProvider>
   );
 }
+

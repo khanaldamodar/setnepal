@@ -44,7 +44,7 @@ export const getCategories = unstable_cache(
 
 export const getCertificates = unstable_cache(
   async () => {
-    return await prisma.certificate.findMany();
+    return await prisma.certificates.findMany();
   },
   ["certificates-list"],
   {

@@ -50,13 +50,14 @@ export default function CertificateSlider({ certificates }: CertificateSliderPro
                     <div key={item.id} className="keen-slider__slide p-2">
                         <motion.div className="bg-white rounded-xl p-6 shadow">
                             <Image
-                                src={item.image}
-                                alt={item.title}
+                                src={item.image || "/placeholder.svg"}
+                                alt={item.title || "Certificate"}
                                 width={400}
                                 height={280}
                                 className="w-full h-auto object-contain"
                             />
                         </motion.div>
+
                     </div>
                 ))}
             </div>
