@@ -101,6 +101,8 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
                     alt={product.name}
                     width={400}
                     height={300}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    priority={products.indexOf(product) < 4}
                     className="object-cover w-full h-64 transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -135,11 +137,10 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
             <div className="px-4 pb-4">
               <button
                 onClick={(e) => handleAddToCart(e, product)}
-                className={`w-full py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-300 ${
-                  addedToCart === product.id
+                className={`w-full py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-300 ${addedToCart === product.id
                     ? "bg-green-600 text-white"
                     : "bg-secondary text-white hover:bg-primary"
-                }`}
+                  }`}
               >
                 <ShoppingCart size={18} />
                 {addedToCart === product.id ? "Added!" : "Add to Cart"}
@@ -163,11 +164,10 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
           <button
             key={idx}
             onClick={() => instanceRef.current?.moveToIdx(idx)}
-            className={`w-3 h-3 rounded-full transition-all ${
-              currentSlide === idx
+            className={`w-3 h-3 rounded-full transition-all ${currentSlide === idx
                 ? "bg-green-600 scale-110"
                 : "bg-gray-300 hover:bg-gray-400"
-            }`}
+              }`}
           ></button>
         ))}
       </div>

@@ -1,26 +1,26 @@
+import { Suspense } from "react";
 import Heading from "@/components/global/Heading";
-import ProductSlider from "@/components/global/ProductSlider";
-// import { FeaturedPackages } from "@/components/Homepage-components/featured-packages";
 import FeatureProductsSection from "@/components/Homepage-components/FeatureProductsSection";
-import HappyClientsSlider from "@/components/Homepage-components/HappyClientsSlider";
 import Introduction from "@/components/Homepage-components/Introduction";
-import { getProducts } from "@/lib/settings";
 import { FeaturedPackages } from "./category/page";
 import CertificateSliderPage from "@/components/Homepage-components/Certificate";
+import ProductsSection, { ProductsSectionSkeleton } from "@/components/Homepage-components/ProductsSection";
 
-export default async function Home() {
-  const products = await getProducts();
+export default function Home() {
   return (
     <>
-      <Introduction />
+      <Suspense fallback={<div className="h-40 animate-pulse bg-gray-200" />}>
+        <Introduction />
+      </Suspense>
       <FeatureProductsSection />
-      {/* <FeaturedPackages /> */}
 
       <FeaturedPackages />
       <div className=" justify-center flex flex-col items-center text-white font-poppins">
         <Heading title="Our Products" />
-        <ProductSlider products={products} />
-       
+        <Suspense fallback={<ProductsSectionSkeleton />}>
+          <ProductsSection />
+        </Suspense>
+
         <CertificateSliderPage />
       </div>
 
@@ -28,3 +28,4 @@ export default async function Home() {
     </>
   );
 }
+

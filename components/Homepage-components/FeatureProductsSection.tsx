@@ -11,6 +11,8 @@ const FeatureProductsSection = () => {
               src="/feature-product.jpeg"
               alt="Feature Products"
               fill
+              priority
+              sizes="(max-width: 768px) 100vw, 288px"
               className="object-cover rounded-xl group-hover:blur-sm transition duration-300"
             />
             {/* <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10">
@@ -38,6 +40,8 @@ const FeatureProductsSection = () => {
               src="/quotation.jpeg"
               alt="Get Quotation"
               fill
+              priority
+              sizes="(max-width: 768px) 100vw, 288px"
               className="object-cover rounded-xl group-hover:blur-sm transition duration-300"
             />
             {/* <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10">
@@ -65,6 +69,8 @@ const FeatureProductsSection = () => {
               src="/repair-maintenance.jpeg"
               alt="repair-and-maintenance"
               fill
+              priority
+              sizes="(max-width: 768px) 100vw, 288px"
               className="object-cover rounded-xl group-hover:blur-sm transition duration-300"
             />
             {/* <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10">

@@ -10,6 +10,7 @@ const ITEMS_PER_PAGE = 6;
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,31 +62,38 @@ export default function ProductsPage() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await fetch("/api/products");
-      const data = await res.json();
+      try {
+        setLoading(true);
+        const res = await fetch("/api/products");
+        const data = await res.json();
 
-      const flattened = data.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        price: p.price,
-        rating: Number(p.rating) || 0,
+        const flattened = data.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          rating: Number(p.rating) || 0,
 
-        category: p.category
-          ? [
+          category: p.category
+            ? [
               {
                 id: p.category.id || 0,
                 name: p.category.name || p.category || "Unknown",
               },
             ]
-          : [],
+            : [],
 
-        imageUrl: p.image || p.imageUrl || "/placeholder.svg",
+          imageUrl: p.image || p.imageUrl || "/placeholder.svg",
 
-        categoryName: p.category?.name || p.category || "Unknown",
-        brandName: p.brand?.name || "Unknown",
-      }));
+          categoryName: p.category?.name || p.category || "Unknown",
+          brandName: p.brand?.name || "Unknown",
+        }));
 
-      setProducts(flattened);
+        setProducts(flattened);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProducts();
@@ -145,7 +153,15 @@ export default function ProductsPage() {
 
           {/* Products Section */}
           <div className="flex-1">
-            {paginatedProducts.length > 0 ? (
+            {loading ? (
+              <div className="flex h-96 items-center justify-center rounded-lg border border-border bg-card">
+                <div className="text-center">
+                  <p className="text-lg font-medium text-foreground">
+                    Loading products...
+                  </p>
+                </div>
+              </div>
+            ) : paginatedProducts.length > 0 ? (
               <>
                 <ProductGrid products={paginatedProducts} />
                 <div className="mt-8">
@@ -174,3 +190,4 @@ export default function ProductsPage() {
     </main>
   );
 }
+
