@@ -1,27 +1,33 @@
 import { Suspense } from "react";
 import Heading from "@/components/global/Heading";
 import FeatureProductsSection from "@/components/Homepage-components/FeatureProductsSection";
-import Introduction from "@/components/Homepage-components/Introduction";
-import { FeaturedPackages } from "./category/page";
-import CertificateSliderPage from "@/components/Homepage-components/Certificate";
+import Introduction, { IntroductionSkeleton } from "@/components/Homepage-components/Introduction";
+import FeaturedPackages, { FeaturedPackagesSkeleton } from "@/components/Homepage-components/FeaturedPackages";
+import CertificatesSection, { CertificatesSectionSkeleton } from "@/components/Homepage-components/CertificatesSection";
 import ProductsSection, { ProductsSectionSkeleton } from "@/components/Homepage-components/ProductsSection";
 
 export default function Home() {
   return (
     <>
-      <Suspense fallback={<div className="h-40 animate-pulse bg-gray-200" />}>
+      <Suspense fallback={<IntroductionSkeleton />}>
         <Introduction />
       </Suspense>
+
       <FeatureProductsSection />
 
-      <FeaturedPackages />
+      <Suspense fallback={<FeaturedPackagesSkeleton />}>
+        <FeaturedPackages />
+      </Suspense>
+
       <div className=" justify-center flex flex-col items-center text-white font-poppins">
         <Heading title="Our Products" />
         <Suspense fallback={<ProductsSectionSkeleton />}>
           <ProductsSection />
         </Suspense>
 
-        <CertificateSliderPage />
+        <Suspense fallback={<CertificatesSectionSkeleton />}>
+          <CertificatesSection />
+        </Suspense>
       </div>
 
       {/* Happy CLients */}

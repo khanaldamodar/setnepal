@@ -21,4 +21,13 @@ const Introduction = async () => {
   );
 };
 
+export function IntroductionSkeleton() {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 animate-pulse">
+      <div className="h-10 bg-white/20 w-48 mb-4 rounded"></div>
+      <div className="h-6 bg-white/20 w-96 rounded"></div>
+    </div>
+  );
+}
+
 export default Introduction;

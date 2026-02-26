@@ -25,3 +25,29 @@ export const getProducts = unstable_cache(
     revalidate: 60,
   },
 );
+
+export const getCategories = unstable_cache(
+  async () => {
+    return await prisma.category.findMany({
+      include: {
+        _count: {
+          select: { products: true },
+        },
+      },
+    });
+  },
+  ["categories-list"],
+  {
+    revalidate: 60,
+  },
+);
+
+export const getCertificates = unstable_cache(
+  async () => {
+    return await prisma.certificate.findMany();
+  },
+  ["certificates-list"],
+  {
+    revalidate: 60,
+  },
+);
