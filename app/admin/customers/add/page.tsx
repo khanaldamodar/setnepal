@@ -41,7 +41,9 @@ export default function AddCustomerPage() {
   const { postData, loading, error } = usePost<CustomerType>("/api/customers");
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     setCustomer({
       ...customer,
@@ -90,20 +92,50 @@ export default function AddCustomerPage() {
       <h1 className="text-2xl font-semibold mb-4">Add Customer</h1>
 
       <form onSubmit={handleAddCustomer} className="space-y-4">
+        <InputField
+          label="Organization Name *"
+          name="organization_name"
+          value={customer.organization_name}
+          onChange={handleChange}
+          required
+        />
 
-        <InputField label="Organization Name" name="organization_name" value={customer.organization_name} onChange={handleChange} />
+        <InputField
+          label="Email"
+          name="email"
+          value={customer.email}
+          onChange={handleChange}
+        />
 
-        <InputField label="Contact Person Name *" name="contact_person_name" value={customer.contact_person_name} onChange={handleChange} required />
+        <InputField
+          label="Phone"
+          name="phone"
+          value={customer.phone}
+          onChange={handleChange}
+        />
 
-        <InputField label="Contact Person Email" name="contact_person_email" value={customer.contact_person_email} onChange={handleChange} />
+        <InputField
+          label="Contact Person Name *"
+          name="contact_person_name"
+          value={customer.contact_person_name}
+          onChange={handleChange}
+          required
+        />
+        {/* <InputField label="Contact Person Email" name="contact_person_email" value={customer.contact_person_email} onChange={handleChange} /> */}
 
-        <InputField label="Contact Person Phone" name="contact_person_phone" value={customer.contact_person_phone} onChange={handleChange} />
+        <InputField
+          label="Contact Person Phone"
+          name="contact_person_phone"
+          value={customer.contact_person_phone}
+          onChange={handleChange}
+        />
 
-        <InputField label="Email" name="email" value={customer.email} onChange={handleChange} />
-
-        <InputField label="Phone" name="phone" value={customer.phone} onChange={handleChange} />
-
-        <InputField label="Address" name="address" value={customer.address} onChange={handleChange} />
+        <InputField
+          label="Address"
+          name="address"
+          value={customer.address}
+          onChange={handleChange}
+        />
 
         {/* lead source */}
         <SelectField
@@ -129,7 +161,12 @@ export default function AddCustomerPage() {
           ]}
         />
 
-        <InputField label="Tags (comma separated)" name="tags" value={customer.tags} onChange={handleChange} />
+        <InputField
+          label="Tags (comma separated)"
+          name="tags"
+          value={customer.tags}
+          onChange={handleChange}
+        />
 
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">Note</label>
@@ -161,13 +198,7 @@ export default function AddCustomerPage() {
 }
 
 // resuable input
-function InputField({
-  label,
-  name,
-  value,
-  onChange,
-  required = false,
-}: any) {
+function InputField({ label, name, value, onChange, required = false }: any) {
   return (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">{label}</label>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 
@@ -60,14 +60,22 @@ interface FollowUpForm {
 export default function ViewCustomerPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params.id as string;
 
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
   const [followUps, setFollowUps] = useState<FollowUp[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // sync active tab with URL
+  const tabFromUrl = searchParams.get("tab") as
+    | "info"
+    | "logs"
+    | "followups"
+    | null;
   const [activeTab, setActiveTab] = useState<"info" | "logs" | "followups">(
-    "info",
+    tabFromUrl || "info",
   );
 
   const [showLogModal, setShowLogModal] = useState(false);
@@ -87,7 +95,7 @@ export default function ViewCustomerPage() {
     status: "PENDING",
   });
 
-  // customer data
+  // fetch customer
   useEffect(() => {
     if (!id) return;
 
@@ -113,7 +121,15 @@ export default function ViewCustomerPage() {
     fetchData();
   }, [id]);
 
-  // form handler
+  // update URL when tab changes
+  const handleTabChange = (tab: "info" | "logs" | "followups") => {
+    setActiveTab(tab);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", tab);
+    router.replace(url.toString());
+  };
+
+  // form handlers
   const handleLogChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -163,7 +179,7 @@ export default function ViewCustomerPage() {
     }
   };
 
-  // submit fllow up
+  // submit follow up
   const submitFollowUp = async () => {
     const token = Cookies.get("token");
     if (!token) return toast.error("You must be logged in");
@@ -190,7 +206,6 @@ export default function ViewCustomerPage() {
     }
   };
 
-  // loading and nt found
   if (loading) return <div className="p-6">Loading...</div>;
   if (!customer) return <div className="p-6">Customer not found</div>;
 
@@ -203,19 +218,19 @@ export default function ViewCustomerPage() {
       {/* tabs */}
       <div className="flex gap-4 border-b mb-6 text-sm font-medium">
         <button
-          onClick={() => setActiveTab("info")}
+          onClick={() => handleTabChange("info")}
           className={activeTab === "info" ? "border-b-2 border-black pb-2" : ""}
         >
           Info
         </button>
         <button
-          onClick={() => setActiveTab("logs")}
+          onClick={() => handleTabChange("logs")}
           className={activeTab === "logs" ? "border-b-2 border-black pb-2" : ""}
         >
           Call Logs
         </button>
         <button
-          onClick={() => setActiveTab("followups")}
+          onClick={() => handleTabChange("followups")}
           className={
             activeTab === "followups" ? "border-b-2 border-black pb-2" : ""
           }
@@ -224,7 +239,7 @@ export default function ViewCustomerPage() {
         </button>
       </div>
 
-      {/* infor tab */}
+      {/* Info Tab */}
       {activeTab === "info" && (
         <div className="space-y-3 text-sm">
           <Field label="Organization Name" value={customer.organization_name} />
@@ -266,7 +281,7 @@ export default function ViewCustomerPage() {
         </div>
       )}
 
-      {/* call log tab */}
+      {/* Call Logs Tab */}
       {activeTab === "logs" && (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
@@ -278,9 +293,7 @@ export default function ViewCustomerPage() {
               Add Log
             </button>
           </div>
-
           {callLogs.length === 0 && <p>No call logs</p>}
-
           {callLogs.map((log) => (
             <div key={log.id} className="border p-4 rounded-md">
               <p>
@@ -307,7 +320,7 @@ export default function ViewCustomerPage() {
         </div>
       )}
 
-      {/* follow up tab */}
+      {/* Follow Ups Tab */}
       {activeTab === "followups" && (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
@@ -319,9 +332,7 @@ export default function ViewCustomerPage() {
               Add Follow-Up
             </button>
           </div>
-
           {followUps.length === 0 && <p>No follow-ups</p>}
-
           {followUps.map((fu) => (
             <div
               key={fu.id}
@@ -357,7 +368,7 @@ export default function ViewCustomerPage() {
         </div>
       )}
 
-      {/* action buttons */}
+      {/* Back Button */}
       <div className="flex gap-3 mt-6">
         <button
           onClick={() => router.back()}
@@ -367,7 +378,7 @@ export default function ViewCustomerPage() {
         </button>
       </div>
 
-      {/* call log modal */}
+      {/* Modals */}
       {showLogModal && (
         <Modal onClose={() => setShowLogModal(false)}>
           <h2 className="text-lg font-semibold mb-3">Add Call Log</h2>
@@ -425,7 +436,6 @@ export default function ViewCustomerPage() {
         </Modal>
       )}
 
-      {/* follow up modal */}
       {showFuModal && (
         <Modal onClose={() => setShowFuModal(false)}>
           <h2 className="text-lg font-semibold mb-3">Add Follow-Up</h2>
@@ -467,7 +477,7 @@ export default function ViewCustomerPage() {
   );
 }
 
-//field
+// Field Component
 function Field({ label, value }: { label: string; value: any }) {
   return (
     <div>
@@ -477,7 +487,7 @@ function Field({ label, value }: { label: string; value: any }) {
   );
 }
 
-// modal
+// Modal Component
 function Modal({
   children,
   onClose,

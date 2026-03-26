@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Phone, Calendar } from "lucide-react";
 import Link from "next/link";
 import CRUDTable from "@/components/admin-components/CRUDTable";
+import { useRouter } from "next/navigation";
 
 interface CustomerType {
   id: number;
@@ -26,14 +27,13 @@ const CustomersPage = () => {
   const [customers, setCustomers] = useState<CustomerType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  // Fetch customers
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
         const res = await fetch("/api/customers");
         if (!res.ok) throw new Error("Failed to fetch customers");
-
         const data: CustomerType[] = await res.json();
         setCustomers(data);
       } catch (err: any) {
@@ -42,7 +42,6 @@ const CustomersPage = () => {
         setLoading(false);
       }
     };
-
     fetchCustomers();
   }, []);
 
@@ -51,10 +50,8 @@ const CustomersPage = () => {
 
   return (
     <div className="h-screen flex flex-col font-poppins">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Customers</h1>
-
         <Link href="/admin/customers/add">
           <Button className="flex items-center gap-2">
             <Plus size={18} /> Add Customer
@@ -62,20 +59,45 @@ const CustomersPage = () => {
         </Link>
       </div>
 
-      {/* Table */}
       <div className="flex-1 p-4 w-full">
         {customers.length > 0 ? (
           <CRUDTable
             endpoint="customers"
             columns={[
               "organization_name",
+              "email",
               "contact_person_name",
-              "contact_person_email",
               "contact_person_phone",
               "status",
             ]}
             data={customers}
             setData={setCustomers}
+            customActions={(row) => (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  title="Call Logs"
+                  onClick={() =>
+                    router.push(`/admin/customers/view/${row.id}?tab=logs`)
+                  }
+                  className="hover:text-indigo-600"
+                >
+                  <Phone size={18} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  title="Follow Ups"
+                  onClick={() =>
+                    router.push(`/admin/customers/view/${row.id}?tab=followups`)
+                  }
+                  className="hover:text-purple-600"
+                >
+                  <Calendar size={18} />
+                </Button>
+              </>
+            )}
           />
         ) : (
           <div className="text-center text-gray-400 mt-10">

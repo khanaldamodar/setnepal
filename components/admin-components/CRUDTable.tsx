@@ -18,6 +18,7 @@ interface CRUDTableProps {
   setData: React.Dispatch<React.SetStateAction<any[]>>;
   actions?: ("view" | "edit" | "delete")[];
   renderCell?: (column: string, row: any) => React.ReactNode;
+  customActions?: (row: any) => React.ReactNode;
 }
 
 export default function CRUDTable({
@@ -28,12 +29,13 @@ export default function CRUDTable({
   setData,
   actions = ["view", "edit", "delete"],
   renderCell,
+  customActions,
 }: CRUDTableProps) {
   const router = useRouter();
   const { deleteItem, loading: deleting } = useDelete(
     data,
     setData,
-    `/api/${apiEndpoint || endpoint}` // use apiEndpoint if provided
+    `/api/${apiEndpoint || endpoint}`, // use apiEndpoint if provided
   );
 
   const [search, setSearch] = useState("");
@@ -47,8 +49,8 @@ export default function CRUDTable({
     const lower = search.toLowerCase();
     return data.filter((item) =>
       Object.values(item).some((val) =>
-        String(val).toLowerCase().includes(lower)
-      )
+        String(val).toLowerCase().includes(lower),
+      ),
     );
   }, [data, search]);
 
@@ -166,7 +168,7 @@ export default function CRUDTable({
                 <motion.tr
                   key={item.id}
                   className={clsx(
-                    "border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-900 transition"
+                    "border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-900 transition",
                   )}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -209,6 +211,8 @@ export default function CRUDTable({
                           <Edit size={18} />
                         </Button>
                       )}
+
+                      {customActions && customActions(item)}
 
                       {actions.includes("delete") && (
                         <Button
