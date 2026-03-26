@@ -149,28 +149,7 @@ export default function EditCustomerPage() {
           name="organization_name"
           value={customer.organization_name}
           onChange={handleChange}
-        />
-
-        <InputField
-          label="Contact Person Name *"
-          name="contact_person_name"
-          value={customer.contact_person_name}
-          onChange={handleChange}
           required
-        />
-
-        <InputField
-          label="Contact Person Email"
-          name="contact_person_email"
-          value={customer.contact_person_email}
-          onChange={handleChange}
-        />
-
-        <InputField
-          label="Contact Person Phone"
-          name="contact_person_phone"
-          value={customer.contact_person_phone}
-          onChange={handleChange}
         />
 
         <InputField
@@ -184,6 +163,28 @@ export default function EditCustomerPage() {
           label="Phone"
           name="phone"
           value={customer.phone}
+          onChange={handleChange}
+        />
+
+        <InputField
+          label="Contact Person Name *"
+          name="contact_person_name"
+          value={customer.contact_person_name}
+          onChange={handleChange}
+          required
+        />
+
+        {/* <InputField
+          label="Contact Person Email"
+          name="contact_person_email"
+          value={customer.contact_person_email}
+          onChange={handleChange}
+        /> */}
+
+        <InputField
+          label="Contact Person Phone"
+          name="contact_person_phone"
+          value={customer.contact_person_phone}
           onChange={handleChange}
         />
 
