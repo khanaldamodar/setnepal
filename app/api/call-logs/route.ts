@@ -1,4 +1,3 @@
-// app/api/call-logs/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
@@ -9,7 +8,7 @@ export async function GET(req: NextRequest) {
 
     const callLogs = await prisma.callLog.findMany({
       include: {
-        customer: true, // Include customer info
+        customer: true, 
       },
       orderBy: {
         createdAt: "desc",

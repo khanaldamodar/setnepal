@@ -1,16 +1,16 @@
-// app/api/follow-ups/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   try {
-    // Optional: protect route
+    
     const user = await requireAuth(req, ["ADMIN"]);
 
     const followUps = await prisma.followUp.findMany({
       include: {
-        customer: true, // Include customer info
+        customer: true,
       },
       orderBy: {
         createdAt: "desc",
