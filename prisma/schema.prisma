@@ -27,6 +27,8 @@ model User {
   packagesCreated Package[]
   orders         Order[]
   payments       Payment[]
+  callLogs   CallLog[]
+  followUps  FollowUp[]
 }
 
 enum Role {
@@ -320,4 +322,95 @@ model PackageProduct {
   quantity    Int      @default(1)
   
   @@unique([packageId, productId])
+}
+
+model Customer {
+  id                   Int      @id @default(autoincrement())
+  organization_name    String?
+  contact_person_name  String
+  contact_person_email String?
+  contact_person_phone String?
+  email                String?
+  phone                String?
+  address              String?
+  leadSource           LeadSource?
+  tags                 Json? 
+  note                 String?   @db.Text
+  status               CustomerStatus @default(NEW)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  callLogs   CallLog[]
+  followUps  FollowUp[]
+}
+
+enum LeadSource {
+  WEBSITE
+  MANUAL
+  REFERRAL
+}
+
+enum CustomerStatus {
+  NEW
+  CONTACTED
+  INTERESTED
+  NOT_INTERESTED
+  CONVERTED
+}
+
+model CallLog {
+  id           Int         @id @default(autoincrement())
+  customerId   Int
+  customer     Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  calledById   Int
+  calledBy     User        @relation(fields: [calledById], references: [id])
+
+  callTime DateTime        @default(now())
+
+  duration                 Int?
+  durationLabel            String?
+
+  callStatus               CallStatus
+  response                  CallResponse?
+
+  notes        String?     @db.Text
+
+  createdAt    DateTime    @default(now())
+}
+
+enum CallStatus {
+  CONNECTED
+  NOT_PICKED
+  BUSY
+}
+
+enum CallResponse {
+  INTERESTED
+  CALL_LATER
+  NOT_INTERESTED
+}
+
+model FollowUp {
+  id           Int         @id @default(autoincrement())
+
+  customerId   Int
+  customer     Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  scheduledAt  DateTime
+
+  status       FollowUpStatus @default(PENDING)
+
+  notes        String?     @db.Text
+
+  createdById  Int
+  createdBy    User        @relation(fields: [createdById], references: [id])
+
+  createdAt    DateTime    @default(now())
+}
+
+enum FollowUpStatus {
+  PENDING
+  COMPLETED
+  MISSED
 }

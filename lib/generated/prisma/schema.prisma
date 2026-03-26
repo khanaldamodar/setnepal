@@ -1,0 +1,408 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  password     String
+  phone        String?  @unique
+  address      String?
+  role         Role     @default(ADMIN)
+  isVerified   Boolean  @default(false)
+  profileImage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  productsCreated Product[]
+  packagesCreated Package[]
+  orders          Order[]
+  payments        Payment[]
+  callLogs        CallLog[]
+  followUps       FollowUp[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String?
+  products Product[]
+  packages Package[]
+}
+
+model Brand {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  stock       Int      @default(0)
+  sku         String?  @unique
+  weight      Float?
+  imageUrl    String?
+  gallery     Json?
+  isFeatured  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  brandId Int?
+  brand   Brand? @relation(fields: [brandId], references: [id], onDelete: SetNull)
+
+  createdById Int?
+  createdBy   User? @relation(fields: [createdById], references: [id])
+
+  packageProducts PackageProduct[] // explicit many-to-many with quantity
+  orderItems      OrderItem[]
+
+  quotationItems QuotationItem[]
+}
+
+model Package {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  discount    Float?   @default(0)
+  stock       Int      @default(0)
+  imageUrl    String?
+  isFeatured  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  createdById Int?
+  createdBy   User? @relation(fields: [createdById], references: [id])
+
+  benefits Json? // List of bullet points
+
+  packageProducts PackageProduct[] // explicit many-to-many with quantity
+  orderItems      OrderItem[]
+  quotationItems  QuotationItem[]
+}
+
+model Order {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id])
+  total           Float
+  status          OrderStatus   @default(PENDING)
+  shippingAddress String
+  paymentMethod   PaymentMethod
+  paymentStatus   PaymentStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  items    OrderItem[]
+  payments Payment[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  packageId Int?
+  package   Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  price     Float
+}
+
+model Payment {
+  id            Int           @id @default(autoincrement())
+  orderId       Int
+  order         Order         @relation(fields: [orderId], references: [id])
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id])
+  amount        Float
+  method        PaymentMethod
+  status        PaymentStatus @default(PENDING)
+  transactionId String?
+  paymentData   Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Settings {
+  id          Int     @id @default(autoincrement())
+  companyName String
+  slogan      String? // optional short slogan
+  aboutShort  String? @db.Text // short description
+  about       String? @db.Text // detailed about section
+
+  // Contact Info
+  phone1 String? // first phone
+  phone2 String? // second phone (optional)
+  email1 String? // first email
+  email2 String? // second email (optional)
+
+  // Address
+  address    String? // street or area
+  city       String?
+  postalCode String?
+
+  // Media
+  logo    String? // company logo URL
+  favicon String? // favicon URL
+
+  // Social Links
+  facebook  String?
+  twitter   String?
+  instagram String?
+  linkedin  String?
+  youtube   String?
+  tiktok    String?
+  github    String?
+  website   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Gallery {
+  id          Int            @id @default(autoincrement())
+  title       String
+  description String?
+  images      GalleryImage[] // relation to multiple images
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model GalleryImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  galleryId Int
+}
+
+model Contacts {
+  id      Int     @id @default(autoincrement())
+  name    String
+  phone   String
+  message String? @db.Text
+}
+
+model Certificates {
+  id    Int     @id @default(autoincrement())
+  title String?
+  image String?
+}
+
+model Quotation {
+  id Int @id @default(autoincrement())
+
+  // Customer Information (directly stored)
+  name    String
+  email   String
+  phone   String
+  address String?
+
+  // Extra fields (optional)
+  companyName String?
+  message     String? @db.Text
+
+  status QuotationStatus @default(PENDING)
+  total  Float           @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items QuotationItem[]
+}
+
+model QuotationItem {
+  id Int @id @default(autoincrement())
+
+  quotationId Int
+  quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  packageId Int?
+  package   Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  quantity Int   @default(1)
+  price    Float
+  subtotal Float
+}
+
+model Members {
+  id          Int     @id @default(autoincrement())
+  name        String
+  phone       String
+  email       String?
+  desc        String?
+  designation String?
+  photo       String?
+}
+
+model Banks {
+  id            Int     @id @default(autoincrement())
+  name          String
+  accountNumber String?
+  businessName  String?
+  branch        String?
+  qr            String?
+}
+
+model Maintenance {
+  id      Int     @id @default(autoincrement())
+  name    String
+  phone   String
+  address String?
+  product String?
+  message String? @db.Text
+}
+
+enum QuotationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  COD
+  ONLINE
+  ESEWA
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model PackageProduct {
+  id        Int     @id @default(autoincrement())
+  packageId Int
+  package   Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int     @default(1)
+
+  @@unique([packageId, productId])
+}
+
+model Customer {
+  id                   Int            @id @default(autoincrement())
+  organization_name    String?
+  contact_person_name  String
+  contact_person_email String?
+  contact_person_phone String?
+  email                String?
+  phone                String?
+  address              String?
+  leadSource           LeadSource?
+  tags                 Json?
+  note                 String?        @db.Text
+  status               CustomerStatus @default(NEW)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  callLogs  CallLog[]
+  followUps FollowUp[]
+}
+
+enum LeadSource {
+  WEBSITE
+  MANUAL
+  REFERRAL
+}
+
+enum CustomerStatus {
+  NEW
+  CONTACTED
+  INTERESTED
+  NOT_INTERESTED
+  CONVERTED
+}
+
+model CallLog {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  calledById Int
+  calledBy   User @relation(fields: [calledById], references: [id])
+
+  callTime DateTime @default(now())
+
+  duration      Int?
+  durationLabel String?
+
+  callStatus CallStatus
+  response   CallResponse?
+
+  notes String? @db.Text
+
+  createdAt DateTime @default(now())
+}
+
+enum CallStatus {
+  CONNECTED
+  NOT_PICKED
+  BUSY
+}
+
+enum CallResponse {
+  INTERESTED
+  CALL_LATER
+  NOT_INTERESTED
+}
+
+model FollowUp {
+  id Int @id @default(autoincrement())
+
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  scheduledAt DateTime
+
+  status FollowUpStatus @default(PENDING)
+
+  notes String? @db.Text
+
+  createdById Int
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum FollowUpStatus {
+  PENDING
+  COMPLETED
+  MISSED
+}

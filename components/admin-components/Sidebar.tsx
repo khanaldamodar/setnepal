@@ -47,6 +47,12 @@ export default function Sidebar() {
       path: "/admin",
     },
     {
+      id: "customers",
+      label: "Customers",
+      icon: <FaUser />,
+      path: "/admin/customers",
+    },
+    {
       id: "brands",
       label: "Brands",
       icon: <MdOutlineBrandingWatermark />,
