@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import { NepaliDatePicker } from "@kkeshavv18/nepali-datepicker";
+import "@kkeshavv18/nepali-datepicker/dist/index.css";
+import { ADToBS, BSToAD } from "bikram-sambat-js";
 
-// types
+// tpes
 interface Customer {
   id: number;
   organization_name: string;
@@ -47,12 +50,12 @@ interface CallLogForm {
   callStatus: string;
   response: string;
   durationLabel: string;
-  callTime?: string;
+  callTime: string | null;
   notes: string;
 }
 
 interface FollowUpForm {
-  scheduledAt: string;
+  scheduledAt: string | null;
   notes: string;
   status: "PENDING" | "COMPLETED" | "MISSED";
 }
@@ -68,7 +71,6 @@ export default function ViewCustomerPage() {
   const [followUps, setFollowUps] = useState<FollowUp[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // sync active tab with URL
   const tabFromUrl = searchParams.get("tab") as
     | "info"
     | "logs"
@@ -81,19 +83,42 @@ export default function ViewCustomerPage() {
   const [showLogModal, setShowLogModal] = useState(false);
   const [showFuModal, setShowFuModal] = useState(false);
 
+  const [logSubmitting, setLogSubmitting] = useState(false);
+  const [fuSubmitting, setFuSubmitting] = useState(false);
+
+  const todayBS = ADToBS(new Date());
+
   const [logForm, setLogForm] = useState<CallLogForm>({
     callStatus: "",
     response: "",
     durationLabel: "",
-    callTime: "",
+    callTime: todayBS + " 12:00",
     notes: "",
   });
+  const [logDate, setLogDate] = useState<string>(todayBS);
+  const [logTime, setLogTime] = useState<string>("12:00");
 
   const [fuForm, setFuForm] = useState<FollowUpForm>({
-    scheduledAt: "",
+    scheduledAt: todayBS + " 12:00",
     notes: "",
     status: "PENDING",
   });
+  const [fuDate, setFuDate] = useState<string>(todayBS);
+  const [fuTime, setFuTime] = useState<string>("12:00");
+
+  const convertToISO = (bsDate: string, time: string) => {
+    const adDate = BSToAD(bsDate);
+    return new Date(`${adDate} ${time}`).toISOString();
+  };
+
+  const formatToNepali = (iso: string) => {
+    if (!iso) return "—";
+    const date = new Date(iso);
+    const bsDate = ADToBS(date);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${bsDate} ${hours}:${minutes}`;
+  };
 
   // fetch customer
   useEffect(() => {
@@ -121,7 +146,7 @@ export default function ViewCustomerPage() {
     fetchData();
   }, [id]);
 
-  // update URL when tab changes
+  // tab change
   const handleTabChange = (tab: "info" | "logs" | "followups") => {
     setActiveTab(tab);
     const url = new URL(window.location.href);
@@ -129,36 +154,35 @@ export default function ViewCustomerPage() {
     router.replace(url.toString());
   };
 
-  // form handlers
   const handleLogChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >,
-  ) => {
-    setLogForm({ ...logForm, [e.target.name]: e.target.value });
-  };
+  ) => setLogForm({ ...logForm, [e.target.name]: e.target.value });
 
   const handleFuChange = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >,
-  ) => {
-    setFuForm({ ...fuForm, [e.target.name]: e.target.value });
-  };
+  ) => setFuForm({ ...fuForm, [e.target.name]: e.target.value });
 
-  // submit call log
+  // log submit
   const submitCallLog = async () => {
     const token = Cookies.get("token");
     if (!token) return toast.error("You must be logged in");
 
+    setLogSubmitting(true);
     try {
+      const isoDate = convertToISO(logDate, logTime);
+      const body = { ...logForm, callTime: isoDate };
+
       const res = await fetch(`/api/customers/${id}/call-logs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(logForm),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) throw new Error("Failed to add call log");
@@ -171,27 +195,35 @@ export default function ViewCustomerPage() {
         callStatus: "",
         response: "",
         durationLabel: "",
-        callTime: "",
+        callTime: todayBS + " 12:00",
         notes: "",
       });
+      setLogDate(todayBS);
+      setLogTime("12:00");
     } catch (err: any) {
       toast.error(err.message);
+    } finally {
+      setLogSubmitting(false);
     }
   };
 
-  // submit follow up
+  // follow up submit
   const submitFollowUp = async () => {
     const token = Cookies.get("token");
     if (!token) return toast.error("You must be logged in");
 
+    setFuSubmitting(true);
     try {
+      const isoDate = convertToISO(fuDate, fuTime);
+      const body = { ...fuForm, scheduledAt: isoDate };
+
       const res = await fetch(`/api/customers/${id}/follow-ups`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(fuForm),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) throw new Error("Failed to add follow-up");
@@ -200,9 +232,17 @@ export default function ViewCustomerPage() {
       setFollowUps((prev) => [newFu, ...prev]);
       toast.success("Follow-up added");
       setShowFuModal(false);
-      setFuForm({ scheduledAt: "", notes: "", status: "PENDING" });
+      setFuForm({
+        scheduledAt: todayBS + " 12:00",
+        notes: "",
+        status: "PENDING",
+      });
+      setFuDate(todayBS);
+      setFuTime("12:00");
     } catch (err: any) {
       toast.error(err.message);
+    } finally {
+      setFuSubmitting(false);
     }
   };
 
@@ -217,29 +257,22 @@ export default function ViewCustomerPage() {
 
       {/* tabs */}
       <div className="flex gap-4 border-b mb-6 text-sm font-medium">
-        <button
-          onClick={() => handleTabChange("info")}
-          className={activeTab === "info" ? "border-b-2 border-black pb-2" : ""}
-        >
-          Info
-        </button>
-        <button
-          onClick={() => handleTabChange("logs")}
-          className={activeTab === "logs" ? "border-b-2 border-black pb-2" : ""}
-        >
-          Call Logs
-        </button>
-        <button
-          onClick={() => handleTabChange("followups")}
-          className={
-            activeTab === "followups" ? "border-b-2 border-black pb-2" : ""
-          }
-        >
-          Follow Ups
-        </button>
+        {["info", "logs", "followups"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => handleTabChange(tab as any)}
+            className={activeTab === tab ? "border-b-2 border-black pb-2" : ""}
+          >
+            {tab === "info"
+              ? "Info"
+              : tab === "logs"
+                ? "Call Logs"
+                : "Follow Ups"}
+          </button>
+        ))}
       </div>
 
-      {/* Info Tab */}
+      {/* information tab */}
       {activeTab === "info" && (
         <div className="space-y-3 text-sm">
           <Field label="Organization Name" value={customer.organization_name} />
@@ -269,9 +302,7 @@ export default function ViewCustomerPage() {
           <div>
             <p className="font-medium text-gray-700">Tags</p>
             <p>
-              {Array.isArray(customer.tags)
-                ? customer.tags.join(", ")
-                : customer.tags || "—"}
+              {Array.isArray(customer.tags) ? customer.tags.join(", ") : "—"}
             </p>
           </div>
           <div>
@@ -281,7 +312,7 @@ export default function ViewCustomerPage() {
         </div>
       )}
 
-      {/* Call Logs Tab */}
+      {/* call log tab */}
       {activeTab === "logs" && (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
@@ -297,8 +328,7 @@ export default function ViewCustomerPage() {
           {callLogs.map((log) => (
             <div key={log.id} className="border p-4 rounded-md">
               <p>
-                <strong>Time:</strong>{" "}
-                {log.callTime ? new Date(log.callTime).toLocaleString() : "—"}
+                <strong>Time:</strong> {formatToNepali(log.callTime)}
               </p>
               <p>
                 <strong>Status:</strong> {log.callStatus}
@@ -320,7 +350,7 @@ export default function ViewCustomerPage() {
         </div>
       )}
 
-      {/* Follow Ups Tab */}
+      {/* follow up tab */}
       {activeTab === "followups" && (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
@@ -340,8 +370,7 @@ export default function ViewCustomerPage() {
             >
               <div>
                 <p>
-                  <strong>Scheduled:</strong>{" "}
-                  {new Date(fu.scheduledAt).toLocaleString()}
+                  <strong>Scheduled:</strong> {formatToNepali(fu.scheduledAt)}
                 </p>
                 <p>
                   <strong>Notes:</strong> {fu.notes || "—"}
@@ -378,18 +407,27 @@ export default function ViewCustomerPage() {
         </button>
       </div>
 
-      {/* Modals */}
+      {/* call log modal */}
       {showLogModal && (
         <Modal onClose={() => setShowLogModal(false)}>
           <h2 className="text-lg font-semibold mb-3">Add Call Log</h2>
           <div className="space-y-3">
-            <input
-              type="datetime-local"
-              name="callTime"
-              value={logForm.callTime}
-              onChange={handleLogChange}
-              className="w-full border p-2 rounded"
-            />
+            <div className="flex gap-2">
+              <div className="w-1/2 border p-2 rounded">
+                <NepaliDatePicker
+                  initialDate={logDate || null}
+                  onDateChange={setLogDate}
+                />
+              </div>
+              <div className="w-1/2 border p-2 rounded">
+                <input
+                  type="time"
+                  value={logTime}
+                  onChange={(e) => setLogTime(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            </div>
             <select
               name="callStatus"
               value={logForm.callStatus}
@@ -429,24 +467,35 @@ export default function ViewCustomerPage() {
             <button
               onClick={submitCallLog}
               className="w-full bg-blue-500 text-white py-2 rounded"
+              disabled={logSubmitting}
             >
-              Save
+              {logSubmitting ? "Saving..." : "Save"}
             </button>
           </div>
         </Modal>
       )}
 
+      {/* follow up modal */}
       {showFuModal && (
         <Modal onClose={() => setShowFuModal(false)}>
           <h2 className="text-lg font-semibold mb-3">Add Follow-Up</h2>
           <div className="space-y-3">
-            <input
-              type="datetime-local"
-              name="scheduledAt"
-              value={fuForm.scheduledAt}
-              onChange={handleFuChange}
-              className="w-full border p-2 rounded"
-            />
+            <div className="flex gap-2">
+              <div className="w-1/2 border p-2 rounded">
+                <NepaliDatePicker
+                  initialDate={fuDate || null}
+                  onDateChange={setFuDate}
+                />
+              </div>
+              <div className="w-1/2 border p-2 rounded">
+                <input
+                  type="time"
+                  value={fuTime}
+                  onChange={(e) => setFuTime(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            </div>
             <textarea
               name="notes"
               placeholder="Notes"
@@ -467,8 +516,9 @@ export default function ViewCustomerPage() {
             <button
               onClick={submitFollowUp}
               className="w-full bg-[#99b84f] text-white py-2 rounded"
+              disabled={fuSubmitting}
             >
-              Save
+              {fuSubmitting ? "Saving..." : "Save"}
             </button>
           </div>
         </Modal>
@@ -477,42 +527,36 @@ export default function ViewCustomerPage() {
   );
 }
 
-// Field Component
-function Field({ label, value }: { label: string; value: any }) {
-  return (
-    <div>
-      <p className="font-medium text-gray-700">{label}</p>
-      <p className="text-gray-900">{value || "—"}</p>
-    </div>
-  );
-}
+// field component
+const Field = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | undefined;
+}) => (
+  <div>
+    <p className="font-medium text-gray-700">{label}</p>
+    <p>{value || "—"}</p>
+  </div>
+);
 
-// Modal Component
-function Modal({
+const Modal = ({
   children,
   onClose,
 }: {
   children: React.ReactNode;
   onClose: () => void;
-}) {
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
-
-  return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white p-5 rounded-lg w-full max-w-md relative">
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500"
-        >
-          ✕
-        </button>
-        {children}
-      </div>
+}) => (
+  <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-xl w-96 relative">
+      <button
+        className="absolute top-2 right-2 text-gray-500 hover:text-black"
+        onClick={onClose}
+      >
+        ×
+      </button>
+      {children}
     </div>
-  );
-}
+  </div>
+);

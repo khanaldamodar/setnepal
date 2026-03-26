@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import { ADToBS } from "bikram-sambat-js";
 
 interface CallLog {
   id: number;
@@ -18,7 +19,7 @@ export default function AllCallLogsPage() {
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedLogId, setExpandedLogId] = useState<number | null>(null); // track expanded log
+  const [expandedLogId, setExpandedLogId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchCallLogs = async () => {
@@ -53,6 +54,15 @@ export default function AllCallLogsPage() {
 
   const toggleExpand = (id: number) => {
     setExpandedLogId(expandedLogId === id ? null : id);
+  };
+
+  const formatToNepali = (iso: string | undefined) => {
+    if (!iso) return "—";
+    const date = new Date(iso);
+    const bsDate = ADToBS(date);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${bsDate} ${hours}:${minutes}`;
   };
 
   if (loading) return <div className="p-6">Loading call logs...</div>;
@@ -96,10 +106,7 @@ export default function AllCallLogsPage() {
               {isExpanded && (
                 <div className="mt-3 space-y-1 pl-2">
                   <p>
-                    <strong>Call Time:</strong>{" "}
-                    {log.callTime
-                      ? new Date(log.callTime).toLocaleString()
-                      : "—"}
+                    <strong>Call Time:</strong> {formatToNepali(log.callTime)}
                   </p>
                   <p>
                     <strong>Response:</strong> {log.response || "—"}

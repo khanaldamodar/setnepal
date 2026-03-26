@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import { ADToBS } from "bikram-sambat-js";
 
 interface FollowUp {
   id: number;
@@ -54,6 +55,15 @@ export default function AllFollowUpsPage() {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  const formatToNepali = (iso: string | undefined) => {
+    if (!iso) return "—";
+    const date = new Date(iso);
+    const bsDate = ADToBS(date);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${bsDate} ${hours}:${minutes}`;
+  };
+
   if (loading) return <div className="p-6">Loading follow-ups...</div>;
   if (error) return <div className="p-6 text-red-500">{error}</div>;
 
@@ -93,7 +103,7 @@ export default function AllFollowUpsPage() {
                 <div className="mt-3 space-y-1 pl-2">
                   <p>
                     <strong>Scheduled At:</strong>{" "}
-                    {new Date(fu.scheduledAt).toLocaleString()}
+                    {formatToNepali(fu.scheduledAt)}
                   </p>
                   {fu.notes && (
                     <p>
