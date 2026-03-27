@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { NepaliDatePicker } from "@kkeshavv18/nepali-datepicker";
 import "@kkeshavv18/nepali-datepicker/dist/index.css";
 import { ADToBS, BSToAD } from "bikram-sambat-js";
+import Pagination from "@/components/global/Pagination";
 
 // tpes
 interface Customer {
@@ -146,6 +147,28 @@ export default function ViewCustomerPage() {
     fetchData();
   }, [id]);
 
+  const ITEMS_PER_PAGE = 10;
+
+  const [logsPage, setLogsPage] = useState(1);
+  const [followUpsPage, setFollowUpsPage] = useState(1);
+
+  // For call logs
+  const paginatedCallLogs =
+    callLogs.length > ITEMS_PER_PAGE
+      ? callLogs.slice(
+          (logsPage - 1) * ITEMS_PER_PAGE,
+          logsPage * ITEMS_PER_PAGE,
+        )
+      : callLogs;
+
+  // For follow ups
+  const paginatedFollowUps =
+    followUps.length > ITEMS_PER_PAGE
+      ? followUps.slice(
+          (followUpsPage - 1) * ITEMS_PER_PAGE,
+          followUpsPage * ITEMS_PER_PAGE,
+        )
+      : followUps;
   // tab change
   const handleTabChange = (tab: "info" | "logs" | "followups") => {
     setActiveTab(tab);
@@ -324,8 +347,10 @@ export default function ViewCustomerPage() {
               Add Log
             </button>
           </div>
+
           {callLogs.length === 0 && <p>No call logs</p>}
-          {callLogs.map((log) => (
+
+          {paginatedCallLogs.map((log) => (
             <div key={log.id} className="border p-4 rounded-md">
               <p>
                 <strong>Time:</strong> {formatToNepali(log.callTime)}
@@ -347,6 +372,16 @@ export default function ViewCustomerPage() {
               </p>
             </div>
           ))}
+
+          {/* Pagination */}
+          {callLogs.length > ITEMS_PER_PAGE && (
+            <Pagination
+              total={callLogs.length}
+              perPage={ITEMS_PER_PAGE}
+              currentPage={logsPage}
+              onPageChange={setLogsPage}
+            />
+          )}
         </div>
       )}
 
@@ -362,8 +397,10 @@ export default function ViewCustomerPage() {
               Add Follow-Up
             </button>
           </div>
+
           {followUps.length === 0 && <p>No follow-ups</p>}
-          {followUps.map((fu) => (
+
+          {paginatedFollowUps.map((fu) => (
             <div
               key={fu.id}
               className="border p-4 rounded-md flex justify-between items-center"
@@ -394,6 +431,16 @@ export default function ViewCustomerPage() {
               </span>
             </div>
           ))}
+
+          {/* Pagination */}
+          {followUps.length > ITEMS_PER_PAGE && (
+            <Pagination
+              total={followUps.length}
+              perPage={ITEMS_PER_PAGE}
+              currentPage={followUpsPage}
+              onPageChange={setFollowUpsPage}
+            />
+          )}
         </div>
       )}
 
@@ -413,13 +460,13 @@ export default function ViewCustomerPage() {
           <h2 className="text-lg font-semibold mb-3">Add Call Log</h2>
           <div className="space-y-3">
             <div className="flex gap-2">
-              <div className="w-1/2 border p-2 rounded">
+              <div className="w-2/3 border p-2 rounded">
                 <NepaliDatePicker
                   initialDate={logDate || null}
                   onDateChange={setLogDate}
                 />
               </div>
-              <div className="w-1/2 border p-2 rounded">
+              <div className="w-1/3 border p-3 rounded">
                 <input
                   type="time"
                   value={logTime}
@@ -481,13 +528,13 @@ export default function ViewCustomerPage() {
           <h2 className="text-lg font-semibold mb-3">Add Follow-Up</h2>
           <div className="space-y-3">
             <div className="flex gap-2">
-              <div className="w-1/2 border p-2 rounded">
+              <div className="w-2/3 border p-2 rounded">
                 <NepaliDatePicker
                   initialDate={fuDate || null}
                   onDateChange={setFuDate}
                 />
               </div>
-              <div className="w-1/2 border p-2 rounded">
+              <div className="w-1/3 border p-3 rounded">
                 <input
                   type="time"
                   value={fuTime}

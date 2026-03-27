@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
 import {
   MdSpaceDashboard,
   MdOutlineProductionQuantityLimits,
@@ -169,7 +171,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="w-20 lg:w-60 p-2 flex flex-col justify-start items-center min-h-screen font-poppins"
+      className="w-20 lg:w-60 px-2 flex flex-col justify-start items-center min-h-screen font-poppins overflow-y-auto pb-20 pt-2"
       style={{ backgroundColor: "#aec958" }}
     >
       <div className="flex flex-col w-full gap-1">
@@ -188,13 +190,18 @@ export default function Sidebar() {
               <button
                 onClick={() => handleClick(item)}
                 className={`w-full flex items-center justify-start gap-2 text-white
-                  rounded-md transition-all duration-200 py-1 px-1 cursor-pointer
-                  ${activeView === item.id ? "bg-[#4998d1]" : "hover:bg-[#4998d1] bg-transparent"}`}
+    rounded-md transition-all duration-200 py-1 px-1 cursor-pointer 
+    ${activeView === item.id ? "bg-[#4998d1]" : "hover:bg-[#4998d1] bg-transparent"}`}
               >
                 {item.icon}
                 <span className="text-base hidden lg:inline">{item.label}</span>
-              </button>
 
+                {item.submenu && (
+                  <span className="ml-auto">
+                    {showCRM ? <ChevronUp /> : <ChevronDown />}
+                  </span>
+                )}
+              </button>
               {/* Submenu */}
               {item.submenu && showCRM && (
                 <div className="flex flex-col ml-6 mt-1 gap-1">
@@ -213,6 +220,7 @@ export default function Sidebar() {
                       <span className="text-sm hidden lg:inline">
                         {subItem.label}
                       </span>
+                      <span className="text-sm sm:text-lg"></span>
                     </button>
                   ))}
                 </div>
@@ -221,7 +229,7 @@ export default function Sidebar() {
           );
         })}
       </div>
-            {/* Footer 
+      {/* Footer 
       <div className="mt-auto flex flex-col items-start w-full">
         <div
           className="flex items-center gap-3 p-3 bg-[#4998d1] rounded-xl w-full cursor-pointer transition-all duration-200 hover:bg-blue-700"

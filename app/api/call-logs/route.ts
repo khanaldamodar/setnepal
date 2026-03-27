@@ -4,29 +4,41 @@ import { requireAuth } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await requireAuth(req, ["ADMIN"]);
+    await requireAuth(req, ["ADMIN"]);
+
+    const { searchParams } = new URL(req.url);
+
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
+    const createdById = searchParams.get("createdById");
+
+    const where: any = {};
+
+    if (from || to) {
+      where.callTime = {};
+      if (from) where.callTime.gte = new Date(from);
+      if (to) where.callTime.lte = new Date(to);
+    }
+
+    if (createdById) {
+      where.calledById = Number(createdById);
+    }
 
     const callLogs = await prisma.callLog.findMany({
+      where,
       include: {
-        customer: true, 
+        customer: true,
+        calledBy: {
+          select: { name: true },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
     });
 
-    return NextResponse.json(callLogs, { status: 200 });
-  } catch (err: any) {
-    console.error("Error fetching call logs:", err);
-
-    if (err.message === "Unauthorized") {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    if (err.message === "Forbidden") {
-      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
-    }
-
+    return NextResponse.json(callLogs);
+  } catch (err) {
     return NextResponse.json(
       { message: "Failed to fetch call logs" },
       { status: 500 }
