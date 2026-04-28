@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -9,65 +9,98 @@ import { motion } from "framer-motion";
 import { AutoplayPlugin } from "@/components/global/SliderAutoplay";
 
 interface Certificate {
-    id: number;
-    title: string;
-    image: string;
+  id: number;
+  title: string;
+  image: string;
 }
 
 interface CertificateSliderProps {
-    certificates: Certificate[];
+  certificates: Certificate[];
 }
 
-export default function CertificateSlider({ certificates }: CertificateSliderProps) {
-    const [currentSlide, setCurrentSlide] = useState(0);
+export default function CertificateSlider({
+  certificates,
+}: CertificateSliderProps) {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(0);
 
-    const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
-        {
-            loop: true,
-            slides: { perView: 3, spacing: 24 },
-            breakpoints: {
-                "(max-width: 1024px)": { slides: { perView: 2, spacing: 16 } },
-                "(max-width: 768px)": { slides: { perView: 1, spacing: 12 } },
-            },
-            slideChanged(slider) {
-                setCurrentSlide(slider.track.details.rel);
-            },
+  
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const getPerView = () => {
+    if (windowWidth <= 768) return 1;
+    if (windowWidth <= 1024) return 2;
+    return 3;
+  };
+
+  const perView = getPerView();
+  const showArrows = certificates.length > perView;
+
+  const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
+    {
+      loop: true,
+      slides: {
+        perView: 3,
+        spacing: 24,
+      },
+      breakpoints: {
+        "(max-width: 1024px)": {
+          slides: { perView: 2, spacing: 16 },
         },
-        [AutoplayPlugin(3000)]
-    );
+        "(max-width: 768px)": {
+          slides: { perView: 1, spacing: 12 },
+        },
+      },
+      slideChanged(slider) {
+        setCurrentSlide(slider.track.details.rel);
+      },
+    },
+    [AutoplayPlugin(3000)],
+  );
 
-    return (
-        <div className="relative w-full flex flex-col items-center">
-            <button
-                onClick={() => instanceRef.current?.prev()}
-                className="absolute left-0 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 text-black shadow-lg rounded-full p-2 z-10 hover:scale-110 transition-transform"
-            >
-                <ChevronLeft />
-            </button>
+  return (
+    <div className="relative w-full flex flex-col items-center">
+      {/* left Arrow */}
+      {showArrows && (
+        <button
+          onClick={() => instanceRef.current?.prev()}
+          className="absolute left-0 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 text-black shadow-lg rounded-full p-2 z-10 hover:scale-110 transition-transform"
+        >
+          <ChevronLeft />
+        </button>
+      )}
 
-            <div ref={sliderRef} className="keen-slider w-full max-w-7xl">
-                {certificates.map((item) => (
-                    <div key={item.id} className="keen-slider__slide p-2">
-                        <motion.div className="bg-white rounded-xl p-6 shadow">
-                            <Image
-                                src={item.image || "/placeholder.svg"}
-                                alt={item.title || "Certificate"}
-                                width={400}
-                                height={280}
-                                className="w-full h-auto object-contain"
-                            />
-                        </motion.div>
+      {/* slider */}
+      <div ref={sliderRef} className="keen-slider w-full max-w-7xl">
+        {certificates.map((item) => (
+          <div key={item.id} className="keen-slider__slide p-2">
+            <motion.div className="bg-white rounded-xl p-6 shadow">
+              <Image
+                src={item.image || "/placeholder.svg"}
+                alt={item.title || "Certificate"}
+                width={400}
+                height={280}
+                className="w-full h-auto object-contain"
+              />
+            </motion.div>
+          </div>
+        ))}
+      </div>
 
-                    </div>
-                ))}
-            </div>
-
-            <button
-                onClick={() => instanceRef.current?.next()}
-                className="absolute right-0 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 text-black shadow-lg rounded-full p-2 z-10 hover:scale-110 transition-transform"
-            >
-                <ChevronRight />
-            </button>
-        </div>
-    );
+      {/* right Arrow */}
+      {showArrows && (
+        <button
+          onClick={() => instanceRef.current?.next()}
+          className="absolute right-0 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 text-black shadow-lg rounded-full p-2 z-10 hover:scale-110 transition-transform"
+        >
+          <ChevronRight />
+        </button>
+      )}
+    </div>
+  );
 }
