@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { AutoplayPlugin } from "@/components/global/SliderAutoplay";
 
 interface Certificate {
   id: number;
@@ -18,34 +17,54 @@ interface CertificateSliderProps {
   certificates: Certificate[];
 }
 
+const AutoplayPlugin = ({ delay = 3000, enabled = true }) => {
+  return (slider: any) => {
+    let timeout: any;
+
+    const clear = () => clearTimeout(timeout);
+
+    const next = () => {
+      clear();
+      if (!enabled) return;
+
+      timeout = setTimeout(() => {
+        slider.next();
+      }, delay);
+    };
+
+    slider.on("created", next);
+    slider.on("dragStarted", clear);
+    slider.on("animationEnded", next);
+    slider.on("updated", next);
+  };
+};
+
 export default function CertificateSlider({
   certificates,
 }: CertificateSliderProps) {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(0);
+  const [perView, setPerView] = useState(3);
 
-  
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const update = () => {
+      if (window.innerWidth <= 768) setPerView(1);
+      else if (window.innerWidth <= 1024) setPerView(2);
+      else setPerView(3);
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
-  const getPerView = () => {
-    if (windowWidth <= 768) return 1;
-    if (windowWidth <= 1024) return 2;
-    return 3;
-  };
-
-  const perView = getPerView();
-  const showArrows = certificates.length > perView;
+  const shouldSlide = certificates.length > perView;
+  const showArrows = shouldSlide;
 
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
     {
-      loop: true,
+      loop: shouldSlide,
+      drag: shouldSlide,
       slides: {
-        perView: 3,
+        perView,
         spacing: 24,
       },
       breakpoints: {
@@ -56,20 +75,26 @@ export default function CertificateSlider({
           slides: { perView: 1, spacing: 12 },
         },
       },
-      slideChanged(slider) {
-        setCurrentSlide(slider.track.details.rel);
-      },
     },
-    [AutoplayPlugin(3000)],
+    [
+      AutoplayPlugin({
+        delay: 3000,
+        enabled: shouldSlide,
+      }),
+    ],
   );
+
+  useEffect(() => {
+    instanceRef.current?.update();
+  }, [perView, certificates.length]);
 
   return (
     <div className="relative w-full flex flex-col items-center">
-      {/* left Arrow */}
+      {/* LEFT ARROW */}
       {showArrows && (
         <button
           onClick={() => instanceRef.current?.prev()}
-          className="absolute left-0 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 text-black shadow-lg rounded-full p-2 z-10 hover:scale-110 transition-transform"
+          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-2 z-10 text-gray-700"
         >
           <ChevronLeft />
         </button>
@@ -78,25 +103,25 @@ export default function CertificateSlider({
       {/* slider */}
       <div ref={sliderRef} className="keen-slider w-full max-w-7xl">
         {certificates.map((item) => (
-          <div key={item.id} className="keen-slider__slide p-2">
-            <motion.div className="bg-white rounded-xl p-6 shadow">
+          <div key={item.id} className="keen-slider__slide">
+            <motion.div className="h-60 shadow">
               <Image
                 src={item.image || "/placeholder.svg"}
                 alt={item.title || "Certificate"}
                 width={400}
-                height={280}
-                className="w-full h-auto object-contain"
+                height={240}
+                className="w-full h-60 object-contain"
               />
             </motion.div>
           </div>
         ))}
       </div>
 
-      {/* right Arrow */}
+      {/* right  arraow */}
       {showArrows && (
         <button
           onClick={() => instanceRef.current?.next()}
-          className="absolute right-0 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 text-black shadow-lg rounded-full p-2 z-10 hover:scale-110 transition-transform"
+          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-2 z-10 text-gray-700"
         >
           <ChevronRight />
         </button>
